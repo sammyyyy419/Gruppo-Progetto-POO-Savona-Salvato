@@ -5,7 +5,7 @@ public class Pagamento {
     private double importo;
     private LocalDateTime dataPagamento;
     private String metodoPagamento;
-    private String statoPagamento;
+    private String statoPagamenti;
 
     public Pagamento (double importo, LocalDateTime dataPagamento, String metodoPagamento, String statoPagamento)
     {
