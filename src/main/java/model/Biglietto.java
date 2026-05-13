@@ -9,5 +9,13 @@ public class Biglietto {
         this.prezzoFinale = prezzoFinale;
     }
 
+    public double getPrezzoFinale() {
+        return prezzoFinale;
+    }
+
+    public void setPrezzoFinale(double prezzoFinale) {
+        this.prezzoFinale = prezzoFinale;
+    }
+
     // Fare i metodi: Applicare lo sconto e generare un titolo di ingresso
 }

@@ -14,5 +14,29 @@ public class Proiezione {
         this.prezzoBase = prezzoBase;
     }
 
+    public LocalDateTime getDataOraInizio() {
+        return dataOraInizio;
+    }
+
+    public void setDataOraInizio(LocalDateTime dataOraInizio) {
+        this.dataOraInizio = dataOraInizio;
+    }
+
+    public LocalDateTime getDataOraFine() {
+        return dataOraFine;
+    }
+
+    public void setDataOraFine(LocalDateTime dataOraFine) {
+        this.dataOraFine = dataOraFine;
+    }
+
+    public double getPrezzoBase() {
+        return prezzoBase;
+    }
+
+    public void setPrezzoBase(double prezzoBase) {
+        this.prezzoBase = prezzoBase;
+    }
+
     // Fare i metodi: Determinare la tariffa e visualizzare la disponibilità dei posti
 }
