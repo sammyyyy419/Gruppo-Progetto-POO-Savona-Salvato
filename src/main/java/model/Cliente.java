@@ -12,5 +12,12 @@ public class Cliente extends Utente {
         // this.dataRegistrazione = LocalDate.now();   Questo è per impostare la data di registrazione da oggi.
     }
 
-    // Fare il metodo per iniziare una procedura per l'acquisto
+    public LocalDate getDataRegistrazione() {
+        return dataRegistrazione;
+    }
+
+    public void setDataRegistrazione(LocalDate dataRegistrazione) {
+        this.dataRegistrazione = dataRegistrazione;
+    }
+// Fare il metodo per iniziare una procedura per l'acquisto
 }

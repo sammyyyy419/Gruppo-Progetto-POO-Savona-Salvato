@@ -12,5 +12,20 @@ public class Dipendente extends Utente{
         this.ruolo = ruolo;
     }
 
+    public double getStipendio() {
+        return stipendio;
+    }
+
+    public void setStipendio(double stipendio) {
+        this.stipendio = stipendio;
+    }
+
+    public String getRuolo() {
+        return ruolo;
+    }
+
+    public void setRuolo(String ruolo) {
+        this.ruolo = ruolo;
+    }
     // Fare i metodi:  pianificare progrmmazione dei film, verificare validita del biglietto di ingresso
 }
