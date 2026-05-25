@@ -1,15 +1,14 @@
 package model;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class Cliente extends Utente {
 
     private LocalDate dataRegistrazione;
 
-    public Cliente (String nomeCliente, String cognomeCliente, String emailCliente, String passwordCliente, LocalDate dataRegistrazioneC)
-    {
-        super(nomeCliente,cognomeCliente,emailCliente,passwordCliente);
-        this.dataRegistrazione = dataRegistrazioneC;
-        // this.dataRegistrazione = LocalDate.now();   Questo è per impostare la data di registrazione da oggi.
+    public Cliente(String nome, String cognome, String email, String password, ArrayList<Prenotazione> prenotazioniEffettuate, LocalDate dataRegistrazione) {
+        super(nome, cognome, email, password, prenotazioniEffettuate);
+        this.dataRegistrazione = dataRegistrazione;
     }
 
     public LocalDate getDataRegistrazione() {
@@ -19,5 +18,6 @@ public class Cliente extends Utente {
     public void setDataRegistrazione(LocalDate dataRegistrazione) {
         this.dataRegistrazione = dataRegistrazione;
     }
-// Fare il metodo per iniziare una procedura per l'acquisto
+
+
 }

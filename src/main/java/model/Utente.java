@@ -1,17 +1,37 @@
 package model;
 
-public class Utente {
-    private String nome;
-    private String cognome;
-    private String email;
-    private String password;
+import java.util.ArrayList;
 
-    public Utente (String nomeUtente, String cognomeUtente, String emailUtente, String passwordUtente)
-    {
-        this.nome = nomeUtente;
-        this.cognome = cognomeUtente;
-        this.email = emailUtente;
-        this.password = passwordUtente;
+public class Utente {
+    protected String nome;
+    protected String cognome;
+    protected String email;
+    protected String password;
+    private ArrayList<Prenotazione> prenotazioniEffettuate;
+
+    public Utente(String nome, String cognome, String email, String password, ArrayList<Prenotazione> prenotazioniEffettuate) {
+        this.nome = nome;
+        this.cognome = cognome;
+        this.email = email;
+        this.password = password;
+        this.prenotazioniEffettuate = prenotazioniEffettuate;
+    }
+
+    public void modificaProfiloUtente(String nomeModificato, String cognomeModificato){
+        this.nome=nomeModificato;
+        this.cognome=cognomeModificato;
+    }
+
+    //collegato al controller per verificrae che credenziali ci siano nel database
+    public boolean verificaCredenziali(String email, String password){
+        return this.email.equalsIgnoreCase(email) && this.password.equals(password);
+    }
+
+    //nell'UML la freccia sulla prenotazione andava solo da cliente... vedere se nel caso spostare questo metodo nella classe cliente o rimanerlo accessibile pure a dipendente
+    public void effettuaPrenotazione(Prenotazione nuovaPrenotazione) {
+        if (nuovaPrenotazione != null) {
+            this.prenotazioniEffettuate.add(nuovaPrenotazione);
+        }
     }
 
     public String getNome() {
@@ -45,6 +65,12 @@ public class Utente {
     public void setPassword(String password) {
         this.password = password;
     }
-    // fai metodo fare l'autenticazione e aggiornare i dati personali
 
+    public ArrayList<Prenotazione> getPrenotazioniEffettuate() {
+        return prenotazioniEffettuate;
+    }
+
+    public void setPrenotazioniEffettuate(ArrayList<Prenotazione> prenotazioniEffettuate) {
+        this.prenotazioniEffettuate = prenotazioniEffettuate;
+    }
 }

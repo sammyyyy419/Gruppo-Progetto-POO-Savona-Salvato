@@ -1,20 +1,58 @@
 package model;
 
+import java.time.LocalTime;
+import java.util.ArrayList;
+
 public class Film {
     private String titolo;
-    private String durata;
+    private LocalTime durata;
     private String genere;
     private String classificazioneEta;
     private String trama;
+    private ArrayList<String> recensioni=new ArrayList<>();
 
-    public Film(String titolo, String durata, String genere, String classificazioneEta, String trama)
-    {
+    public Film(String titolo, LocalTime durata, String genere, String classificazioneEta, String trama, ArrayList<String> recensioni) {
         this.titolo = titolo;
         this.durata = durata;
         this.genere = genere;
         this.classificazioneEta = classificazioneEta;
         this.trama = trama;
+        this.recensioni = recensioni;
     }
+
+
+
+    //metodo che restituisce durata in minuti
+    public int getDurataMinuti(){
+        if(this.durata==null){
+            return 0;
+        }
+
+        return (this.durata.getHour()*60)+this.durata.getMinute();
+    }
+
+    public void aggiungiFeedback(String commento, int voto) {
+        if (commento != null && voto >= 1 && voto <= 5) {
+            String feedback = "Voto: " + voto + "/5 - " + commento;
+            this.recensioni.add(feedback);
+        }
+    }
+
+    public ArrayList<String> getRecensioniClienti() {
+        return this.recensioni;
+    }
+
+    public String getDettagli() {
+
+        return "🎬  " + this.titolo + "  🎬\n" +
+                "--------------------------------------------------\n" +
+                "• Genere: " + this.genere + "\n" +
+                "• Durata: " + this.getDurataMinuti() + "\n" +
+                "• Classificazione: " + this.classificazioneEta + "\n\n" +
+                "• TRAMA:\n" + this.trama + "\n" +
+                "--------------------------------------------------";
+    }
+
 
     public String getTitolo() {
         return titolo;
@@ -24,11 +62,11 @@ public class Film {
         this.titolo = titolo;
     }
 
-    public String getDurata() {
+    public LocalTime getDurata() {
         return durata;
     }
 
-    public void setDurata(String durata) {
+    public void setDurata(LocalTime durata) {
         this.durata = durata;
     }
 
@@ -40,6 +78,14 @@ public class Film {
         this.genere = genere;
     }
 
+    public String getClassificazioneEta() {
+        return classificazioneEta;
+    }
+
+    public void setClassificazioneEta(String classificazioneEta) {
+        this.classificazioneEta = classificazioneEta;
+    }
+
     public String getTrama() {
         return trama;
     }
@@ -48,12 +94,12 @@ public class Film {
         this.trama = trama;
     }
 
-    public String getClassificazioneEta() {
-        return classificazioneEta;
+    public ArrayList<String> getRecensioni() {
+        return recensioni;
     }
 
-    public void setClassificazioneEta(String classificazioneEta) {
-        this.classificazioneEta = classificazioneEta;
+    public void setRecensioni(ArrayList<String> recensioni) {
+        this.recensioni = recensioni;
     }
 
     // Fare i metodi: Fornire i dettagli del film e Registrare un feedback

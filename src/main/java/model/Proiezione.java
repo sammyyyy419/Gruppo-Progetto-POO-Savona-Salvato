@@ -1,17 +1,37 @@
 package model;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class Proiezione {
 
     private LocalDateTime dataOraInizio;
     private LocalDateTime dataOraFine;
     private double prezzoBase;
+    private Film film;
+    private Sala sala;
+    private ArrayList<Prenotazione> prenotazioniRicevute;
 
-    public Proiezione(LocalDateTime dataOraInizio,LocalDateTime dataOraFine, double prezzoBase)
+    public Proiezione(LocalDateTime dataOraInizio,LocalDateTime dataOraFine, double prezzoBase,Film film, Sala sala)
     {
         this.dataOraInizio = dataOraInizio;
         this.dataOraFine = dataOraFine;
         this.prezzoBase = prezzoBase;
+        this.film=film;
+        this.sala=sala;
+        this.prenotazioniRicevute=new ArrayList<>();
+    }
+
+    public int controllaPostiDisponibili() {
+        if (this.sala == null) {
+            return 0;
+        }
+        return this.sala.postiLiberiInSala(this);
+    }
+
+    public void registraPrenotazione(Prenotazione p) {
+        if (p != null) {
+            this.prenotazioniRicevute.add(p);
+        }
     }
 
     public LocalDateTime getDataOraInizio() {
@@ -37,6 +57,32 @@ public class Proiezione {
     public void setPrezzoBase(double prezzoBase) {
         this.prezzoBase = prezzoBase;
     }
+
+    public Film getFilm() {
+        return film;
+    }
+
+    public void setFilm(Film film) {
+        this.film = film;
+    }
+
+    public Sala getSala() {
+        return sala;
+    }
+
+    public void setSala(Sala sala) {
+        this.sala = sala;
+    }
+
+    public ArrayList<Prenotazione> getPrenotazioniRicevute() {
+        return prenotazioniRicevute;
+    }
+
+
+    public void setPrenotazioniRicevute(ArrayList<Prenotazione> prenotazioniRicevute) {
+        this.prenotazioniRicevute = prenotazioniRicevute;
+    }
+
 
     // Fare i metodi: Determinare la tariffa e visualizzare la disponibilità dei posti
 }
