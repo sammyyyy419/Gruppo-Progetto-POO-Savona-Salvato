@@ -7,79 +7,55 @@ public class Sala {
     private String numeroSala;
     private int capienza;
     private String tipoSala;
-    private ArrayList<Proiezione> listaProiezioni=new ArrayList<>();
 
-    public Sala(String numeroSala, int capienza, String tipoSala, ArrayList<Proiezione> listaProiezioni) {
+    private ArrayList<Posto> posti;
+    private ArrayList<Proiezione> proiezioni;
+
+    public Sala(String numeroSala, int capienza, String tipoSala) {
         this.numeroSala = numeroSala;
         this.capienza = capienza;
         this.tipoSala = tipoSala;
-        this.listaProiezioni = listaProiezioni;
+        this.posti = new ArrayList<>();
+        this.proiezioni = new ArrayList<>();
+
+        int postiPerFila = 10;
+        char filaCorrente = 'A';
+        for (int i = 1; i <= capienza; i++) {
+            this.posti.add(new Posto(((i - 1) % postiPerFila) + 1, filaCorrente));
+            if (i % postiPerFila == 0) {
+                filaCorrente++;
+            }
+        }
     }
 
-    public void aggiungiProiezioneInSala(Proiezione nuovaProiezione){
-        this.listaProiezioni.add(nuovaProiezione);
+    public int controllareCapienzaPostiResidua(Proiezione proiezioneCorrente) {
+        if (proiezioneCorrente == null) return this.capienza;
+        int postiOccupati = 0;
+        for (Prenotazione p : proiezioneCorrente.getPrenotazioniRicevute()) {
+            if (p.getStato() == StatoPrenotazione.CONFERMATO || p.getStato() == StatoPrenotazione.PENDENTE) {
+                postiOccupati += p.getBiglietti().size();
+            }
+        }
+        return this.capienza - postiOccupati;
     }
 
-    public boolean isLibera(LocalDateTime inizioNuovaProiezione, LocalDateTime fineNuovaProiezione){
-        for(Proiezione temp:listaProiezioni){
-            if(inizioNuovaProiezione.isBefore(temp.getDataOraFine()) && fineNuovaProiezione.isAfter(temp.getDataOraInizio())){
+    public boolean isLibera(LocalDateTime inizio, LocalDateTime fine) {
+        for (Proiezione p : proiezioni) {
+            if (inizio.isBefore(p.getDataOraFine()) && fine.isAfter(p.getDataOraInizio())) {
                 return false;
             }
         }
         return true;
     }
 
-    public int getPostiOccupati(Proiezione proiezione){
-        if(proiezione==null){
-            return 0;
-        }
-
-        ArrayList<Prenotazione> prenotazioni=proiezione.getPrenotazioniRicevute();
-        int postiOccupati=0;
-        if(prenotazioni != null){
-            for(Prenotazione temp:prenotazioni){
-                postiOccupati+=temp.getNumeroBiglietti();
-            }
-        }
-
-        return postiOccupati;
-    }
-
-    public int postiLiberiInSala(Proiezione proiezione){
-        return this.capienza-this.getPostiOccupati(proiezione);
-    }
-
-    public String getNumeroSala() {
-        return numeroSala;
-    }
-
-    public void setNumeroSala(String numeroSala) {
-        this.numeroSala = numeroSala;
-    }
-
-    public int getCapienza() {
-        return capienza;
-    }
-
-    public void setCapienza(int capienza) {
-        this.capienza = capienza;
-    }
-
-    public String getTipoSala() {
-        return tipoSala;
-    }
-
-    public void setTipoSala(String tipoSala) {
-        this.tipoSala = tipoSala;
-    }
-
-    public ArrayList<Proiezione> getListaProiezioni() {
-        return listaProiezioni;
-    }
-
-    public void setListaProiezioni(ArrayList<Proiezione> listaProiezioni) {
-        this.listaProiezioni = listaProiezioni;
-    }
-
-    // Fare il metodo che controlla la capienza della sala
+    public String getNumeroSala() { return numeroSala; }
+    public void setNumeroSala(String numeroSala) { this.numeroSala = numeroSala; }
+    public int getCapienza() { return capienza; }
+    public void setCapienza(int capienza) { this.capienza = capienza; }
+    public String getTipoSala() { return tipoSala; }
+    public void setTipoSala(String tipoSala) { this.tipoSala = tipoSala; }
+    public ArrayList<Posto> getPosti() { return posti; }
+    public void setPosti(ArrayList<Posto> posti) { this.posti = posti; }
+    public ArrayList<Proiezione> getProiezioni() { return proiezioni; }
+    public void setProiezioni(ArrayList<Proiezione> proiezioni) { this.proiezioni = proiezioni; }
 }

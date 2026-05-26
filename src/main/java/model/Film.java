@@ -17,17 +17,13 @@ public class Film {
         this.genere = genere;
         this.classificazioneEta = classificazioneEta;
         this.trama = trama;
-        this.recensioni = recensioni;
+        this.recensioni = (recensioni != null) ? recensioni : new ArrayList<>();
     }
 
-
-
-    //metodo che restituisce durata in minuti
     public int getDurataMinuti(){
         if(this.durata==null){
             return 0;
         }
-
         return (this.durata.getHour()*60)+this.durata.getMinute();
     }
 
@@ -43,64 +39,25 @@ public class Film {
     }
 
     public String getDettagli() {
-
-        return "🎬  " + this.titolo + "  🎬\n" +
+        return "  " + this.titolo + "  \n" +
                 "--------------------------------------------------\n" +
                 "• Genere: " + this.genere + "\n" +
-                "• Durata: " + this.getDurataMinuti() + "\n" +
+                "• Durata: " + this.getDurataMinuti() + " min\n" +
                 "• Classificazione: " + this.classificazioneEta + "\n\n" +
                 "• TRAMA:\n" + this.trama + "\n" +
                 "--------------------------------------------------";
     }
 
-
-    public String getTitolo() {
-        return titolo;
-    }
-
-    public void setTitolo(String titolo) {
-        this.titolo = titolo;
-    }
-
-    public LocalTime getDurata() {
-        return durata;
-    }
-
-    public void setDurata(LocalTime durata) {
-        this.durata = durata;
-    }
-
-    public String getGenere() {
-        return genere;
-    }
-
-    public void setGenere(String genere) {
-        this.genere = genere;
-    }
-
-    public String getClassificazioneEta() {
-        return classificazioneEta;
-    }
-
-    public void setClassificazioneEta(String classificazioneEta) {
-        this.classificazioneEta = classificazioneEta;
-    }
-
-    public String getTrama() {
-        return trama;
-    }
-
-    public void setTrama(String trama) {
-        this.trama = trama;
-    }
-
-    public ArrayList<String> getRecensioni() {
-        return recensioni;
-    }
-
-    public void setRecensioni(ArrayList<String> recensioni) {
-        this.recensioni = recensioni;
-    }
-
-    // Fare i metodi: Fornire i dettagli del film e Registrare un feedback
+    public String getTitolo() { return titolo; }
+    public void setTitolo(String titolo) { this.titolo = titolo; }
+    public LocalTime getDurata() { return durata; }
+    public void setDurata(LocalTime durata) { this.durata = durata; }
+    public String getGenere() { return genere; }
+    public void setGenere(String genere) { this.genere = genere; }
+    public String getClassificazioneEta() { return classificazioneEta; }
+    public void setClassificazioneEta(String classificazioneEta) { this.classificazioneEta = classificazioneEta; }
+    public String getTrama() { return trama; }
+    public void setTrama(String trama) { this.trama = trama; }
+    public ArrayList<String> getRecensioni() { return recensioni; }
+    public void setRecensioni(ArrayList<String> recensioni) { this.recensioni = recensioni; }
 }

@@ -1,4 +1,5 @@
 package model;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -9,40 +10,40 @@ public class Prenotazione {
     private Proiezione proiezione;
     private ArrayList<Biglietto> biglietti;
 
-    public Prenotazione(LocalDateTime dataPrenotazione, StatoPrenotazione stato, Proiezione proiezione, ArrayList<Biglietto> biglietti) {
+    private Cliente cliente;
+    private Pagamento pagamento;
+
+    public Prenotazione(LocalDateTime dataPrenotazione, StatoPrenotazione stato, Proiezione proiezione, ArrayList<Biglietto> biglietti, Cliente cliente, Pagamento pagamento) {
         this.dataPrenotazione = dataPrenotazione;
         this.stato = stato;
         this.proiezione = proiezione;
-        this.biglietti = biglietti;
+        this.biglietti = (biglietti != null) ? biglietti : new ArrayList<>();
+        this.cliente = cliente;
+        this.pagamento = pagamento;
     }
 
-    public int getNumeroBiglietti(){
+    public int getNumeroBiglietti() {
         return this.biglietti.size();
     }
 
-    public boolean verificaDisponibilitaPostiInSala(){
-        if(this.proiezione==null){
+    public boolean verificaDisponibilitaPostiInSala() {
+        if (this.proiezione == null) {
             return false;
         }
 
-        int postiLiberi=this.proiezione.controllaPostiDisponibili();
-        int numeroBigliettiRichiesti=this.getNumeroBiglietti();
+        int postiLiberi = this.proiezione.controllaPostiDisponibili();
+        int numeroBigliettiRichiesti = this.getNumeroBiglietti();
 
-        if(postiLiberi>=numeroBigliettiRichiesti){
-
-            //non modifico lo stato a Confermato perché devo verificare prima anche esito pagamento
+        if (postiLiberi >= numeroBigliettiRichiesti) {
             return true;
-        }
-        else{
-            this.stato=StatoPrenotazione.ANNULATO;
+        } else {
+            this.stato = StatoPrenotazione.ANNULATO;
             return false;
         }
-
     }
 
-    //da usare quando si prenota per occupare posti
-    public void inserisciBiglietti(Biglietto biglietto){
-        if(biglietto != null){
+    public void inserisciBiglietti(Biglietto biglietto) {
+        if (biglietto != null) {
             this.biglietti.add(biglietto);
         }
     }
@@ -57,7 +58,7 @@ public class Prenotazione {
     public void aggiungiPosto() {
         if (this.proiezione != null) {
             double prezzo = this.proiezione.getPrezzoBase();
-            Biglietto nuovoBiglietto = new Biglietto(prezzo);
+            Biglietto nuovoBiglietto = new Biglietto(prezzo, null, this.proiezione, this);
             this.inserisciBiglietti(nuovoBiglietto);
         }
     }
@@ -72,37 +73,16 @@ public class Prenotazione {
         return totale;
     }
 
-    public LocalDateTime getDataPrenotazione() {
-        return dataPrenotazione;
-    }
-
-    public void setDataPrenotazione(LocalDateTime dataPrenotazione) {
-        this.dataPrenotazione = dataPrenotazione;
-    }
-
-    public StatoPrenotazione getStato() {
-        return stato;
-    }
-
-    public void setStato(StatoPrenotazione stato) {
-        this.stato = stato;
-    }
-
-    public Proiezione getProiezione() {
-        return proiezione;
-    }
-
-    public void setProiezione(Proiezione proiezione) {
-        this.proiezione = proiezione;
-    }
-
-    public ArrayList<Biglietto> getBiglietti() {
-        return biglietti;
-    }
-
-    public void setBiglietti(ArrayList<Biglietto> biglietti) {
-        this.biglietti = biglietti;
-    }
-
-    // Fare i metodi: calcolo totale, confermare la prenotazione e aggiungere un posto.
+    public LocalDateTime getDataPrenotazione() { return dataPrenotazione; }
+    public void setDataPrenotazione(LocalDateTime dataPrenotazione) { this.dataPrenotazione = dataPrenotazione; }
+    public StatoPrenotazione getStato() { return stato; }
+    public void setStato(StatoPrenotazione stato) { this.stato = stato; }
+    public Proiezione getProiezione() { return proiezione; }
+    public void setProiezione(Proiezione proiezione) { this.proiezione = proiezione; }
+    public ArrayList<Biglietto> getBiglietti() { return biglietti; }
+    public void setBiglietti(ArrayList<Biglietto> biglietti) { this.biglietti = biglietti; }
+    public Cliente getCliente() { return cliente; }
+    public void setCliente(Cliente cliente) { this.cliente = cliente; }
+    public Pagamento getPagamento() { return pagamento; }
+    public void setPagamento(Pagamento pagamento) { this.pagamento = pagamento; }
 }
