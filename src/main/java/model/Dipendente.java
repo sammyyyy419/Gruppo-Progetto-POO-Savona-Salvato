@@ -7,10 +7,26 @@ public class Dipendente extends Utente {
     private double stipendio;
     private String ruolo;
 
-    public Dipendente(String nomeDipendente, String cognomeDipendente, String emailDipendente, String passwordDipendente, double stipendio, String ruolo) {
+    public Dipendente(String nomeDipendente, String cognomeDipendente, String emailDipendente, String passwordDipendente, String ruolo) {
         super(nomeDipendente, cognomeDipendente, emailDipendente, passwordDipendente);
-        this.stipendio = stipendio;
         this.ruolo = ruolo;
+        switch (ruolo.toLowerCase()) {
+            case "cassiere":
+                this.stipendio = 1200.00;
+                break;
+            case "manager":
+                this.stipendio = 1800.00;
+                break;
+            case "proiezionista":
+                this.stipendio = 1400.00;
+                break;
+            case "addetto alle pulizie":
+                this.stipendio = 1100.00;
+                break;
+            default:
+                this.stipendio = 1000.00;
+                break;
+        }
     }
     public void pianificareProgrammazioneDeiFilm(){}
 

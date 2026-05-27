@@ -8,10 +8,10 @@ public class Cliente extends Utente {
     private LocalDate dataRegistrazione;
     private ArrayList<Prenotazione> prenotazioniEffettuate;
 
-    public Cliente(String nome, String cognome, String email, String password, LocalDate dataRegistrazione) {
+    public Cliente(String nome, String cognome, String email, String password) {
         super(nome, cognome, email, password);
-        this.dataRegistrazione = dataRegistrazione;
         this.prenotazioniEffettuate = new ArrayList<>();
+        this.dataRegistrazione = LocalDate.now();
     }
 
     public void effettuaPrenotazione(Prenotazione nuovaPrenotazione) {
