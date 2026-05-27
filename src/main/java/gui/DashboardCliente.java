@@ -37,5 +37,13 @@ public class DashboardCliente extends JFrame {
         buttonCatalogoFilm.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Apertura Catalogo Film in corso...");
         });
+        buttonMenuBar.addActionListener(e ->
+        {
+            JOptionPane.showMessageDialog(this,"Apertura Menù Bar in corso...");
+        });
+        buttonModificaCredenziali.addActionListener(e ->
+        {
+            JOptionPane.showMessageDialog(this,"Apertura procedura per modificare le credenziali...");
+        });
     }
 }

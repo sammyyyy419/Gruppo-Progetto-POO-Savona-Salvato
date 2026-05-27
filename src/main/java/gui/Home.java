@@ -1,8 +1,11 @@
 package gui;
 
 import controller.Controller;
+import exception.PasswordErrataException;
+import exception.UtenteNonTrovatoException;
 import model.Cliente;
 import model.Dipendente;
+import model.Utente;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -20,9 +23,7 @@ public class Home extends JFrame {
     private Controller controller;
 
     public static void main(String[] args) {
-
         Controller ctrl = new Controller();
-
         new Home(ctrl);
     }
 
@@ -36,7 +37,6 @@ public class Home extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
 
-
         buttonAccedi.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -49,19 +49,22 @@ public class Home extends JFrame {
         String email = textEmail.getText().trim();
         String password = new String(textPassword.getPassword()).trim();
 
-        String esito = controller.verificaLogin(email, password);
+        try {
 
-        if (esito.equals("CLIENTE")) {
-            Cliente c = (Cliente) controller.recuperaUtente(email);
-            new DashboardCliente(controller, c);
-            this.dispose();
-        } else if (esito.equals("DIPENDENTE")) {
-            Dipendente d = (Dipendente) controller.recuperaUtente(email);
-            // Tra poco creeremo DashboardDipendente
-        //    new DashboardDipendente(controller, d);
-          //  this.dispose();
-        } else {
-            JOptionPane.showMessageDialog(this, "Credenziali errate!");
+            controller.validaLogin(email, password);
+
+            Utente u = controller.recuperaUtente(email);
+
+            if (u instanceof Cliente) {
+                new DashboardCliente(controller, (Cliente) u);
+                this.dispose();
+            } else if (u instanceof Dipendente) {
+                // Tra poco creeremo DashboardDipendente
+                //    new DashboardDipendente(controller, d);
+                //  this.dispose();
+            }
+        } catch (UtenteNonTrovatoException | PasswordErrataException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Errore di Accesso", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
