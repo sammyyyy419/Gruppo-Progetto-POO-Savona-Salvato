@@ -14,17 +14,17 @@ public class Controller {
 
     private ArrayList<Cliente> listaClienti;
     private ArrayList<Dipendente> listaDipendenti;
+    private ArrayList<String> listaSegnalazioni;
 
     public Controller() {
         this.listaClienti = new ArrayList<>();
         this.listaDipendenti = new ArrayList<>();
+        this.listaSegnalazioni = new ArrayList<>();
 
-        // Inizializzazione dati di prova
         listaClienti.add(new Cliente("Sammy", "Cliente", "sammy@gmail.com", "password123"));
         listaDipendenti.add(new Dipendente("Francesca", "Volpe", "francesca.volpe@enterprise.com", "sammy", "cassiere"));
     }
 
-    // Metodo per il check rapido (usato in Home se necessario)
     public String verificaLogin(String emailInserita, String passwordInserita) {
         if (emailInserita.endsWith("@enterprise.com")) {
             for (Dipendente d : listaDipendenti) {
@@ -42,7 +42,6 @@ public class Controller {
         return "ACCESSO FALLITO!";
     }
 
-    // Metodo per recuperare l'oggetto utente completo
     public Utente recuperaUtente(String email) {
         for (Cliente c : listaClienti) {
             if (c.getEmail().equals(email)) return c;
@@ -53,7 +52,6 @@ public class Controller {
         return null;
     }
 
-    // Metodo di validazione professionale con eccezioni
     public void validaLogin(String email, String password) throws UtenteNonTrovatoException, PasswordErrataException {
         Utente u = recuperaUtente(email);
 
@@ -65,12 +63,23 @@ public class Controller {
         }
     }
 
-    // Logica di business: Prenotazione Film
-  /*  public void prenotaFilm(Film film) throws FilmNonDisponibileException {
+  /* public void prenotaFilm(Film film) throws FilmNonDisponibileException {
         if (!film.isDisponibile()) {
             throw new FilmNonDisponibileException("Il film " + film.getTitolo() + " non è al momento proiettabile.");
         }
-        // Qui aggiungerai la logica per collegare la prenotazione al cliente
     }
     */
+
+    public void aggiungiCliente(Cliente nuovoCliente) {
+        listaClienti.add(nuovoCliente);
+    }
+
+    public void aggiungiSegnalazione(String messaggio, Dipendente mittente) {
+        String segnalazioneCompleta = "Da: " + mittente.getNome() + " " + mittente.getCognome() + " (" + mittente.getRuolo() + ") - " + messaggio;
+        listaSegnalazioni.add(segnalazioneCompleta);
+    }
+
+    public ArrayList<String> getSegnalazioni() {
+        return listaSegnalazioni;
+    }
 }

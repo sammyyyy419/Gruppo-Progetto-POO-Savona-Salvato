@@ -43,6 +43,13 @@ public class Home extends JFrame {
                 eseguiLogin();
             }
         });
+
+        buttonRegistra.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new Registrazione(controller);
+            }
+        });
     }
 
     private void eseguiLogin() {
@@ -50,7 +57,6 @@ public class Home extends JFrame {
         String password = new String(textPassword.getPassword()).trim();
 
         try {
-
             controller.validaLogin(email, password);
 
             Utente u = controller.recuperaUtente(email);
@@ -59,9 +65,8 @@ public class Home extends JFrame {
                 new DashboardCliente(controller, (Cliente) u);
                 this.dispose();
             } else if (u instanceof Dipendente) {
-                // Tra poco creeremo DashboardDipendente
-                //    new DashboardDipendente(controller, d);
-                //  this.dispose();
+                new DashboardDipendente(controller, (Dipendente) u);
+                this.dispose();
             }
         } catch (UtenteNonTrovatoException | PasswordErrataException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Errore di Accesso", JOptionPane.ERROR_MESSAGE);
