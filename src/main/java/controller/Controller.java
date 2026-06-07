@@ -8,6 +8,7 @@ import model.Dipendente;
 import model.Film;
 import model.Utente;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 public class Controller {
@@ -15,16 +16,18 @@ public class Controller {
     private ArrayList<Cliente> listaClienti;
     private ArrayList<Dipendente> listaDipendenti;
     private ArrayList<String> listaSegnalazioni;
+    private ArrayList<Film> listaFilm;
 
     public Controller() {
         this.listaClienti = new ArrayList<>();
         this.listaDipendenti = new ArrayList<>();
         this.listaSegnalazioni = new ArrayList<>();
+        this.listaFilm = new ArrayList<>();
 
         listaClienti.add(new Cliente("Sammy", "Cliente", "sammy@gmail.com", "password123"));
         listaDipendenti.add(new Dipendente("Francesca", "Volpe", "francesca.volpe@enterprise.com", "sammy", "cassiere"));
+        listaFilm.add(new Film("Interstellar", LocalTime.of(2, 30), "Fantascienza", "T", "Trama di interstelalr prova prova fisica buxhi neri", null));
     }
-
     public String verificaLogin(String emailInserita, String passwordInserita) {
         if (emailInserita.endsWith("@enterprise.com")) {
             for (Dipendente d : listaDipendenti) {
@@ -63,6 +66,8 @@ public class Controller {
         }
     }
 
+
+
   /* public void prenotaFilm(Film film) throws FilmNonDisponibileException {
         if (!film.isDisponibile()) {
             throw new FilmNonDisponibileException("Il film " + film.getTitolo() + " non è al momento proiettabile.");
@@ -82,4 +87,8 @@ public class Controller {
     public ArrayList<String> getSegnalazioni() {
         return listaSegnalazioni;
     }
+
+        public ArrayList<Film> getListaFilm() {
+            return this.listaFilm;
+        }
 }
