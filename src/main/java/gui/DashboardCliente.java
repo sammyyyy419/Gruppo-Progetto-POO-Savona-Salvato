@@ -5,7 +5,7 @@ import model.Cliente;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import gui.CatalogoFilm.CatalogoFilm;
+import gui.CatalogoFilm;
 
 public class DashboardCliente extends JFrame {
     private JPanel mainPanel;
@@ -45,7 +45,7 @@ public class DashboardCliente extends JFrame {
                 }
             });
         });
-        S
+
         buttonMenuBar.addActionListener(e ->
         {
             JOptionPane.showMessageDialog(this,"Apertura Menù Bar in corso...");
