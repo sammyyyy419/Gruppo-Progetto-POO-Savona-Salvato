@@ -1,10 +1,12 @@
 package implementazionePostgresDAO;
 
-import Database.ConnessioneDatabase;
+import database.ConnessioneDatabase;
 import dao.EsempioDAO;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import static database.ConnessioneDatabase.*;
 
 public class EsempioImplementazionePostgresDAO implements EsempioDAO {
 
@@ -12,7 +14,7 @@ public class EsempioImplementazionePostgresDAO implements EsempioDAO {
 
 	public EsempioImplementazionePostgresDAO() {
 		try {
-			connection = ConnessioneDatabase.getInstance().connection;
+			connection = getInstance().connection;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

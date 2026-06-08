@@ -37,7 +37,7 @@ public class Prenotazione {
         if (postiLiberi >= numeroBigliettiRichiesti) {
             return true;
         } else {
-            this.stato = StatoPrenotazione.ANNULATO;
+            this.stato = StatoPrenotazione.ANNULLATO;
             return false;
         }
     }

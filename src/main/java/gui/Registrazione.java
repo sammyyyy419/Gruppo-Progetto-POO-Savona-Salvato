@@ -2,7 +2,6 @@ package gui;
 
 import controller.Controller;
 import model.Cliente;
-
 import javax.swing.*;
 
 public class Registrazione extends JFrame {
@@ -11,11 +10,11 @@ public class Registrazione extends JFrame {
     private JLabel labelNome;
     private JTextField textNome;
     private JLabel labelCognome;
-    private JTextField textCognome; // Nome aggiornato!
+    private JTextField textCognome;
     private JLabel labelMail;
     private JTextField textMail;
     private JLabel labelPassword;
-    private JPasswordField textPassword; // Nome aggiornato!
+    private JPasswordField textPassword;
     private JButton buttonConferma;
 
     private Controller controller;
@@ -25,38 +24,38 @@ public class Registrazione extends JFrame {
 
         setContentPane(mainPanel);
         setTitle("Registrazione Nuovo Cliente");
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE); // Chiude SOLO questa finestra, lasciando aperta la Home
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
 
-        // Azione del bottone conferma
         buttonConferma.addActionListener(e -> registraNuovoCliente());
     }
 
     private void registraNuovoCliente() {
-        // 1. Prendi i dati inseriti dall'utente usando i nuovi nomi
         String nome = textNome.getText().trim();
         String cognome = textCognome.getText().trim();
         String email = textMail.getText().trim();
         String password = new String(textPassword.getPassword()).trim();
 
-        // 2. Controllo di sicurezza: verifica che i campi non siano vuoti
         if (nome.isEmpty() || cognome.isEmpty() || email.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Per favore, compila tutti i campi.", "Attenzione", JOptionPane.WARNING_MESSAGE);
-            return; // Interrompe il metodo se manca qualcosa
+            return;
         }
 
-        // 3. Crea il nuovo cliente
         Cliente nuovoCliente = new Cliente(nome, cognome, email, password);
 
-        // 4. Passa il cliente al controller per salvarlo nella lista
-        controller.aggiungiCliente(nuovoCliente);
+        try {
+            // Tenta il salvataggio immediato sul Database
+            controller.aggiungiCliente(nuovoCliente);
 
-        // 5. Messaggio di successo e chiusura finestra
-        JOptionPane.showMessageDialog(this, "Registrazione completata con successo!\nOra puoi effettuare il login.", "Successo", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Registrazione completata con successo!\nOra puoi effettuare il login.", "Successo", JOptionPane.INFORMATION_MESSAGE);
+            this.dispose(); // Chiude la schermata di registrazione
 
-        // Chiude la finestra di registrazione.
-        this.dispose();
+        } catch (Exception ex) {
+            // Se il DB restituisce un errore (es. chiave primaria violata o errore SQL), viene intercettato qui
+            JOptionPane.showMessageDialog(this, "Errore durante il salvataggio sul Database:\n" + ex.getMessage(), "Errore di Registrazione", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+        }
     }
 }
