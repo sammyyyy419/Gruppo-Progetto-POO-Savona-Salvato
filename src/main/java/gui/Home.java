@@ -21,6 +21,8 @@ public class Home extends JFrame {
     private JButton buttonRegistra;
     private JButton buttonAccedi;
     private Controller controller;
+    private Dipendente dipendente;
+    private Cliente cliente;
 
     public static void main(String[] args) {
         Controller ctrl = new Controller();
@@ -57,19 +59,24 @@ public class Home extends JFrame {
         String password = new String(textPassword.getPassword()).trim();
 
         try {
+            // 1. Chiama il metodo del controller (che può lanciare Exception)
             controller.validaLogin(email, password);
 
+            // 2. Se le credenziali sono corrette, recupera l'utente ed esegui lo switch delle schermate
             Utente u = controller.recuperaUtente(email);
 
-            if (u instanceof Cliente) {
-                new DashboardCliente(controller, (Cliente) u);
+            if (u instanceof model.Dipendente) {
+                new DashboardDipendente(controller,dipendente).setVisible(true);
                 this.dispose();
-            } else if (u instanceof Dipendente) {
-                new DashboardDipendente(controller, (Dipendente) u);
+            } else if (u instanceof model.Cliente) {
+                new DashboardCliente(controller,cliente).setVisible(true);
                 this.dispose();
             }
-        } catch (UtenteNonTrovatoException | PasswordErrataException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Errore di Accesso", JOptionPane.ERROR_MESSAGE);
+
+        } catch (Exception e) {
+            // <--- CAMBIA IL CATCH QUI METTENDO 'Exception e'
+            // In questo modo catturi qualsiasi errore e mostri il messaggio impostato nel controller
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Errore di Accesso", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

@@ -16,14 +16,6 @@
           <text value="Benvenuta/o"/>
         </properties>
       </component>
-      <component id="a14c3" class="javax.swing.JButton" binding="buttonVendiBiglietti">
-        <constraints>
-          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Vendi i Biglietti"/>
-        </properties>
-      </component>
       <component id="d48c2" class="javax.swing.JButton" binding="buttonGestioneFilm">
         <constraints>
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -62,6 +54,14 @@
         </constraints>
         <properties>
           <text value="Esci"/>
+        </properties>
+      </component>
+      <component id="5f172" class="javax.swing.JButton" binding="buttonConvalidaBiglietti">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Convalida i biglietti"/>
         </properties>
       </component>
     </children>

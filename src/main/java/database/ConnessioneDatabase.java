@@ -5,26 +5,23 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnessioneDatabase {
-
-	// ATTRIBUTI
 	private static ConnessioneDatabase instance;
 	public Connection connection = null;
+
 	private String nome = "postgres";
-	private String password = "password";
-	private String url = "jdbc:postgresql://localhost:5433/Borsa";
+	private String password = "password"; // <-- CAMBIA QUESTO SE LA TUA PASSWORD È DIVERSA
+	private String url = "jdbc:postgresql://localhost:5432/CinemaDB";
 	private String driver = "org.postgresql.Driver";
 
-	// COSTRUTTORE
+
 	private ConnessioneDatabase() throws SQLException {
 		try {
 			Class.forName(driver);
 			connection = DriverManager.getConnection(url, nome, password);
-
 		} catch (ClassNotFoundException ex) {
-			System.out.println("Database Connection Creation Failed : " + ex.getMessage());
+			System.out.println("Database Connection Creation Failed: " + ex.getMessage());
 			ex.printStackTrace();
 		}
-
 	}
 
 

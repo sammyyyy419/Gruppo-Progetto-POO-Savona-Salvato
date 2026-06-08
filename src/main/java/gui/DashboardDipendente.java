@@ -2,6 +2,7 @@ package gui;
 
 import controller.Controller;
 import model.Dipendente;
+import model.Biglietto;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 public class DashboardDipendente extends JFrame {
     private JPanel mainPanel;
     private JLabel labelBenvenuto;
-    private JButton buttonVendiBiglietti;
+    private JButton buttonConvalidaBiglietti;
     private JButton buttonGestioneFilm;
     private JButton buttonGestioneSale;
     private JButton buttonLeggiSegnalazioni;
@@ -35,9 +36,9 @@ public class DashboardDipendente extends JFrame {
 
         buttonInviaSegnalazione.addActionListener(e -> inviaSegnalazione());
         buttonLeggiSegnalazioni.addActionListener(e -> leggiSegnalazioni());
+        buttonConvalidaBiglietti.addActionListener(e -> eseguiConvalida());
         buttonEsci.addActionListener(e -> eseguiLogout());
 
-        buttonVendiBiglietti.addActionListener(e -> JOptionPane.showMessageDialog(this, "Apertura cassa in corso..."));
         buttonGestioneFilm.addActionListener(e -> JOptionPane.showMessageDialog(this, "Apertura gestione film in corso..."));
         buttonGestioneSale.addActionListener(e -> JOptionPane.showMessageDialog(this, "Apertura gestione sale in corso..."));
 
@@ -45,7 +46,7 @@ public class DashboardDipendente extends JFrame {
     }
 
     private void configuraPermessi() {
-        buttonVendiBiglietti.setVisible(false);
+        buttonConvalidaBiglietti.setVisible(false);
         buttonGestioneFilm.setVisible(false);
         buttonGestioneSale.setVisible(false);
         buttonLeggiSegnalazioni.setVisible(false);
@@ -53,14 +54,14 @@ public class DashboardDipendente extends JFrame {
         String ruolo = dipendenteLoggato.getRuolo().toLowerCase();
 
         if (ruolo.equals("cassiere")) {
-            buttonVendiBiglietti.setVisible(true);
+            buttonConvalidaBiglietti.setVisible(true);
         } else if (ruolo.equals("proiezionista")) {
             buttonGestioneFilm.setVisible(true);
         } else if (ruolo.equals("pulizie")) {
             buttonGestioneSale.setVisible(true);
         } else if (ruolo.equals("manager")) {
             buttonLeggiSegnalazioni.setVisible(true);
-            buttonVendiBiglietti.setVisible(true);
+            buttonConvalidaBiglietti.setVisible(true);
             buttonGestioneFilm.setVisible(true);
             buttonGestioneSale.setVisible(true);
         }
@@ -86,6 +87,35 @@ public class DashboardDipendente extends JFrame {
                 testo.append(s).append("\n\n");
             }
             JOptionPane.showMessageDialog(this, testo.toString(), "Elenco Segnalazioni", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    private void eseguiConvalida() {
+        String titolo = JOptionPane.showInputDialog(this, "Inserisci il titolo del film:", "Convalida - Film", JOptionPane.PLAIN_MESSAGE);
+        if (titolo == null || titolo.trim().isEmpty()) return;
+
+        String filaStr = JOptionPane.showInputDialog(this, "Inserisci la lettera della fila:", "Convalida - Fila", JOptionPane.PLAIN_MESSAGE);
+        if (filaStr == null || filaStr.trim().isEmpty()) return;
+
+        // Estraiamo il primo carattere inserito per passarlo come char
+        char fila = filaStr.trim().charAt(0);
+
+        String numStr = JOptionPane.showInputDialog(this, "Inserisci il numero del posto:", "Convalida - Numero Posto", JOptionPane.PLAIN_MESSAGE);
+        if (numStr == null || numStr.trim().isEmpty()) return;
+
+        try {
+            int numeroPosto = Integer.parseInt(numStr.trim());
+
+            // Invia il char fila al metodo aggiornato del controller
+            Biglietto b = controller.convalidaBiglietto(titolo.trim(), fila, numeroPosto);
+
+            if (b != null) {
+                JOptionPane.showMessageDialog(this, "Biglietto convalidato con successo!\n\n" + b.generaTitoloIngresso(), "Convalida Riuscita", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Nessun biglietto corrispondente trovato oppure il biglietto è già stato OBLITERATO.", "Errore Convalida", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Il numero del posto deve essere un valore numerico intero.", "Errore Input", JOptionPane.ERROR_MESSAGE);
         }
     }
 
