@@ -30,11 +30,30 @@ public class DashboardCatalogoFilm extends JFrame {
         for (Film film : filmDisponibili) {
 
             JPanel rigaFilm = new JPanel(new BorderLayout());
-
             rigaFilm.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
             String testoFilm = film.getTitolo() + " - Genere: " + film.getGenere() + " - Durata: " + film.getDurata();
             JLabel etichettaDati = new JLabel(testoFilm);
-            rigaFilm.add(etichettaDati, BorderLayout.WEST);
+            etichettaDati.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+
+            JLabel labelLocandina = new JLabel();
+            String titolo = film.getTitolo().toLowerCase().replace(" ", "_");
+            String nomeImmagine = "/" + titolo + ".png";
+            java.net.URL imageUrl = DashboardCatalogoFilm.class.getResource(nomeImmagine);
+
+            if (imageUrl != null) {
+                ImageIcon iconaOriginale = new ImageIcon(imageUrl);
+                Image imgScalata = iconaOriginale.getImage().getScaledInstance(60, 90, Image.SCALE_SMOOTH);
+                labelLocandina.setIcon(new ImageIcon(imgScalata));
+            } else {
+                labelLocandina.setText("No Cover");
+                labelLocandina.setPreferredSize(new Dimension(60, 90));
+                labelLocandina.setHorizontalAlignment(SwingConstants.CENTER);
+                labelLocandina.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            }
+
+            rigaFilm.add(labelLocandina, BorderLayout.WEST);
+            rigaFilm.add(etichettaDati, BorderLayout.CENTER);
 
             JPanel panelPulsanti = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             JButton pulsanteTrama = new JButton("Visualizza Trama");
@@ -44,11 +63,9 @@ public class DashboardCatalogoFilm extends JFrame {
             panelPulsanti.add(pulsantePrenotazione);
             rigaFilm.add(panelPulsanti, BorderLayout.EAST);
 
-
             pulsanteTrama.addActionListener(e -> {
                 JOptionPane.showMessageDialog(this, film.getTrama(), film.getTitolo() + " : ", JOptionPane.INFORMATION_MESSAGE);
             });
-
 
             panelListaFilm.add(rigaFilm);
             panelListaFilm.add(new JSeparator(JSeparator.HORIZONTAL));
@@ -58,7 +75,8 @@ public class DashboardCatalogoFilm extends JFrame {
             this.dispose();
         });
 
+        panelListaFilm.revalidate();
+        panelListaFilm.repaint();
         setVisible(true);
     }
-
 }
