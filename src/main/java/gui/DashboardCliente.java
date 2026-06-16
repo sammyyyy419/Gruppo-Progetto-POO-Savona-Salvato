@@ -5,7 +5,6 @@ import model.Cliente;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import gui.CatalogoFilm;
 
 public class DashboardCliente extends JFrame {
     private JPanel mainPanel;
@@ -37,7 +36,7 @@ public class DashboardCliente extends JFrame {
 
         buttonCatalogoFilm.addActionListener(e -> {
              this.setVisible(false);
-            CatalogoFilm finestraCatalogo = new CatalogoFilm(this.controller, this.clienteLoggato);
+            DashboardCatalogoFilm finestraCatalogo = new DashboardCatalogoFilm(this.controller, this.clienteLoggato);
             finestraCatalogo.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
                 public void windowClosing(java.awt.event.WindowEvent windowEvent) {

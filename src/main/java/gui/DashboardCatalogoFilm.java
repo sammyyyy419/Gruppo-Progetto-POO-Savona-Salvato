@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class CatalogoFilm extends JFrame {
+public class DashboardCatalogoFilm extends JFrame {
     private JPanel panelCatalogo;
     private JButton tornaAlMenuButton;
     private JScrollPane scrollPanelFilm;
@@ -15,14 +15,13 @@ public class CatalogoFilm extends JFrame {
     private Controller controller;
     private Cliente clienteLoggato;
 
-    public CatalogoFilm(Controller controller, Cliente cliente) {
+    public DashboardCatalogoFilm(Controller controller, Cliente cliente) {
         this.controller = controller;
         this.clienteLoggato = cliente;
 
         setContentPane(panelCatalogo);
         setTitle("Catalogo Film Disponibili");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
         setSize(600, 500);
         setLocationRelativeTo(null);
         panelListaFilm.setLayout(new BoxLayout(panelListaFilm, BoxLayout.Y_AXIS));
@@ -30,35 +29,36 @@ public class CatalogoFilm extends JFrame {
 
         for (Film film : filmDisponibili) {
 
-            JPanel rigaFilm = new JPanel();
-            //aggiungere locandina a lato
+            JPanel rigaFilm = new JPanel(new BorderLayout());
+
+            rigaFilm.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
             String testoFilm = film.getTitolo() + " - Genere: " + film.getGenere() + " - Durata: " + film.getDurata();
             JLabel etichettaDati = new JLabel(testoFilm);
+            rigaFilm.add(etichettaDati, BorderLayout.WEST);
+
+            JPanel panelPulsanti = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             JButton pulsanteTrama = new JButton("Visualizza Trama");
             JButton pulsantePrenotazione = new JButton("Prenota Biglietti");
+
+            panelPulsanti.add(pulsanteTrama);
+            panelPulsanti.add(pulsantePrenotazione);
+            rigaFilm.add(panelPulsanti, BorderLayout.EAST);
+
 
             pulsanteTrama.addActionListener(e -> {
                 JOptionPane.showMessageDialog(this, film.getTrama(), film.getTitolo() + " : ", JOptionPane.INFORMATION_MESSAGE);
             });
 
-           /*
-           pulsantePrenotazione.addActionListener(e -> {
-              da implementare
-           });
-
-            */
-            rigaFilm.add(etichettaDati);
-            rigaFilm.add(pulsanteTrama);
-            rigaFilm.add(pulsantePrenotazione);
 
             panelListaFilm.add(rigaFilm);
+            panelListaFilm.add(new JSeparator(JSeparator.HORIZONTAL));
         }
 
         tornaAlMenuButton.addActionListener(e -> {
-            this.dispose();});
+            this.dispose();
+        });
 
         setVisible(true);
     }
-
 
 }
