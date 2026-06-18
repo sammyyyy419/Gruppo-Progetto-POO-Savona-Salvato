@@ -9,7 +9,9 @@ import model.Proiezione;
 import model.Prenotazione;
 import model.Film;
 import dao.FilmDAO;
+import dao.ClienteDAO;
 import implementazionePostgresDAO.FilmImplementazionePostgresDAO;
+import implementazionePostgresDAO.ClienteImplementazionePostgresDAO;
 
 import java.util.ArrayList;
 
@@ -20,26 +22,40 @@ public class Controller {
     private ArrayList<String> listaSegnalazioni;
     private ArrayList<Biglietto> listaBiglietti;
     private ArrayList<Film> listaFilm;
+
     private FilmDAO filmDAO;
+    private ClienteDAO clienteDAO;
 
     public Controller() {
         this.listaClienti = new ArrayList<>();
         this.listaDipendenti = new ArrayList<>();
         this.listaSegnalazioni = new ArrayList<>();
         this.listaBiglietti = new ArrayList<>();
-        this.listaFilm = new ArrayList<>();
 
         this.filmDAO = new FilmImplementazionePostgresDAO();
+        this.clienteDAO = new ClienteImplementazionePostgresDAO();
 
-        // Inizializzazione utenti predefiniti
-        listaClienti.add(new Cliente("Sammy", "Cliente", "sammy@gmail.com", "password123"));
+        // ------------------------------------------------------------------
+        // NOVITÀ: All'avvio, il Controller carica tutti i film da pgAdmin!
+        // ------------------------------------------------------------------
+        try {
+            this.listaFilm = filmDAO.recuperaTuttiFilm();
+        } catch (Exception e) {
+            System.out.println("Attenzione: Impossibile caricare i film dal database. " + e.getMessage());
+            this.listaFilm = new ArrayList<>(); // Se c'è un errore, crea almeno la lista vuota
+        }
+
+        // Inizializzazione dipendenti predefiniti (I dipendenti al momento restano in RAM)
         listaDipendenti.add(new Dipendente("Francesca", "Volpe", "francesca.volpe@enterprise.com", "sammy", "cassiere"));
+
+        // NUOVO DIPENDENTE: Sammy Savona (Manager) con accesso a tutti i pulsanti
+        listaDipendenti.add(new Dipendente("Sammy", "Savona", "savonasammy@enterprise.com", "1236", "manager"));
     }
 
     public void aggiungiFilm(Film nuovoFilm) throws Exception {
         if (nuovoFilm != null) {
-            listaFilm.add(nuovoFilm);
-            filmDAO.inserisciFilmDB(nuovoFilm);
+            filmDAO.inserisciFilmDB(nuovoFilm); // PRIMA Salva su database
+            listaFilm.add(nuovoFilm);           // POI Aggiorna la memoria RAM
         }
     }
 
@@ -47,17 +63,19 @@ public class Controller {
         return listaFilm;
     }
 
-    public void aggiungiCliente(Cliente nuovoCliente) {
+    // ORA SALVA NEL DATABASE!
+    public void aggiungiCliente(Cliente nuovoCliente) throws Exception {
         if (nuovoCliente != null) {
-            listaClienti.add(nuovoCliente);
+            clienteDAO.inserisciClienteDB(nuovoCliente); // Salva su pgAdmin
+            listaClienti.add(nuovoCliente); // Aggiorna anche la RAM
         }
     }
 
-    // Metodo per convalidare il login (Modificato senza eccezioni custom)
+    // ORA CONTROLLA IL DATABASE!
     public boolean validaLogin(String email, String password) throws Exception {
         Utente utente = recuperaUtente(email);
 
-        // Se l'utente non viene trovato nella lista
+        // Se l'utente non viene trovato nel DB né tra i dipendenti
         if (utente == null) {
             throw new Exception("Utente non trovato con questa email.");
         }
@@ -70,18 +88,21 @@ public class Controller {
         return true; // Login corretto
     }
 
-    // Metodo per recuperare l'utente tramite email
-    public Utente recuperaUtente(String email) {
-        for (Cliente c : listaClienti) {
-            if (c.getEmail().equalsIgnoreCase(email)) {
-                return c;
-            }
-        }
+    // ORA ESTRAE DAL DATABASE!
+    public Utente recuperaUtente(String email) throws Exception {
+        // 1. Prima cerca tra i dipendenti
         for (Dipendente d : listaDipendenti) {
             if (d.getEmail().equalsIgnoreCase(email)) {
                 return d;
             }
         }
+
+        // 2. Se non è un dipendente, cerca nel database clienti
+        Cliente clienteDalDB = clienteDAO.recuperaClienteDaDB(email);
+        if (clienteDalDB != null) {
+            return clienteDalDB;
+        }
+
         return null;
     }
 

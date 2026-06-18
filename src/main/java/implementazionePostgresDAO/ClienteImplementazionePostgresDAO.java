@@ -1,27 +1,25 @@
 package implementazionePostgresDAO;
 
 import dao.ClienteDAO;
-import model.Cliente;
 import database.ConnessioneDatabase;
+import model.Cliente;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class ClienteImplementazionePostgresDAO implements ClienteDAO {
 
     @Override
     public void inserisciClienteDB(Cliente cliente) throws SQLException {
-        String query = "INSERT INTO cliente (nome, cognome, email, password) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO cliente (email, nome, cognome, password, data_registrazione) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection con = ConnessioneDatabase.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
 
-            ps.setString(1, cliente.getNome());
-            ps.setString(2, cliente.getCognome());
-            ps.setString(3, cliente.getEmail());
+            ps.setString(1, cliente.getEmail());
+            ps.setString(2, cliente.getNome());
+            ps.setString(3, cliente.getCognome());
             ps.setString(4, cliente.getPassword());
+            ps.setDate(5, Date.valueOf(cliente.getDataRegistrazione()));
 
             ps.executeUpdate();
         }
@@ -38,15 +36,17 @@ public class ClienteImplementazionePostgresDAO implements ClienteDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new Cliente(
+                    Cliente cliente = new Cliente(
                             rs.getString("nome"),
                             rs.getString("cognome"),
                             rs.getString("email"),
                             rs.getString("password")
                     );
+                    cliente.setDataRegistrazione(rs.getDate("data_registrazione").toLocalDate());
+                    return cliente;
                 }
             }
         }
-        return null; // Ritorna null se l'utente con quella mail non esiste nel DB
+        return null; // Ritorna null se la mail non esiste nel DB
     }
 }
