@@ -39,96 +39,79 @@ public class Controller {
         this.clienteDAO = new ClienteImplementazionePostgresDAO();
         this.proiezioneDAO = new ProiezioneImplementazionePostgresDAO();
 
-        // ------------------------------------------------------------------
-        // NOVITÀ: All'avvio, il Controller carica tutti i film da pgAdmin!
-        // ------------------------------------------------------------------
         try {
             this.listaFilm = filmDAO.recuperaTuttiFilm();
         } catch (Exception e) {
             System.out.println("Attenzione: Impossibile caricare i film dal database. " + e.getMessage());
-            this.listaFilm = new ArrayList<>(); // Se c'è un errore, crea almeno la lista vuota
+            this.listaFilm = new ArrayList<>();
         }
 
-        // Inizializzazione dipendenti predefiniti (I dipendenti al momento restano in RAM)
         listaDipendenti.add(new Dipendente("Francesca", "Volpe", "francesca.volpe@enterprise.com", "sammy", "cassiere"));
-
-        // NUOVO DIPENDENTE: Sammy Savona (Manager) con accesso a tutti i pulsanti
         listaDipendenti.add(new Dipendente("Sammy", "Savona", "savonasammy@enterprise.com", "1236", "manager"));
     }
 
     public void aggiungiFilm(Film nuovoFilm) throws Exception {
         if (nuovoFilm != null) {
-            filmDAO.inserisciFilmDB(nuovoFilm); // PRIMA Salva su database
-            listaFilm.add(nuovoFilm);           // POI Aggiorna la memoria RAM
+            filmDAO.inserisciFilmDB(nuovoFilm);
+            listaFilm.add(nuovoFilm);
         }
     }
-
-    // ================= NUOVI METODI PER MODIFICA ED ELIMINAZIONE =================
 
     public void eliminaFilm(Film filmDaEliminare) throws Exception {
         if (filmDaEliminare != null) {
-            filmDAO.eliminaFilmDB(filmDaEliminare); // Elimina dal Database
-            listaFilm.remove(filmDaEliminare);      // Rimuove dalla memoria RAM
+            filmDAO.eliminaFilmDB(filmDaEliminare);
+            listaFilm.remove(filmDaEliminare);
         }
     }
 
-    public void modificaFilm(Film filmAttuale, String nTitolo, java.time.LocalTime nDurata, String nGenere, String nClass, String nTrama, String nPercorso) throws Exception {
+    public void modificaFilm(Film filmAttuale, String nTitolo, java.time.LocalTime nDurata, String nGenere, String nClass, String nTrama, String nPercorso, java.time.LocalDate nDataInizio) throws Exception {
         String vecchioTitolo = filmAttuale.getTitolo();
 
-        // Creiamo un oggetto temporaneo con i nuovi dati per passarlo al DAO
-        Film filmAggiornato = new Film(nTitolo, nDurata, nGenere, nClass, nTrama, filmAttuale.getRecensioniClienti(),nPercorso);
+        Film filmAggiornato = new Film(nTitolo, nDurata, nGenere, nClass, nTrama, filmAttuale.getRecensioniClienti(), nPercorso, nDataInizio);
 
-        filmDAO.aggiornaFilmDB(vecchioTitolo, filmAggiornato); // Aggiorna il DB
+        filmDAO.aggiornaFilmDB(vecchioTitolo, filmAggiornato);
 
-        // Se il DB è andato a buon fine, aggiorniamo l'oggetto in RAM
         filmAttuale.setTitolo(nTitolo);
         filmAttuale.setDurata(nDurata);
         filmAttuale.setGenere(nGenere);
         filmAttuale.setClassificazioneEta(nClass);
         filmAttuale.setTrama(nTrama);
+        filmAttuale.setPercorsoCopertina(nPercorso);
+        filmAttuale.setDataInizioProgrammazione(nDataInizio);
     }
-
-    // =============================================================================
 
     public ArrayList<Film> getListaFilm() {
         return listaFilm;
     }
 
-    // ORA SALVA NEL DATABASE!
     public void aggiungiCliente(Cliente nuovoCliente) throws Exception {
         if (nuovoCliente != null) {
-            clienteDAO.inserisciClienteDB(nuovoCliente); // Salva su pgAdmin
-            listaClienti.add(nuovoCliente); // Aggiorna anche la RAM
+            clienteDAO.inserisciClienteDB(nuovoCliente);
+            listaClienti.add(nuovoCliente);
         }
     }
 
-    // ORA CONTROLLA IL DATABASE!
     public boolean validaLogin(String email, String password) throws Exception {
         Utente utente = recuperaUtente(email);
 
-        // Se l'utente non viene trovato nel DB né tra i dipendenti
         if (utente == null) {
             throw new Exception("Utente non trovato con questa email.");
         }
 
-        // Se la password non corrisponde
         if (!utente.getPassword().equals(password)) {
             throw new Exception("Password errata.");
         }
 
-        return true; // Login corretto
+        return true;
     }
 
-    // ORA ESTRAE DAL DATABASE!
     public Utente recuperaUtente(String email) throws Exception {
-        // 1. Prima cerca tra i dipendenti
         for (Dipendente d : listaDipendenti) {
             if (d.getEmail().equalsIgnoreCase(email)) {
                 return d;
             }
         }
 
-        // 2. Se non è un dipendente, cerca nel database clienti
         Cliente clienteDalDB = clienteDAO.recuperaClienteDaDB(email);
         if (clienteDalDB != null) {
             return clienteDalDB;
@@ -137,7 +120,6 @@ public class Controller {
         return null;
     }
 
-
     public void aggiungiSegnalazione(String messaggio, Dipendente mittente) {
         if (mittente != null && messaggio != null) {
             String segnalazioneCompleta = mittente.getNome() + " " + mittente.getCognome() + " (" + mittente.getRuolo() + ") - " + messaggio;
@@ -145,7 +127,6 @@ public class Controller {
         }
     }
 
-    // Sovraccarico di sicurezza nel caso l'ordine dei parametri fosse invertito altrove
     public void aggiungiSegnalazione(Dipendente mittente, String messaggio) {
         this.aggiungiSegnalazione(messaggio, mittente);
     }
@@ -161,48 +142,39 @@ public class Controller {
     }
 
     public Biglietto convalidaBiglietto(String titoloFilm, char fila, int numeroPosto) {
-        // Cicliamo sulla lista dei biglietti esistenti
         for (Biglietto b : listaBiglietti) {
-
-            // CONTROLLO DI SICUREZZA: Evita che il programma vada in crash se mancano i collegamenti
             if (b == null || b.getProiezione() == null || b.getProiezione().getFilm() == null || b.getPostoAssegnato() == null) {
-                continue; // Se un dato è parziale o null, salta questo biglietto e passa al successivo senza crashare
+                continue;
             }
 
-            // Ora possiamo estrarre i dati in totale sicurezza
             String titoloReale = b.getProiezione().getFilm().getTitolo();
             char filaReale = b.getPostoAssegnato().getFila();
             int numeroPostoReale = b.getPostoAssegnato().getNumeroPosto();
 
-            // Verifichiamo se i dati inseriti nella Dashboard corrispondono a questo biglietto
             if (titoloReale != null && titoloReale.equalsIgnoreCase(titoloFilm) &&
                     Character.toUpperCase(filaReale) == Character.toUpperCase(fila) &&
                     numeroPostoReale == numeroPosto) {
 
-                // Se il biglietto è valido (cioè non è ancora stato obliterato/utilizzato)
                 if (!b.isValido()) {
-                    b.setValido(true); // Lo marchiamo come OBLITERATO/UTILIZZATO
-                    return b; // Ritorna il biglietto convalidato alla dashboard
+                    b.setValido(true);
+                    return b;
                 }
             }
         }
-
-        return null; // Ritorna null se non trova corrispondenze o se è già stato usato
+        return null;
     }
 
     public ArrayList<Proiezione> getProiezioniPerFilm(Film filmSelezionato) {
         try {
             if (filmSelezionato != null) {
-
                 return proiezioneDAO.recuperaProiezioniDiUnFilm(filmSelezionato);
             }
         } catch (Exception e) {
             System.out.println("Errore nel recupero delle proiezioni: " + e.getMessage());
         }
-        return new ArrayList<>(); // ritorna una lista vuota per sicurezza se errore
+        return new ArrayList<>();
     }
 
-    // carrello
     public static class ElementoCarrello {
         private Proiezione proiezione;
         private int quantita;
@@ -249,22 +221,19 @@ public class Controller {
         double prezzoSingoloScontato = prezzoBase - (prezzoBase * (percentualeSconto / 100.0));
 
         for (ElementoCarrello elem : carrello) {
-
-            // usare 'prezzoSingoloScontato' o il totale per la query SQL
             for (int i = 0; i < elem.getQuantita(); i++) {
                 acquistaBiglietto(prezzoSingoloScontato, null, elem.getProiezione(), null);
             }
         }
-
         svuotaCarrello();
     }
 
     public double valutaCodiceSconto(String codice) {
         if (codice == null) return 0.0;
         String cod = codice.toUpperCase().trim();
-        if (cod.equals("ENTERPRISE")) return 10.0; // 10% di sconto
-        if (cod.equals("SENIOR")) return 50.0;  // 50% di sconto
-        if (cod.equals("JUNIOR")) return 25.0; // 25% di sconto
+        if (cod.equals("ENTERPRISE")) return 10.0;
+        if (cod.equals("SENIOR")) return 50.0;
+        if (cod.equals("JUNIOR")) return 25.0;
 
         return 0.0;
     }

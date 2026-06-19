@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
 public class DashboardGestioneFilm extends JFrame {
@@ -27,7 +28,6 @@ public class DashboardGestioneFilm extends JFrame {
     private JButton buttonSalva;
     private JButton buttonAnnulla;
 
-    // Variabile per salvare il percorso dell'immagine scelta
     private String percorsoImmagineSelezionata = null;
 
     public DashboardGestioneFilm(Controller controller) {
@@ -39,7 +39,6 @@ public class DashboardGestioneFilm extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
-        // Griglia aumentata a 6 righe per fare spazio al caricamento immagine
         JPanel panelForm = new JPanel(new GridLayout(6, 2, 10, 10));
         panelForm.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
 
@@ -59,7 +58,6 @@ public class DashboardGestioneFilm extends JFrame {
         comboClassificazione = new JComboBox<>(new String[]{"T (Per Tutti)", "14+", "16+", "18+"});
         panelForm.add(comboClassificazione);
 
-        // --- NUOVA PARTE PER L'IMMAGINE ---
         panelForm.add(new JLabel("Copertina:"));
         JPanel panelImmagine = new JPanel(new BorderLayout(5, 5));
         btnScegliImmagine = new JButton("Scegli File...");
@@ -87,7 +85,6 @@ public class DashboardGestioneFilm extends JFrame {
         panelBottoni.add(buttonAnnulla);
         add(panelBottoni, BorderLayout.SOUTH);
 
-        // LISTENER PER IL PULSANTE IMMAGINE
         btnScegliImmagine.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setFileFilter(new FileNameExtensionFilter("Immagini (JPG, PNG)", "jpg", "jpeg", "png"));
@@ -95,16 +92,13 @@ public class DashboardGestioneFilm extends JFrame {
             if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 File fileSelezionato = fileChooser.getSelectedFile();
                 try {
-                    // Crea la cartella locandine se non esiste
                     File cartellaLocandine = new File("locandine");
                     if (!cartellaLocandine.exists()) cartellaLocandine.mkdir();
 
-                    // Copia il file selezionato dentro la cartella del progetto
                     Path origine = fileSelezionato.toPath();
                     Path destinazione = Paths.get("locandine", fileSelezionato.getName());
                     Files.copy(origine, destinazione, StandardCopyOption.REPLACE_EXISTING);
 
-                    // Salva il percorso per il database
                     percorsoImmagineSelezionata = "locandine/" + fileSelezionato.getName();
                     labelPathImmagine.setText("✅ " + fileSelezionato.getName());
                 } catch (Exception ex) {
@@ -131,8 +125,7 @@ public class DashboardGestioneFilm extends JFrame {
                 if (durataStr.length() == 5) durataStr += ":00";
                 LocalTime durata = LocalTime.parse(durataStr);
 
-                // Passiamo anche il percorsoImmagineSelezionata!
-                Film nuovoFilm = new Film(titolo, durata, genere, classificazione, trama, null, percorsoImmagineSelezionata);
+                Film nuovoFilm = new Film(titolo, durata, genere, classificazione, trama, null, percorsoImmagineSelezionata, LocalDate.now());
 
                 controller.aggiungiFilm(nuovoFilm);
 
