@@ -14,6 +14,7 @@ public class DashboardCliente extends JFrame {
     private JButton buttonModificaCredenziali;
     private JButton buttonCarrello;
     private JButton buttonBiglietti;
+    private JButton buttonTornaLogin;
 
     private Controller controller;
     private Cliente clienteLoggato;
@@ -34,6 +35,10 @@ public class DashboardCliente extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
             }
+        });
+        buttonTornaLogin.addActionListener(e -> {
+            this.dispose();
+            new Home(this.controller);
         });
 
         buttonCatalogoFilm.addActionListener(e -> {

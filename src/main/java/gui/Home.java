@@ -20,11 +20,6 @@ public class Home extends JFrame {
     private JButton buttonAccedi;
     private Controller controller;
 
-    public static void main(String[] args) {
-        Controller ctrl = new Controller();
-        new Home(ctrl);
-    }
-
     public Home(Controller controller) {
         this.controller = controller;
 
