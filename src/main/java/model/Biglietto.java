@@ -1,11 +1,14 @@
 package model;
 
+import java.util.Random;
+
 public class Biglietto {
     private double prezzoFinale;
     private boolean valido;
     private Posto postoAssegnato;
     private Proiezione proiezione;
     private Prenotazione prenotazione;
+    private String codiceUnivoco; // NUOVO ATTRIBUTO
 
     public Biglietto(double prezzoFinale, Posto postoAssegnato, Proiezione proiezione, Prenotazione prenotazione) {
         this.prezzoFinale = prezzoFinale;
@@ -13,12 +16,21 @@ public class Biglietto {
         this.postoAssegnato = postoAssegnato;
         this.proiezione = proiezione;
         this.prenotazione = prenotazione;
+        this.codiceUnivoco = generaCodiceA8Cifre(); // Generazione automatica
     }
 
     public Biglietto(double prezzoFinale, Posto postoAssegnato) {
         this.prezzoFinale = prezzoFinale;
         this.valido = false;
         this.postoAssegnato = postoAssegnato;
+        this.codiceUnivoco = generaCodiceA8Cifre(); // Generazione automatica
+    }
+
+    // Metodo per generare un numero casuale a 8 cifre
+    private String generaCodiceA8Cifre() {
+        Random rand = new Random();
+        int num = rand.nextInt(90000000) + 10000000; // Garantisce sempre un numero tra 10000000 e 99999999
+        return String.valueOf(num);
     }
 
     public void applicaSconto(double percentualeSconto) {
@@ -37,8 +49,9 @@ public class Biglietto {
                 "-----------------------------------\n" +
                 " Film: " + infoFilm + "\n" +
                 " " + dettagliPosto + "\n" +
+                " Codice Ingresso: " + codiceUnivoco + "\n" +
                 " Prezzo: €" + String.format("%.2f", prezzoFinale) + "\n" +
-                " Stato: " + (valido ? "OBLITERATO" : "VALIDO") + "\n" +
+                " Stato: " + (valido ? "CONVALIDATO" : "DA CONVALIDARE") + "\n" +
                 "----------------------------------";
     }
 
@@ -52,4 +65,5 @@ public class Biglietto {
     public void setValido(boolean valido) { this.valido = valido; }
     public double getPrezzoFinale() { return prezzoFinale; }
     public void setPrezzoFinale(double prezzoFinale) { this.prezzoFinale = prezzoFinale; }
+    public String getCodiceUnivoco() { return codiceUnivoco; } // Getter per il codice
 }

@@ -127,20 +127,29 @@ public class Controller {
         return nuovoBiglietto;
     }
 
-    public Biglietto convalidaBiglietto(String titoloFilm, char fila, int numeroPosto) {
+    // NUOVO METODO: Trova il biglietto tramite il codice univoco a 8 cifre e lo convalida
+    public Biglietto convalidaBigliettoPerCodice(String codiceUnivoco) throws Exception {
+        if (codiceUnivoco == null || codiceUnivoco.trim().isEmpty()) {
+            throw new Exception("Inserire un codice valido.");
+        }
+
+        // Cerca il biglietto in tutta la lista globale dei biglietti acquistati
         for (Biglietto b : listaBiglietti) {
-            if (b == null || b.getProiezione() == null || b.getProiezione().getFilm() == null || b.getPostoAssegnato() == null) continue;
-            String titoloReale = b.getProiezione().getFilm().getTitolo();
-            char filaReale = b.getPostoAssegnato().getFila();
-            int numeroPostoReale = b.getPostoAssegnato().getNumeroPosto();
-            if (titoloReale != null && titoloReale.equalsIgnoreCase(titoloFilm) && Character.toUpperCase(filaReale) == Character.toUpperCase(fila) && numeroPostoReale == numeroPosto) {
-                if (!b.isValido()) {
-                    b.setValido(true);
-                    return b;
+            if (b.getCodiceUnivoco() != null && b.getCodiceUnivoco().equals(codiceUnivoco)) {
+
+                // Se è già stato obliterato, blocca l'ingresso
+                if (b.isValido()) {
+                    throw new Exception("Attenzione! Questo biglietto (Codice: " + codiceUnivoco + ") risulta GIÀ CONVALIDATO precedentemente.");
                 }
+
+                // Convalida il biglietto
+                b.setValido(true);
+                return b;
             }
         }
-        return null;
+
+        // Se finisce il ciclo senza trovare nulla, il codice non esiste
+        throw new Exception("Codice inesistente. Nessun biglietto trovato per: " + codiceUnivoco);
     }
 
     public ArrayList<Proiezione> getProiezioniPerFilm(Film filmSelezionato) {
@@ -182,7 +191,7 @@ public class Controller {
         return this.listaBiglietti;
     }
 
-    // --- INIZIO LOGICA ASSEGNAZIONE POSTI (PASSO 3 E 4) ---
+    // --- INIZIO LOGICA ASSEGNAZIONE POSTI ---
 
     // 1. Controllo se un posto in quella specifica ora/sala è già occupato da un biglietto venduto
     private boolean isPostoOccupato(Proiezione proiezione, Posto posto) {
@@ -225,8 +234,6 @@ public class Controller {
             }
         }
 
-        // TENTATIVO B: (Piano B) Se la sala è pienissima e non ci sono N posti vicini,
-        // diamo i primi N posti vuoti rimasti (anche se separati)
         postiScelti.clear();
         for (Posto p : proiezione.getSala().getPosti()) {
             if (!isPostoOccupato(proiezione, p)) {
@@ -255,13 +262,12 @@ public class Controller {
                 // Prende il posto corrispondente
                 Posto postoEsatto = (i < postiAssegnati.size()) ? postiAssegnati.get(i) : null;
 
-                // Crea fisicamente il biglietto!
+                // Crea fisicamente il biglietto (ora genererà anche il codice univoco automaticamente in base alle tue modifiche)
                 acquistaBiglietto(prezzoSingoloScontato, postoEsatto, proiezione, null);
             }
         }
         svuotaCarrello();
     }
-    // --- FINE LOGICA ASSEGNAZIONE POSTI ---
 
     public double valutaCodiceSconto(String codice) {
         if (codice == null) return 0.0;
