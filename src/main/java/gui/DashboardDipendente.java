@@ -18,6 +18,7 @@ public class DashboardDipendente extends JFrame {
     private JButton buttonGestioneSale;
     private JButton buttonLeggiSegnalazioni;
     private JButton buttonInviaSegnalazione;
+    private JButton buttonTornaLogin; // NUOVO PULSANTE
     private JButton buttonEsci;
 
     private Controller controller;
@@ -34,7 +35,8 @@ public class DashboardDipendente extends JFrame {
         buttonGestioneSale = new JButton("Gestione Sale");
         buttonLeggiSegnalazioni = new JButton("Leggi Segnalazioni");
         buttonInviaSegnalazione = new JButton("Invia Segnalazione");
-        buttonEsci = new JButton("Esci");
+        buttonTornaLogin = new JButton("Torna al Login"); // INIZIALIZZAZIONE
+        buttonEsci = new JButton("Esci dal Programma"); // TESTO MODIFICATO
 
         mainPanel.setLayout(new BorderLayout(10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
@@ -45,12 +47,14 @@ public class DashboardDipendente extends JFrame {
         panelSuperiore.add(labelBenvenuto);
         mainPanel.add(panelSuperiore, BorderLayout.NORTH);
 
-        JPanel panelBottoni = new JPanel(new GridLayout(3, 2, 10, 10));
+        // GRIGLIA MODIFICATA: da 3 a 4 righe per fare spazio ai 7 pulsanti
+        JPanel panelBottoni = new JPanel(new GridLayout(4, 2, 10, 10));
         panelBottoni.add(buttonConvalidaBiglietti);
         panelBottoni.add(buttonInviaSegnalazione);
         panelBottoni.add(buttonLeggiSegnalazioni);
         panelBottoni.add(buttonGestioneFilm);
         panelBottoni.add(buttonGestioneSale);
+        panelBottoni.add(buttonTornaLogin); // AGGIUNTO ALLA GRIGLIA
         panelBottoni.add(buttonEsci);
         mainPanel.add(panelBottoni, BorderLayout.CENTER);
 
@@ -75,6 +79,13 @@ public class DashboardDipendente extends JFrame {
             JOptionPane.showMessageDialog(this, "Apertura modulo Gestione Sale...", "Gestione Sale", JOptionPane.INFORMATION_MESSAGE);
         });
 
+        // NUOVO LISTENER: Torna alla schermata di Login
+        buttonTornaLogin.addActionListener(e -> {
+            this.dispose(); // Chiude questa dashboard
+            new Home(this.controller).setVisible(true); // Riapre il login
+        });
+
+        // LISTENER ESISTENTE: Chiude tutto il programma
         buttonEsci.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

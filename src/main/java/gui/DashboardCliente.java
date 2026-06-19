@@ -45,17 +45,10 @@ public class DashboardCliente extends JFrame {
             });
         });
 
-        buttonMenuBar.addActionListener(e -> {
-            this.setVisible(false);
-            DashboardBar finestraBar = new DashboardBar(this.controller, this.clienteLoggato);
-            finestraBar.addWindowListener(new java.awt.event.WindowAdapter() {
-                @Override
-                public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                    DashboardCliente.this.setVisible(true);
-                }
-            });
+        buttonMenuBar.addActionListener(e ->
+        {
+            JOptionPane.showMessageDialog(this,"Apertura Menù Bar in corso...");
         });
-
         buttonModificaCredenziali.addActionListener(e ->
         {
             JOptionPane.showMessageDialog(this,"Apertura procedura per modificare le credenziali...");

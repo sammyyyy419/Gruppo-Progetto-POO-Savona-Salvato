@@ -12,18 +12,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 public class DashboardPrenotazione extends JFrame {
+    // Componenti GUI
     private JPanel panelPrenotazione;
     private JLabel labelTitoloFilm;
-    private JPanel panelDettagliFilm;
     private JLabel labelDettagliFilm;
-    private JPanel panelGiorno;
-    private JLabel labelGiorno;
     private JComboBox<String> comboGiorni;
-    private JPanel panelOrari;
-    private JLabel labelOrari;
     private JComboBox<Proiezione> comboOrari;
-    private JPanel panelBiglietti;
-    private JLabel labelBiglietti;
     private JComboBox<Integer> comboQuantita;
     private JLabel labelTotPagamento;
     private JButton pulsantePagamento;
@@ -39,14 +33,20 @@ public class DashboardPrenotazione extends JFrame {
         this.controller = controller;
         this.clienteLoggato = cliente;
         this.filmSelezionato = film;
+
+        // 1. Costruisce l'interfaccia grafica (bypassando il file .form e i suoi errori)
+        inizializzaInterfaccia();
+
         setContentPane(panelPrenotazione);
-        setTitle("Prenotazione Biglietti");
-        setSize(550, 500);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setTitle("Prenotazione Biglietti - Enterprise Cinema");
+        setSize(550, 450);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE); // Chiude solo questa finestra
         setLocationRelativeTo(null);
 
+        // 2. Inserimento dati iniziali
         labelTitoloFilm.setText(filmSelezionato.getTitolo().toUpperCase());
         labelDettagliFilm.setText("Genere: " + filmSelezionato.getGenere() + "    Durata: " + filmSelezionato.getDurata() + " min");
+
         for (int i = 1; i <= 10; i++) {
             comboQuantita.addItem(i);
         }
@@ -62,6 +62,11 @@ public class DashboardPrenotazione extends JFrame {
         for (String giorno : giorni) {
             comboGiorni.addItem(giorno);
         }
+
+        // =================================================================
+        // LISTENER DEI COMPONENTI
+        // =================================================================
+
         comboGiorni.addActionListener(e -> {
             if (inInizializzazione) return;
 
@@ -126,8 +131,11 @@ public class DashboardPrenotazione extends JFrame {
         });
 
         pulsantePagamento.addActionListener(e -> {
-            // da impelemntare collegamento col pagamento
+            JOptionPane.showMessageDialog(this, "Reindirizzamento al modulo di pagamento in corso...");
+            // TODO: Implementare collegamento col pagamento
         });
+
+        // 3. Setup finale pre-visualizzazione
         inInizializzazione = false;
         if (comboGiorni.getItemCount() > 0) {
             comboGiorni.setSelectedIndex(0);
@@ -137,5 +145,52 @@ public class DashboardPrenotazione extends JFrame {
         }
 
         setVisible(true);
+    }
+
+    /**
+     * Metodo per generare la grafica senza dipendere dal file .form di IntelliJ.
+     */
+    private void inizializzaInterfaccia() {
+        panelPrenotazione = new JPanel(new BorderLayout(15, 15));
+        panelPrenotazione.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Pannello Superiore: Titolo e Info Film
+        JPanel topPanel = new JPanel(new GridLayout(2, 1, 5, 5));
+        labelTitoloFilm = new JLabel("", SwingConstants.CENTER);
+        labelTitoloFilm.setFont(new Font("Arial", Font.BOLD, 22));
+        labelTitoloFilm.setForeground(new Color(30, 60, 100)); // Colore blu scuro
+        labelDettagliFilm = new JLabel("", SwingConstants.CENTER);
+        labelDettagliFilm.setFont(new Font("Arial", Font.ITALIC, 14));
+        topPanel.add(labelTitoloFilm);
+        topPanel.add(labelDettagliFilm);
+        panelPrenotazione.add(topPanel, BorderLayout.NORTH);
+
+        // Pannello Centrale: Griglia per le combobox
+        JPanel centerPanel = new JPanel(new GridLayout(3, 2, 10, 20));
+        comboGiorni = new JComboBox<>();
+        comboOrari = new JComboBox<>();
+        comboQuantita = new JComboBox<>();
+
+        centerPanel.add(new JLabel("Seleziona Giorno:", SwingConstants.RIGHT));
+        centerPanel.add(comboGiorni);
+        centerPanel.add(new JLabel("Seleziona Orario:", SwingConstants.RIGHT));
+        centerPanel.add(comboOrari);
+        centerPanel.add(new JLabel("Quantità Biglietti:", SwingConstants.RIGHT));
+        centerPanel.add(comboQuantita);
+        panelPrenotazione.add(centerPanel, BorderLayout.CENTER);
+
+        // Pannello Inferiore: Riepilogo prezzo e pulsante pagamento
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
+        labelTotPagamento = new JLabel("Tot. : 0,00 €");
+        labelTotPagamento.setFont(new Font("Arial", Font.BOLD, 18));
+        pulsantePagamento = new JButton("Procedi al Pagamento");
+        pulsantePagamento.setBackground(new Color(46, 204, 113)); // Verde scuro
+        pulsantePagamento.setForeground(Color.WHITE);
+        pulsantePagamento.setFont(new Font("Arial", Font.BOLD, 14));
+        pulsantePagamento.setEnabled(false); // Disabilitato finché non si sceglie tutto
+
+        bottomPanel.add(labelTotPagamento);
+        bottomPanel.add(pulsantePagamento);
+        panelPrenotazione.add(bottomPanel, BorderLayout.SOUTH);
     }
 }

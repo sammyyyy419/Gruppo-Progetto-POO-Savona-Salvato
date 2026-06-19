@@ -26,6 +26,8 @@ public class DashboardCatalogoFilm extends JFrame {
         setSize(850, 600);
         setLocationRelativeTo(null);
 
+        setVisible(true);
+
         panelListaFilm.setLayout(new BoxLayout(panelListaFilm, BoxLayout.Y_AXIS));
 
         // Metodo commentato per ora, se vuoi inserire i film dal database!
@@ -113,6 +115,7 @@ public class DashboardCatalogoFilm extends JFrame {
 
         tornaAlMenuButton.addActionListener(e -> {
             this.dispose();
+            new DashboardCliente(this.controller, this.clienteLoggato);
         });
     }
 
