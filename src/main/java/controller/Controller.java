@@ -12,6 +12,8 @@ import dao.FilmDAO;
 import dao.ClienteDAO;
 import implementazionePostgresDAO.FilmImplementazionePostgresDAO;
 import implementazionePostgresDAO.ClienteImplementazionePostgresDAO;
+import dao.ProiezioneDAO;
+import implementazionePostgresDAO.ProiezioneImplementazionePostgresDAO;
 
 import java.util.ArrayList;
 
@@ -21,6 +23,7 @@ public class Controller {
     private ArrayList<Dipendente> listaDipendenti;
     private ArrayList<String> listaSegnalazioni;
     private ArrayList<Biglietto> listaBiglietti;
+    private ProiezioneDAO proiezioneDAO;
     private ArrayList<Film> listaFilm;
 
     private FilmDAO filmDAO;
@@ -34,6 +37,7 @@ public class Controller {
 
         this.filmDAO = new FilmImplementazionePostgresDAO();
         this.clienteDAO = new ClienteImplementazionePostgresDAO();
+        this.proiezioneDAO = new ProiezioneImplementazionePostgresDAO();
 
         // ------------------------------------------------------------------
         // NOVITÀ: All'avvio, il Controller carica tutti i film da pgAdmin!
@@ -159,5 +163,17 @@ public class Controller {
         }
 
         return null; // Ritorna null se non trova corrispondenze o se è già stato usato
+    }
+
+    public ArrayList<Proiezione> getProiezioniPerFilm(Film filmSelezionato) {
+        try {
+            if (filmSelezionato != null) {
+
+                return proiezioneDAO.recuperaProiezioniDiUnFilm(filmSelezionato);
+            }
+        } catch (Exception e) {
+            System.out.println("Errore nel recupero delle proiezioni: " + e.getMessage());
+        }
+        return new ArrayList<>(); // ritorna una lista vuota per sicurezza se errore
     }
 }

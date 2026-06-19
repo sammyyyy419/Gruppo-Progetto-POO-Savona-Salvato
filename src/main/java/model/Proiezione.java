@@ -38,6 +38,14 @@ public class Proiezione {
     public void setDataOraInizio(LocalDateTime dataOraInizio) { this.dataOraInizio = dataOraInizio; }
     public LocalDateTime getDataOraFine() { return dataOraFine; }
     public void setDataOraFine(LocalDateTime dataOraFine) { this.dataOraFine = dataOraFine; }
+    @Override
+    public String toString() {
+        if (this.dataOraInizio != null) {
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            return this.dataOraInizio.format(formatter);
+        }
+        return "Data non disponibile";
+    }
     public double getPrezzoBase() { return prezzoBase; }
     public void setPrezzoBase(double prezzoBase) { this.prezzoBase = prezzoBase; }
     public Film getFilm() { return film; }

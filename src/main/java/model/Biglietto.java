@@ -1,10 +1,8 @@
 package model;
 
 public class Biglietto {
-
     private double prezzoFinale;
     private boolean valido;
-
     private Posto postoAssegnato;
     private Proiezione proiezione;
     private Prenotazione prenotazione;

@@ -39,6 +39,22 @@ public class DashboardCatalogoFilm extends JFrame {
             JPanel rigaFilm = new JPanel(new BorderLayout(15, 10));
             rigaFilm.setBorder(BorderFactory.createEmptyBorder(12, 15, 12, 15));
 
+            /*
+            String titoloImg = film.getTitolo().toLowerCase().replace(" ", "_");
+            String nomeImmagine = "/" + titoloImg + ".png";
+            java.net.URL imageUrl = DashboardCatalogoFilm.class.getResource(nomeImmagine);
+
+            if (imageUrl != null) {
+                ImageIcon iconaOriginale = new ImageIcon(imageUrl);
+                Image imgScalata = iconaOriginale.getImage().getScaledInstance(60, 90, Image.SCALE_SMOOTH);
+                labelLocandina.setIcon(new ImageIcon(imgScalata));
+            } else {
+                labelLocandina.setText("🎬");
+                labelLocandina.setPreferredSize(new Dimension(60, 90));
+                labelLocandina.setHorizontalAlignment(SwingConstants.CENTER);
+                labelLocandina.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            } */
+
             JLabel labelLocandina = new JLabel("🎬");
             labelLocandina.setPreferredSize(new Dimension(60, 90));
             labelLocandina.setHorizontalAlignment(SwingConstants.CENTER);
@@ -88,6 +104,9 @@ public class DashboardCatalogoFilm extends JFrame {
                 mostraFinestraDettagli(film);
             });
 
+            pulsantePrenotazione.addActionListener(e -> {
+                new DashboardPrenotazione(controller, clienteLoggato, film);
+            });
             panelListaFilm.add(rigaFilm);
             panelListaFilm.add(new JSeparator(JSeparator.HORIZONTAL));
         }
