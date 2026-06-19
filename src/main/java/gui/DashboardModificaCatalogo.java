@@ -62,23 +62,20 @@ public class DashboardModificaCatalogo extends JFrame {
         riga.setBorder(BorderFactory.createEmptyBorder(12, 15, 12, 15));
         riga.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
 
-        // Visualizza la locandina VERA se esiste
         JLabel labelLocandina = new JLabel();
         labelLocandina.setPreferredSize(new Dimension(60, 90));
         labelLocandina.setHorizontalAlignment(SwingConstants.CENTER);
         labelLocandina.setBorder(BorderFactory.createLineBorder(Color.GRAY));
 
         if (film.getPercorsoCopertina() != null && !film.getPercorsoCopertina().isEmpty()) {
-            // Crea l'icona e la ridimensiona per adattarsi al box
             ImageIcon icon = new ImageIcon(film.getPercorsoCopertina());
             Image img = icon.getImage().getScaledInstance(60, 90, Image.SCALE_SMOOTH);
             labelLocandina.setIcon(new ImageIcon(img));
         } else {
-            labelLocandina.setText("🎬"); // Se non c'è, mostra l'emoji di default
+            labelLocandina.setText("🎬");
         }
         riga.add(labelLocandina, BorderLayout.WEST);
 
-        // Dati del film
         JPanel panelTesto = new JPanel();
         panelTesto.setLayout(new BoxLayout(panelTesto, BoxLayout.Y_AXIS));
         JLabel labelTitolo = new JLabel(film.getTitolo());
@@ -93,7 +90,6 @@ public class DashboardModificaCatalogo extends JFrame {
         panelTesto.add(labelClass);
         riga.add(panelTesto, BorderLayout.CENTER);
 
-        // Bottoni
         JPanel panelPulsanti = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 15));
         JButton btnModifica = new JButton("Modifica ✏️");
         JButton btnElimina = new JButton("Elimina 🗑️");
@@ -132,7 +128,7 @@ public class DashboardModificaCatalogo extends JFrame {
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
 
-        JPanel formPanel = new JPanel(new GridLayout(6, 2, 10, 10)); // Aumentato a 6
+        JPanel formPanel = new JPanel(new GridLayout(6, 2, 10, 10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         JTextField txtTitolo = new JTextField(film.getTitolo());
@@ -142,7 +138,6 @@ public class DashboardModificaCatalogo extends JFrame {
         JComboBox<String> cmbClassificazione = new JComboBox<>(new String[]{"T (Per Tutti)", "14+", "16+", "18+"});
         cmbClassificazione.setSelectedItem(film.getClassificazioneEta());
 
-        // Array speciale per poter modificare la stringa dentro il pulsante
         final String[] percorsoAggiornato = {film.getPercorsoCopertina()};
 
         JButton btnCambiaImmagine = new JButton("Cambia Foto...");
@@ -180,7 +175,7 @@ public class DashboardModificaCatalogo extends JFrame {
         formPanel.add(new JLabel("Durata (HH:MM):")); formPanel.add(txtDurata);
         formPanel.add(new JLabel("Genere:")); formPanel.add(txtGenere);
         formPanel.add(new JLabel("Classificazione:")); formPanel.add(cmbClassificazione);
-        formPanel.add(new JLabel("Copertina:")); formPanel.add(panelImg); // Aggiunto il pannello immagine
+        formPanel.add(new JLabel("Copertina:")); formPanel.add(panelImg);
         formPanel.add(new JLabel("Trama:")); formPanel.add(scrollTrama);
 
         dialog.add(formPanel, BorderLayout.CENTER);
@@ -199,7 +194,7 @@ public class DashboardModificaCatalogo extends JFrame {
                 String nClass = (String) cmbClassificazione.getSelectedItem();
                 String nTrama = txtTrama.getText().trim();
 
-                controller.modificaFilm(film, nTitolo, nDurata, nGenere, nClass, nTrama, percorsoAggiornato[0]);
+                controller.modificaFilm(film, nTitolo, nDurata, nGenere, nClass, nTrama, percorsoAggiornato[0], film.getDataInizioProgrammazione());
 
                 JOptionPane.showMessageDialog(dialog, "Film aggiornato!");
                 dialog.dispose();
