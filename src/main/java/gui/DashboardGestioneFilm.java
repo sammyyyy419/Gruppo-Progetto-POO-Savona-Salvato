@@ -4,7 +4,13 @@ import controller.Controller;
 import model.Film;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 
@@ -16,19 +22,25 @@ public class DashboardGestioneFilm extends JFrame {
     private JTextField textGenere;
     private JComboBox<String> comboClassificazione;
     private JTextArea textTrama;
+    private JButton btnScegliImmagine;
+    private JLabel labelPathImmagine;
     private JButton buttonSalva;
     private JButton buttonAnnulla;
+
+    // Variabile per salvare il percorso dell'immagine scelta
+    private String percorsoImmagineSelezionata = null;
 
     public DashboardGestioneFilm(Controller controller) {
         this.controller = controller;
 
         setTitle("Gestione Film - Inserimento Nuovo Titolo");
-        setSize(500, 500);
+        setSize(550, 550);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
-        JPanel panelForm = new JPanel(new GridLayout(5, 2, 10, 10));
+        // Griglia aumentata a 6 righe per fare spazio al caricamento immagine
+        JPanel panelForm = new JPanel(new GridLayout(6, 2, 10, 10));
         panelForm.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
 
         panelForm.add(new JLabel("Titolo del Film:"));
@@ -44,66 +56,94 @@ public class DashboardGestioneFilm extends JFrame {
         panelForm.add(textGenere);
 
         panelForm.add(new JLabel("Classificazione Età:"));
-        String[] opzioniEta = {"T (Per Tutti)", "14+", "16+", "18+"};
-        comboClassificazione = new JComboBox<>(opzioniEta);
+        comboClassificazione = new JComboBox<>(new String[]{"T (Per Tutti)", "14+", "16+", "18+"});
         panelForm.add(comboClassificazione);
 
-        add(panelForm, BorderLayout.NORTH);
+        // --- NUOVA PARTE PER L'IMMAGINE ---
+        panelForm.add(new JLabel("Copertina:"));
+        JPanel panelImmagine = new JPanel(new BorderLayout(5, 5));
+        btnScegliImmagine = new JButton("Scegli File...");
+        labelPathImmagine = new JLabel("Nessun file");
+        panelImmagine.add(btnScegliImmagine, BorderLayout.WEST);
+        panelImmagine.add(labelPathImmagine, BorderLayout.CENTER);
+        panelForm.add(panelImmagine);
 
-        JPanel panelTrama = new JPanel(new BorderLayout());
-        panelTrama.setBorder(BorderFactory.createEmptyBorder(0, 20, 10, 20));
-        panelTrama.add(new JLabel("Trama:"), BorderLayout.NORTH);
-
-        textTrama = new JTextArea(5, 20);
+        panelForm.add(new JLabel("Trama:"));
+        textTrama = new JTextArea();
         textTrama.setLineWrap(true);
         textTrama.setWrapStyleWord(true);
         JScrollPane scrollTrama = new JScrollPane(textTrama);
-        panelTrama.add(scrollTrama, BorderLayout.CENTER);
+        panelForm.add(scrollTrama);
 
-        add(panelTrama, BorderLayout.CENTER);
+        add(panelForm, BorderLayout.CENTER);
 
-        JPanel panelPulsanti = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel panelBottoni = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         buttonSalva = new JButton("Salva nel Database");
+        buttonSalva.setBackground(new Color(46, 204, 113));
+        buttonSalva.setForeground(Color.WHITE);
         buttonAnnulla = new JButton("Annulla");
 
-        panelPulsanti.add(buttonSalva);
-        panelPulsanti.add(buttonAnnulla);
-        add(panelPulsanti, BorderLayout.SOUTH);
+        panelBottoni.add(buttonSalva);
+        panelBottoni.add(buttonAnnulla);
+        add(panelBottoni, BorderLayout.SOUTH);
+
+        // LISTENER PER IL PULSANTE IMMAGINE
+        btnScegliImmagine.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setFileFilter(new FileNameExtensionFilter("Immagini (JPG, PNG)", "jpg", "jpeg", "png"));
+
+            if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                File fileSelezionato = fileChooser.getSelectedFile();
+                try {
+                    // Crea la cartella locandine se non esiste
+                    File cartellaLocandine = new File("locandine");
+                    if (!cartellaLocandine.exists()) cartellaLocandine.mkdir();
+
+                    // Copia il file selezionato dentro la cartella del progetto
+                    Path origine = fileSelezionato.toPath();
+                    Path destinazione = Paths.get("locandine", fileSelezionato.getName());
+                    Files.copy(origine, destinazione, StandardCopyOption.REPLACE_EXISTING);
+
+                    // Salva il percorso per il database
+                    percorsoImmagineSelezionata = "locandine/" + fileSelezionato.getName();
+                    labelPathImmagine.setText("✅ " + fileSelezionato.getName());
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Errore durante il caricamento: " + ex.getMessage(), "Errore", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
 
         buttonAnnulla.addActionListener(e -> this.dispose());
-        buttonSalva.addActionListener(e -> salvaFilm());
-    }
 
-    private void salvaFilm() {
-        String titolo = textTitolo.getText().trim();
-        String durataStr = textDurata.getText().trim();
-        String genere = textGenere.getText().trim();
-        String classificazione = (String) comboClassificazione.getSelectedItem();
-        String trama = textTrama.getText().trim();
+        buttonSalva.addActionListener(e -> {
+            String titolo = textTitolo.getText().trim();
+            String durataStr = textDurata.getText().trim();
+            String genere = textGenere.getText().trim();
+            String classificazione = (String) comboClassificazione.getSelectedItem();
+            String trama = textTrama.getText().trim();
 
-        if (titolo.isEmpty() || durataStr.isEmpty() || genere.isEmpty() || trama.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Compila tutti i campi prima di salvare.", "Attenzione", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        try {
-            if (durataStr.length() == 5) {
-                durataStr += ":00";
+            if (titolo.isEmpty() || durataStr.isEmpty() || genere.isEmpty() || trama.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Compila tutti i campi prima di salvare.", "Attenzione", JOptionPane.WARNING_MESSAGE);
+                return;
             }
-            LocalTime durata = LocalTime.parse(durataStr);
 
-            Film nuovoFilm = new Film(titolo, durata, genere, classificazione, trama, null);
+            try {
+                if (durataStr.length() == 5) durataStr += ":00";
+                LocalTime durata = LocalTime.parse(durataStr);
 
-            controller.aggiungiFilm(nuovoFilm);
+                // Passiamo anche il percorsoImmagineSelezionata!
+                Film nuovoFilm = new Film(titolo, durata, genere, classificazione, trama, null, percorsoImmagineSelezionata);
 
-            JOptionPane.showMessageDialog(this, "Film '" + titolo + "' registrato con successo nel Database!", "Successo", JOptionPane.INFORMATION_MESSAGE);
-            this.dispose();
+                controller.aggiungiFilm(nuovoFilm);
 
-        } catch (DateTimeParseException ex) {
-            JOptionPane.showMessageDialog(this, "Formato durata non valido. Usa HH:MM (es. 02:15).", "Errore Input", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Errore durante il salvataggio nel database:\n" + ex.getMessage(), "Errore DB", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-        }
+                JOptionPane.showMessageDialog(this, "Film '" + titolo + "' registrato con successo nel Database!", "Successo", JOptionPane.INFORMATION_MESSAGE);
+                this.dispose();
+
+            } catch (DateTimeParseException ex) {
+                JOptionPane.showMessageDialog(this, "Formato durata non valido. Usa HH:MM (es. 02:15).", "Errore Input", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Errore durante il salvataggio nel database:\n" + ex.getMessage(), "Errore DB", JOptionPane.ERROR_MESSAGE);
+            }
+        });
     }
 }

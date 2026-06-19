@@ -164,9 +164,6 @@ public class DashboardPrenotazione extends JFrame {
         setVisible(true);
     }
 
-    /**
-     * Metodo per generare la grafica senza dipendere dal file .form di IntelliJ.
-     */
     private void inizializzaInterfaccia() {
         panelPrenotazione = new JPanel(new BorderLayout(15, 15));
         panelPrenotazione.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));

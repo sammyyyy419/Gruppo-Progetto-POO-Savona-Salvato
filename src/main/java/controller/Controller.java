@@ -63,6 +63,33 @@ public class Controller {
         }
     }
 
+    // ================= NUOVI METODI PER MODIFICA ED ELIMINAZIONE =================
+
+    public void eliminaFilm(Film filmDaEliminare) throws Exception {
+        if (filmDaEliminare != null) {
+            filmDAO.eliminaFilmDB(filmDaEliminare); // Elimina dal Database
+            listaFilm.remove(filmDaEliminare);      // Rimuove dalla memoria RAM
+        }
+    }
+
+    public void modificaFilm(Film filmAttuale, String nTitolo, java.time.LocalTime nDurata, String nGenere, String nClass, String nTrama, String nPercorso) throws Exception {
+        String vecchioTitolo = filmAttuale.getTitolo();
+
+        // Creiamo un oggetto temporaneo con i nuovi dati per passarlo al DAO
+        Film filmAggiornato = new Film(nTitolo, nDurata, nGenere, nClass, nTrama, filmAttuale.getRecensioniClienti(),nPercorso);
+
+        filmDAO.aggiornaFilmDB(vecchioTitolo, filmAggiornato); // Aggiorna il DB
+
+        // Se il DB è andato a buon fine, aggiorniamo l'oggetto in RAM
+        filmAttuale.setTitolo(nTitolo);
+        filmAttuale.setDurata(nDurata);
+        filmAttuale.setGenere(nGenere);
+        filmAttuale.setClassificazioneEta(nClass);
+        filmAttuale.setTrama(nTrama);
+    }
+
+    // =============================================================================
+
     public ArrayList<Film> getListaFilm() {
         return listaFilm;
     }
@@ -110,9 +137,7 @@ public class Controller {
         return null;
     }
 
-    /**
-     * CORREZIONE 1: Metodo richiesto da DashboardDipendente (Messaggio, Dipendente)
-     */
+
     public void aggiungiSegnalazione(String messaggio, Dipendente mittente) {
         if (mittente != null && messaggio != null) {
             String segnalazioneCompleta = mittente.getNome() + " " + mittente.getCognome() + " (" + mittente.getRuolo() + ") - " + messaggio;
@@ -220,8 +245,8 @@ public class Controller {
     }
 
     public void confermaAcquistoCarrello(String metodoPagamento, double percentualeSconto) {
-       double prezzoBase = 8.00;
-       double prezzoSingoloScontato = prezzoBase - (prezzoBase * (percentualeSconto / 100.0));
+        double prezzoBase = 8.00;
+        double prezzoSingoloScontato = prezzoBase - (prezzoBase * (percentualeSconto / 100.0));
 
         for (ElementoCarrello elem : carrello) {
 

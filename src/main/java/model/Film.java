@@ -9,22 +9,26 @@ public class Film {
     private String genere;
     private String classificazioneEta;
     private String trama;
-    private ArrayList<String> recensioni=new ArrayList<>();
+    private ArrayList<String> recensioni = new ArrayList<>();
 
-    public Film(String titolo, LocalTime durata, String genere, String classificazioneEta, String trama, ArrayList<String> recensioni) {
+    // NUOVO: variabile per il percorso dell'immagine (es. "locandine/nomefile.jpg")
+    private String percorsoCopertina;
+
+    public Film(String titolo, LocalTime durata, String genere, String classificazioneEta, String trama, ArrayList<String> recensioni, String percorsoCopertina) {
         this.titolo = titolo;
         this.durata = durata;
         this.genere = genere;
         this.classificazioneEta = classificazioneEta;
         this.trama = trama;
         this.recensioni = (recensioni != null) ? recensioni : new ArrayList<>();
+        this.percorsoCopertina = percorsoCopertina;
     }
 
     public int getDurataMinuti(){
-        if(this.durata==null){
+        if(this.durata == null){
             return 0;
         }
-        return (this.durata.getHour()*60)+this.durata.getMinute();
+        return (this.durata.getHour() * 60) + this.durata.getMinute();
     }
 
     public void aggiungiFeedback(String commento, int voto) {
@@ -48,6 +52,8 @@ public class Film {
                 "--------------------------------------------------";
     }
 
+    // --- GETTER E SETTER AGGIORNATI ---
+
     public String getTitolo() { return titolo; }
     public void setTitolo(String titolo) { this.titolo = titolo; }
     public LocalTime getDurata() { return durata; }
@@ -60,4 +66,8 @@ public class Film {
     public void setTrama(String trama) { this.trama = trama; }
     public ArrayList<String> getRecensioni() { return recensioni; }
     public void setRecensioni(ArrayList<String> recensioni) { this.recensioni = recensioni; }
+
+    // Getter e Setter per il nuovo campo
+    public String getPercorsoCopertina() { return percorsoCopertina; }
+    public void setPercorsoCopertina(String percorsoCopertina) { this.percorsoCopertina = percorsoCopertina; }
 }

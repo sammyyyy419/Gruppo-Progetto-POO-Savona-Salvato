@@ -18,9 +18,9 @@ public class DashboardDipendente extends JFrame {
     private JButton buttonGestioneSale;
     private JButton buttonLeggiSegnalazioni;
     private JButton buttonInviaSegnalazione;
-    private JButton buttonTornaLogin; // NUOVO PULSANTE
+    private JButton buttonTornaLogin;
     private JButton buttonEsci;
-    private JButton btnModificaCatalogoFilm;
+    private JButton btnModificaCatalogoFilm; // Variabile esistente
 
     private Controller controller;
     private Dipendente dipendenteLoggato;
@@ -32,12 +32,15 @@ public class DashboardDipendente extends JFrame {
         mainPanel = new JPanel();
         labelBenvenuto = new JLabel();
         buttonConvalidaBiglietti = new JButton("Convalida Biglietti");
-        buttonInserisciFilm = new JButton("Gestione Film");
-        buttonGestioneSale = new JButton("Gestione Sale");
-        buttonLeggiSegnalazioni = new JButton("Leggi Segnalazioni");
         buttonInviaSegnalazione = new JButton("Invia Segnalazione");
-        buttonTornaLogin = new JButton("Torna al Login"); // INIZIALIZZAZIONE
-        buttonEsci = new JButton("Esci dal Programma"); // TESTO MODIFICATO
+        buttonLeggiSegnalazioni = new JButton("Leggi Segnalazioni");
+        buttonInserisciFilm = new JButton("Inserisci Film");
+        buttonGestioneSale = new JButton("Gestione Sale");
+        buttonTornaLogin = new JButton("Torna al Login");
+
+        // CORREZIONE 1: Inizializzazione del pulsante mancante
+        btnModificaCatalogoFilm = new JButton("Modifica Catalogo Completo");
+        buttonEsci = new JButton("Esci dal Programma");
 
         mainPanel.setLayout(new BorderLayout(10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
@@ -48,15 +51,19 @@ public class DashboardDipendente extends JFrame {
         panelSuperiore.add(labelBenvenuto);
         mainPanel.add(panelSuperiore, BorderLayout.NORTH);
 
-        // GRIGLIA MODIFICATA: da 3 a 4 righe per fare spazio ai 7 pulsanti
+        // Pannello bottoni a griglia (4 righe x 2 colonne = 8 slot totali)
         JPanel panelBottoni = new JPanel(new GridLayout(4, 2, 10, 10));
-        panelBottoni.add(buttonConvalidaBiglietti);
-        panelBottoni.add(buttonInviaSegnalazione);
-        panelBottoni.add(buttonLeggiSegnalazioni);
-        panelBottoni.add(buttonInserisciFilm);
-        panelBottoni.add(buttonGestioneSale);
-        panelBottoni.add(buttonTornaLogin); // AGGIUNTO ALLA GRIGLIA
-        panelBottoni.add(buttonEsci);
+        panelBottoni.add(buttonConvalidaBiglietti);  // Slot 1
+        panelBottoni.add(buttonInviaSegnalazione);    // Slot 2
+        panelBottoni.add(buttonLeggiSegnalazioni);    // Slot 3
+        panelBottoni.add(buttonInserisciFilm);        // Slot 4
+        panelBottoni.add(buttonGestioneSale);         // Slot 5
+        panelBottoni.add(buttonTornaLogin);           // Slot 6
+
+        // CORREZIONE 2: Aggiunta del pulsante alla griglia visiva
+        panelBottoni.add(btnModificaCatalogoFilm);    // Slot 7
+        panelBottoni.add(buttonEsci);                 // Slot 8
+
         mainPanel.add(panelBottoni, BorderLayout.CENTER);
 
         setContentPane(mainPanel);
@@ -65,13 +72,13 @@ public class DashboardDipendente extends JFrame {
         setSize(550, 400);
         setLocationRelativeTo(null);
 
+        // Applica le restrizioni sui pulsanti in base al ruolo
         configuraPermessi();
 
         buttonInviaSegnalazione.addActionListener(e -> inviaSegnalazione());
         buttonLeggiSegnalazioni.addActionListener(e -> leggiSegnalazioni());
         buttonConvalidaBiglietti.addActionListener(e -> eseguiConvalidaBiglietti());
 
-        // APRE LA SCHERMATA DI INSERIMENTO FILM
         buttonInserisciFilm.addActionListener(e -> {
             new DashboardGestioneFilm(this.controller).setVisible(true);
         });
@@ -80,13 +87,16 @@ public class DashboardDipendente extends JFrame {
             JOptionPane.showMessageDialog(this, "Apertura modulo Gestione Sale...", "Gestione Sale", JOptionPane.INFORMATION_MESSAGE);
         });
 
-        // NUOVO LISTENER: Torna alla schermata di Login
-        buttonTornaLogin.addActionListener(e -> {
-            this.dispose(); // Chiude questa dashboard
-            new Home(this.controller).setVisible(true); // Riapre il login
+        // CORREZIONE 3: Listener provvisorio per il pulsante di modifica catalogo
+        btnModificaCatalogoFilm.addActionListener(e -> {
+            new DashboardModificaCatalogo(this.controller).setVisible(true);
         });
 
-        // LISTENER ESISTENTE: Chiude tutto il programma
+        buttonTornaLogin.addActionListener(e -> {
+            this.dispose();
+            new Home(this.controller).setVisible(true);
+        });
+
         buttonEsci.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -101,21 +111,26 @@ public class DashboardDipendente extends JFrame {
             case "cassiere":
                 buttonInserisciFilm.setEnabled(false);
                 buttonGestioneSale.setEnabled(false);
+                btnModificaCatalogoFilm.setEnabled(false); // CORREZIONE 4: Bloccato per il cassiere
                 break;
             case "proiezionista":
                 buttonConvalidaBiglietti.setEnabled(false);
                 buttonGestioneSale.setEnabled(false);
+                // Lasciato TRUE: Come richiesto, il proiezionista può modificare il catalogo
                 break;
             case "addetto alle pulizie":
                 buttonConvalidaBiglietti.setEnabled(false);
                 buttonInserisciFilm.setEnabled(false);
                 buttonGestioneSale.setEnabled(false);
+                btnModificaCatalogoFilm.setEnabled(false); // CORREZIONE 5: Bloccato per addetto pulizie
                 break;
             case "manager":
+                // Il manager ha accesso totale, nessun pulsante viene disabilitato
                 break;
             default:
                 buttonInserisciFilm.setEnabled(false);
                 buttonGestioneSale.setEnabled(false);
+                btnModificaCatalogoFilm.setEnabled(false);
                 break;
         }
     }

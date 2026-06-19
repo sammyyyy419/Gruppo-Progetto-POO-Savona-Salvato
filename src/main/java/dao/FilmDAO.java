@@ -8,6 +8,12 @@ public interface FilmDAO {
     // Salva un nuovo film
     void inserisciFilmDB(Film film) throws SQLException;
 
-    // Novità: Estrae tutti i film dal database
+    // Estrae tutti i film dal database
     ArrayList<Film> recuperaTuttiFilm() throws SQLException;
+
+    // ELIMINA un film dal database
+    void eliminaFilmDB(Film film) throws SQLException;
+
+    // AGGIORNA un film esistente nel database
+    void aggiornaFilmDB(String vecchioTitolo, Film nuovoFilm) throws SQLException;
 }

@@ -5,7 +5,7 @@ import model.Cliente;
 import model.Film;
 import javax.swing.*;
 import java.awt.*;
-import java.time.LocalTime;
+import java.io.File;
 import java.util.ArrayList;
 
 public class DashboardCatalogoFilm extends JFrame {
@@ -23,72 +23,70 @@ public class DashboardCatalogoFilm extends JFrame {
         setContentPane(panelCatalogo);
         setTitle("Catalogo Film Disponibili");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setSize(850, 600);
+        setSize(900, 700); // Leggermente più grande per contenere meglio le immagini
         setLocationRelativeTo(null);
 
-        setVisible(true);
-
         panelListaFilm.setLayout(new BoxLayout(panelListaFilm, BoxLayout.Y_AXIS));
-
-        // Metodo commentato per ora, se vuoi inserire i film dal database!
-        // se vuoi auto-popolarla per test de-commenta la riga sotto:
-        // inizializzaFilmDiProva();
 
         ArrayList<Film> filmDisponibili = controller.getListaFilm();
 
         for (Film film : filmDisponibili) {
 
-            JPanel rigaFilm = new JPanel(new BorderLayout(15, 10));
-            rigaFilm.setBorder(BorderFactory.createEmptyBorder(12, 15, 12, 15));
+            // Pannello riga con layout moderno
+            JPanel rigaFilm = new JPanel(new BorderLayout(20, 10));
+            rigaFilm.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
+                    BorderFactory.createEmptyBorder(15, 15, 15, 15)
+            ));
+            rigaFilm.setBackground(Color.WHITE);
 
-            /*
-            String titoloImg = film.getTitolo().toLowerCase().replace(" ", "_");
-            String nomeImmagine = "/" + titoloImg + ".png";
-            java.net.URL imageUrl = DashboardCatalogoFilm.class.getResource(nomeImmagine);
+            // --- LOGICA CARICAMENTO IMMAGINE MIGLIORATA ---
+            JLabel labelLocandina = new JLabel();
+            labelLocandina.setPreferredSize(new Dimension(120, 180));
+            labelLocandina.setHorizontalAlignment(SwingConstants.CENTER);
+            // Niente bordi aggressivi, solo spazio pulito
+            labelLocandina.setBorder(BorderFactory.createEmptyBorder());
 
-            if (imageUrl != null) {
-                ImageIcon iconaOriginale = new ImageIcon(imageUrl);
-                Image imgScalata = iconaOriginale.getImage().getScaledInstance(60, 90, Image.SCALE_SMOOTH);
-                labelLocandina.setIcon(new ImageIcon(imgScalata));
+            if (film.getPercorsoCopertina() != null && !film.getPercorsoCopertina().isEmpty()) {
+                File fileImmagine = new File(film.getPercorsoCopertina());
+                if (fileImmagine.exists()) {
+                    ImageIcon icona = new ImageIcon(film.getPercorsoCopertina());
+                    Image imgScalata = icona.getImage().getScaledInstance(120, 180, Image.SCALE_SMOOTH);
+                    labelLocandina.setIcon(new ImageIcon(imgScalata));
+                } else {
+                    labelLocandina.setText("N/D");
+                }
             } else {
                 labelLocandina.setText("🎬");
-                labelLocandina.setPreferredSize(new Dimension(60, 90));
-                labelLocandina.setHorizontalAlignment(SwingConstants.CENTER);
-                labelLocandina.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            } */
-
-            JLabel labelLocandina = new JLabel("🎬");
-            labelLocandina.setPreferredSize(new Dimension(60, 90));
-            labelLocandina.setHorizontalAlignment(SwingConstants.CENTER);
-            labelLocandina.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+                labelLocandina.setFont(new Font("SansSerif", Font.PLAIN, 40));
+            }
             rigaFilm.add(labelLocandina, BorderLayout.WEST);
 
+            // Panel testo con font più leggibili
             JPanel panelTesto = new JPanel();
             panelTesto.setLayout(new BoxLayout(panelTesto, BoxLayout.Y_AXIS));
+            panelTesto.setBackground(Color.WHITE);
 
             JLabel labelTitolo = new JLabel(film.getTitolo());
-            labelTitolo.setFont(new Font("Arial", Font.BOLD, 16));
+            labelTitolo.setFont(new Font("SansSerif", Font.BOLD, 20));
 
             JLabel labelInfoGenerali = new JLabel("Genere: " + film.getGenere() + "  |  Durata: " + film.getDurataMinuti() + " min");
-            labelInfoGenerali.setFont(new Font("Arial", Font.PLAIN, 13));
+            labelInfoGenerali.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
             JLabel labelClassificazione = new JLabel("Classificazione Età: " + film.getClassificazioneEta());
-            labelClassificazione.setFont(new Font("Arial", Font.PLAIN, 13));
-
-            JLabel labelSalaOrario = new JLabel("Sala: Sala 1  |  Orario: 18:30 - 21:00");
-            labelSalaOrario.setFont(new Font("Arial", Font.PLAIN, 13));
+            labelClassificazione.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
             panelTesto.add(labelTitolo);
-            panelTesto.add(Box.createVerticalStrut(5));
+            panelTesto.add(Box.createVerticalStrut(10));
             panelTesto.add(labelInfoGenerali);
-            panelTesto.add(Box.createVerticalStrut(3));
+            panelTesto.add(Box.createVerticalStrut(5));
             panelTesto.add(labelClassificazione);
-            panelTesto.add(Box.createVerticalStrut(3));
-            panelTesto.add(labelSalaOrario);
 
             rigaFilm.add(panelTesto, BorderLayout.CENTER);
 
-            JPanel panelPulsanti = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 15));
+            // Pannello bottoni
+            JPanel panelPulsanti = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+            panelPulsanti.setBackground(Color.WHITE);
             JButton pulsanteTrama = new JButton("Visualizza Trama");
             JButton pulsanteRecensioni = new JButton("Recensioni");
             JButton pulsantePrenotazione = new JButton("Prenota Biglietti");
@@ -96,7 +94,7 @@ public class DashboardCatalogoFilm extends JFrame {
             panelPulsanti.add(pulsanteTrama);
             panelPulsanti.add(pulsanteRecensioni);
             panelPulsanti.add(pulsantePrenotazione);
-            rigaFilm.add(panelPulsanti, BorderLayout.EAST);
+            rigaFilm.add(panelPulsanti, BorderLayout.SOUTH); // Spostato in basso nella riga per pulizia
 
             pulsanteRecensioni.addActionListener(e -> {
                 JOptionPane.showMessageDialog(this, "Sezione Recensioni non ancora popolata.", "Recensioni: " + film.getTitolo(), JOptionPane.INFORMATION_MESSAGE);
@@ -109,14 +107,16 @@ public class DashboardCatalogoFilm extends JFrame {
             pulsantePrenotazione.addActionListener(e -> {
                 new DashboardPrenotazione(controller, clienteLoggato, film);
             });
+
             panelListaFilm.add(rigaFilm);
-            panelListaFilm.add(new JSeparator(JSeparator.HORIZONTAL));
         }
 
         tornaAlMenuButton.addActionListener(e -> {
             this.dispose();
             new DashboardCliente(this.controller, this.clienteLoggato);
         });
+
+        setVisible(true);
     }
 
     private void mostraFinestraDettagli(Film film) {
@@ -130,43 +130,24 @@ public class DashboardCatalogoFilm extends JFrame {
         panelContenuto.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
 
         JLabel dTitolo = new JLabel(film.getTitolo());
-        dTitolo.setFont(new Font("Arial", Font.BOLD, 20));
-
-        JLabel dInfo = new JLabel("<html><body style='font-family: Arial; font-size: 11px;'>"
-                + "<b>Genere:</b> " + film.getGenere() + " &nbsp;|&nbsp; <b>Durata:</b> " + film.getDurataMinuti() + " min<br>"
-                + "<b>Classificazione Età:</b> " + film.getClassificazioneEta() + "<br>"
-                + "<b>Ubicazione:</b> Sala 1 &nbsp;|&nbsp; <b>Orario Sessione:</b> 18:30 - 21:00"
-                + "</body></html>");
-        dInfo.setBorder(BorderFactory.createEmptyBorder(10, 0, 15, 0));
+        dTitolo.setFont(new Font("SansSerif", Font.BOLD, 20));
 
         JTextArea dTrama = new JTextArea(film.getTrama());
         dTrama.setLineWrap(true);
         dTrama.setWrapStyleWord(true);
         dTrama.setEditable(false);
-        dTrama.setBackground(panelContenuto.getBackground());
-        dTrama.setFont(new Font("Arial", Font.ITALIC, 14));
-
+        dTrama.setFont(new Font("SansSerif", Font.PLAIN, 14));
         JScrollPane scrollTrama = new JScrollPane(dTrama);
-        scrollTrama.setBorder(BorderFactory.createTitledBorder("Trama del Film"));
 
         panelContenuto.add(dTitolo);
-        panelContenuto.add(dInfo);
+        panelContenuto.add(Box.createVerticalStrut(15));
         panelContenuto.add(scrollTrama);
 
         dialogDettagli.add(panelContenuto, BorderLayout.CENTER);
 
-        JPanel panelInferiore = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 12));
-        JButton buttonAcquista = new JButton("Acquista");
         JButton buttonChiudi = new JButton("Chiudi");
-
         buttonChiudi.addActionListener(ev -> dialogDettagli.dispose());
-        buttonAcquista.addActionListener(ev -> {
-            JOptionPane.showMessageDialog(dialogDettagli, "Funzionalità di acquisto non ancora implementata.", "Acquista", JOptionPane.INFORMATION_MESSAGE);
-        });
-
-        panelInferiore.add(buttonAcquista);
-        panelInferiore.add(buttonChiudi);
-        dialogDettagli.add(panelInferiore, BorderLayout.SOUTH);
+        dialogDettagli.add(buttonChiudi, BorderLayout.SOUTH);
 
         dialogDettagli.setVisible(true);
     }
