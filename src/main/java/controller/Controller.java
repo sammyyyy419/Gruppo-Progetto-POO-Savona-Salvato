@@ -176,4 +176,71 @@ public class Controller {
         }
         return new ArrayList<>(); // ritorna una lista vuota per sicurezza se errore
     }
+
+    // carrello
+    public static class ElementoCarrello {
+        private Proiezione proiezione;
+        private int quantita;
+        private double prezzoTotale;
+        public ElementoCarrello(Proiezione proiezione, int quantita, double prezzoTotale) {
+            this.proiezione = proiezione;
+            this.quantita = quantita;
+            this.prezzoTotale = prezzoTotale;
+        }
+        public Proiezione getProiezione() { return proiezione; }
+        public int getQuantita() { return quantita; }
+        public double getPrezzoTotale() { return prezzoTotale; }
+    }
+
+    private ArrayList<ElementoCarrello> carrello = new ArrayList<>();
+    public void aggiungiAlCarrello(Proiezione proiezione, int quantita, double prezzoTotale) {
+        this.carrello.add(new ElementoCarrello(proiezione, quantita, prezzoTotale));
+    }
+
+    public ArrayList<ElementoCarrello> getCarrello() {
+        return carrello;
+    }
+
+    public void rimuoviDalCarrello(ElementoCarrello elemento) {
+        if (elemento != null) {
+            this.carrello.remove(elemento);
+        }
+    }
+
+    public double calcolaTotaleCarrello() {
+        double totale = 0;
+        for (ElementoCarrello elem : carrello) {
+            totale += elem.getPrezzoTotale();
+        }
+        return totale;
+    }
+
+    public void svuotaCarrello() {
+        this.carrello.clear();
+    }
+
+    public void confermaAcquistoCarrello(String metodoPagamento, double percentualeSconto) {
+       double prezzoBase = 8.00;
+       double prezzoSingoloScontato = prezzoBase - (prezzoBase * (percentualeSconto / 100.0));
+
+        for (ElementoCarrello elem : carrello) {
+
+            // usare 'prezzoSingoloScontato' o il totale per la query SQL
+            for (int i = 0; i < elem.getQuantita(); i++) {
+                acquistaBiglietto(prezzoSingoloScontato, null, elem.getProiezione(), null);
+            }
+        }
+
+        svuotaCarrello();
+    }
+
+    public double valutaCodiceSconto(String codice) {
+        if (codice == null) return 0.0;
+        String cod = codice.toUpperCase().trim();
+        if (cod.equals("ENTERPRISE")) return 10.0; // 10% di sconto
+        if (cod.equals("SENIOR")) return 50.0;  // 50% di sconto
+        if (cod.equals("JUNIOR")) return 25.0; // 25% di sconto
+
+        return 0.0;
+    }
 }

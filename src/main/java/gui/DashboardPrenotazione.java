@@ -20,7 +20,8 @@ public class DashboardPrenotazione extends JFrame {
     private JComboBox<Proiezione> comboOrari;
     private JComboBox<Integer> comboQuantita;
     private JLabel labelTotPagamento;
-    private JButton pulsantePagamento;
+    private JButton pulsanteAggiungiCarrello;
+    private JButton pulsanteTorna;
 
     private Controller controller;
     private Cliente clienteLoggato;
@@ -34,13 +35,13 @@ public class DashboardPrenotazione extends JFrame {
         this.clienteLoggato = cliente;
         this.filmSelezionato = film;
 
-        // 1. Costruisce l'interfaccia grafica (bypassando il file .form e i suoi errori)
+        // 1. Costruisce l'interfaccia grafica
         inizializzaInterfaccia();
 
         setContentPane(panelPrenotazione);
         setTitle("Prenotazione Biglietti - Enterprise Cinema");
-        setSize(550, 450);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE); // Chiude solo questa finestra
+        setSize(600, 480);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
         // 2. Inserimento dati iniziali
@@ -67,11 +68,16 @@ public class DashboardPrenotazione extends JFrame {
         // LISTENER DEI COMPONENTI
         // =================================================================
 
+        // Azione del pulsante Torna
+        pulsanteTorna.addActionListener(e -> {
+            this.dispose();
+        });
+
         comboGiorni.addActionListener(e -> {
             if (inInizializzazione) return;
 
             comboOrari.removeAllItems();
-            pulsantePagamento.setEnabled(false);
+            pulsanteAggiungiCarrello.setEnabled(false);
             String giornoSelezionato = (String) comboGiorni.getSelectedItem();
             if (giornoSelezionato != null) {
                 for (Proiezione p : proiezioni) {
@@ -92,7 +98,7 @@ public class DashboardPrenotazione extends JFrame {
 
                 if (postiLiberi < 1) {
                     JOptionPane.showMessageDialog(this, "Siamo spiacenti! Non ci sono più biglietti disponibili per la data/ora scelti", "Posti Esauriti", JOptionPane.WARNING_MESSAGE);
-                    pulsantePagamento.setEnabled(false);
+                    pulsanteAggiungiCarrello.setEnabled(false);
                     this.dispose();
                     return;
                 }
@@ -104,9 +110,9 @@ public class DashboardPrenotazione extends JFrame {
 
                 double totale = quantita * prezzoSingoloBiglietto;
                 labelTotPagamento.setText("Tot. : " + String.format("%.2f", totale) + " €");
-                pulsantePagamento.setEnabled(true);
+                pulsanteAggiungiCarrello.setEnabled(true);
             } else {
-                pulsantePagamento.setEnabled(false);
+                pulsanteAggiungiCarrello.setEnabled(false);
             }
         });
 
@@ -126,13 +132,24 @@ public class DashboardPrenotazione extends JFrame {
                 }
                 double totale = quantita * prezzoSingoloBiglietto;
                 labelTotPagamento.setText("Tot. : " + String.format("%.2f", totale) + " €");
-                pulsantePagamento.setEnabled(true);
+                pulsanteAggiungiCarrello.setEnabled(true);
             }
         });
 
-        pulsantePagamento.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Reindirizzamento al modulo di pagamento in corso...");
-            // TODO: Implementare collegamento col pagamento
+        // Azione del pulsante Aggiungi al Carrello aggiornata
+        pulsanteAggiungiCarrello.addActionListener(e -> {
+            Proiezione proiezioneSelezionata = (Proiezione) comboOrari.getSelectedItem();
+            Integer quantita = (Integer) comboQuantita.getSelectedItem();
+
+            if (proiezioneSelezionata != null && quantita != null) {
+                double totale = quantita * prezzoSingoloBiglietto;
+
+                // Salva i dati dentro il carrello globale del controller
+                controller.aggiungiAlCarrello(proiezioneSelezionata, quantita, totale);
+
+                JOptionPane.showMessageDialog(this, "I biglietti sono stati aggiunti con successo al tuo carrello!", "Carrello Aggiornato", JOptionPane.INFORMATION_MESSAGE);
+                this.dispose();
+            }
         });
 
         // 3. Setup finale pre-visualizzazione
@@ -154,19 +171,36 @@ public class DashboardPrenotazione extends JFrame {
         panelPrenotazione = new JPanel(new BorderLayout(15, 15));
         panelPrenotazione.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Pannello Superiore: Titolo e Info Film
-        JPanel topPanel = new JPanel(new GridLayout(2, 1, 5, 5));
+        // Pannello Superiore strutturato a BorderLayout per accogliere il tasto Torna a sinistra
+        JPanel topPanel = new JPanel(new BorderLayout(15, 5));
+
+        pulsanteTorna = new JButton("← Torna al Catalogo");
+        pulsanteTorna.setFocusable(false);
+
+        JPanel wrapperBottone = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 10));
+        wrapperBottone.add(pulsanteTorna);
+
+        JPanel infoFilmPanel = new JPanel(new GridLayout(2, 1, 5, 5));
         labelTitoloFilm = new JLabel("", SwingConstants.CENTER);
         labelTitoloFilm.setFont(new Font("Arial", Font.BOLD, 22));
-        labelTitoloFilm.setForeground(new Color(30, 60, 100)); // Colore blu scuro
+        labelTitoloFilm.setForeground(new Color(30, 60, 100));
         labelDettagliFilm = new JLabel("", SwingConstants.CENTER);
         labelDettagliFilm.setFont(new Font("Arial", Font.ITALIC, 14));
-        topPanel.add(labelTitoloFilm);
-        topPanel.add(labelDettagliFilm);
+        infoFilmPanel.add(labelTitoloFilm);
+        infoFilmPanel.add(labelDettagliFilm);
+
+        // Questo spacer finto a destra controbilancia il pulsante a sinistra tenendo il titolo centrato
+        JLabel spacerDestro = new JLabel("");
+        spacerDestro.setPreferredSize(new Dimension(145, 10));
+
+        topPanel.add(wrapperBottone, BorderLayout.WEST);
+        topPanel.add(infoFilmPanel, BorderLayout.CENTER);
+        topPanel.add(spacerDestro, BorderLayout.EAST);
+
         panelPrenotazione.add(topPanel, BorderLayout.NORTH);
 
         // Pannello Centrale: Griglia per le combobox
-        JPanel centerPanel = new JPanel(new GridLayout(3, 2, 10, 20));
+        JPanel centerPanel = new JPanel(new GridLayout(3, 2, 10, 25));
         comboGiorni = new JComboBox<>();
         comboOrari = new JComboBox<>();
         comboQuantita = new JComboBox<>();
@@ -179,18 +213,19 @@ public class DashboardPrenotazione extends JFrame {
         centerPanel.add(comboQuantita);
         panelPrenotazione.add(centerPanel, BorderLayout.CENTER);
 
-        // Pannello Inferiore: Riepilogo prezzo e pulsante pagamento
+        // Pannello Inferiore: Riepilogo prezzo e pulsante carrello
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
         labelTotPagamento = new JLabel("Tot. : 0,00 €");
         labelTotPagamento.setFont(new Font("Arial", Font.BOLD, 18));
-        pulsantePagamento = new JButton("Procedi al Pagamento");
-        pulsantePagamento.setBackground(new Color(46, 204, 113)); // Verde scuro
-        pulsantePagamento.setForeground(Color.WHITE);
-        pulsantePagamento.setFont(new Font("Arial", Font.BOLD, 14));
-        pulsantePagamento.setEnabled(false); // Disabilitato finché non si sceglie tutto
+
+        pulsanteAggiungiCarrello = new JButton("Aggiungi al Carrello 🛒");
+        pulsanteAggiungiCarrello.setBackground(new Color(41, 128, 185)); // Un bel blu per l'azione del carrello
+        pulsanteAggiungiCarrello.setForeground(Color.WHITE);
+        pulsanteAggiungiCarrello.setFont(new Font("Arial", Font.BOLD, 14));
+        pulsanteAggiungiCarrello.setEnabled(false);
 
         bottomPanel.add(labelTotPagamento);
-        bottomPanel.add(pulsantePagamento);
+        bottomPanel.add(pulsanteAggiungiCarrello);
         panelPrenotazione.add(bottomPanel, BorderLayout.SOUTH);
     }
 }
