@@ -14,12 +14,13 @@ public class DashboardDipendente extends JFrame {
     private JPanel mainPanel;
     private JLabel labelBenvenuto;
     private JButton buttonConvalidaBiglietti;
-    private JButton buttonGestioneFilm;
+    private JButton buttonInserisciFilm;
     private JButton buttonGestioneSale;
     private JButton buttonLeggiSegnalazioni;
     private JButton buttonInviaSegnalazione;
     private JButton buttonTornaLogin; // NUOVO PULSANTE
     private JButton buttonEsci;
+    private JButton btnModificaCatalogoFilm;
 
     private Controller controller;
     private Dipendente dipendenteLoggato;
@@ -31,7 +32,7 @@ public class DashboardDipendente extends JFrame {
         mainPanel = new JPanel();
         labelBenvenuto = new JLabel();
         buttonConvalidaBiglietti = new JButton("Convalida Biglietti");
-        buttonGestioneFilm = new JButton("Gestione Film");
+        buttonInserisciFilm = new JButton("Gestione Film");
         buttonGestioneSale = new JButton("Gestione Sale");
         buttonLeggiSegnalazioni = new JButton("Leggi Segnalazioni");
         buttonInviaSegnalazione = new JButton("Invia Segnalazione");
@@ -52,7 +53,7 @@ public class DashboardDipendente extends JFrame {
         panelBottoni.add(buttonConvalidaBiglietti);
         panelBottoni.add(buttonInviaSegnalazione);
         panelBottoni.add(buttonLeggiSegnalazioni);
-        panelBottoni.add(buttonGestioneFilm);
+        panelBottoni.add(buttonInserisciFilm);
         panelBottoni.add(buttonGestioneSale);
         panelBottoni.add(buttonTornaLogin); // AGGIUNTO ALLA GRIGLIA
         panelBottoni.add(buttonEsci);
@@ -71,7 +72,7 @@ public class DashboardDipendente extends JFrame {
         buttonConvalidaBiglietti.addActionListener(e -> eseguiConvalidaBiglietti());
 
         // APRE LA SCHERMATA DI INSERIMENTO FILM
-        buttonGestioneFilm.addActionListener(e -> {
+        buttonInserisciFilm.addActionListener(e -> {
             new DashboardGestioneFilm(this.controller).setVisible(true);
         });
 
@@ -98,7 +99,7 @@ public class DashboardDipendente extends JFrame {
         String ruolo = dipendenteLoggato.getRuolo().toLowerCase();
         switch (ruolo) {
             case "cassiere":
-                buttonGestioneFilm.setEnabled(false);
+                buttonInserisciFilm.setEnabled(false);
                 buttonGestioneSale.setEnabled(false);
                 break;
             case "proiezionista":
@@ -107,13 +108,13 @@ public class DashboardDipendente extends JFrame {
                 break;
             case "addetto alle pulizie":
                 buttonConvalidaBiglietti.setEnabled(false);
-                buttonGestioneFilm.setEnabled(false);
+                buttonInserisciFilm.setEnabled(false);
                 buttonGestioneSale.setEnabled(false);
                 break;
             case "manager":
                 break;
             default:
-                buttonGestioneFilm.setEnabled(false);
+                buttonInserisciFilm.setEnabled(false);
                 buttonGestioneSale.setEnabled(false);
                 break;
         }

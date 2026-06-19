@@ -35,7 +35,7 @@ public class DashboardCliente extends JFrame {
         });
 
         buttonCatalogoFilm.addActionListener(e -> {
-             this.setVisible(false);
+            this.setVisible(false);
             DashboardCatalogoFilm finestraCatalogo = new DashboardCatalogoFilm(this.controller, this.clienteLoggato);
             finestraCatalogo.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
@@ -45,12 +45,22 @@ public class DashboardCliente extends JFrame {
             });
         });
 
-        buttonMenuBar.addActionListener(e ->
-        {
-            JOptionPane.showMessageDialog(this,"Apertura Menù Bar in corso...");
+        // ======= MODIFICA APPORTATA QUI =======
+        buttonMenuBar.addActionListener(e -> {
+            this.setVisible(false); // Nasconde la dashboard del cliente
+            DashboardBar finestraBar = new DashboardBar(this.controller, this.clienteLoggato); // Apre il menù del bar
+
+            // Aggiungiamo un listener per sapere quando la finestra del bar viene chiusa
+            finestraBar.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                    DashboardCliente.this.setVisible(true); // Mostra di nuovo la dashboard cliente
+                }
+            });
         });
-        buttonModificaCredenziali.addActionListener(e ->
-        {
+        // ======================================
+
+        buttonModificaCredenziali.addActionListener(e -> {
             JOptionPane.showMessageDialog(this,"Apertura procedura per modificare le credenziali...");
         });
     }
