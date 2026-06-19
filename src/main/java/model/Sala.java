@@ -11,20 +11,21 @@ public class Sala {
     private ArrayList<Posto> posti;
     private ArrayList<Proiezione> proiezioni;
 
-    public Sala(String numeroSala, int capienza, String tipoSala) {
+    public Sala(String numeroSala, int capienzaGenerica, String tipoSala) {
         this.numeroSala = numeroSala;
-        this.capienza = capienza;
+        // Imponiamo la tua regola fissa: 180 posti totali per ogni sala!
+        this.capienza = 180;
         this.tipoSala = tipoSala;
         this.posti = new ArrayList<>();
         this.proiezioni = new ArrayList<>();
 
-        int postiPerFila = 10;
+        // Generazione esatta delle poltrone: File da 'A' ad 'L' (12 file) e Posti da 1 a 15
         char filaCorrente = 'A';
-        for (int i = 1; i <= capienza; i++) {
-            this.posti.add(new Posto(((i - 1) % postiPerFila) + 1, filaCorrente));
-            if (i % postiPerFila == 0) {
-                filaCorrente++;
+        for (int i = 0; i < 12; i++) { // Ciclo per le 12 file
+            for (int numPosto = 1; numPosto <= 15; numPosto++) { // Ciclo per i 15 posti per fila
+                this.posti.add(new Posto(numPosto, filaCorrente));
             }
+            filaCorrente++; // Passa alla lettera successiva (A -> B -> C...)
         }
     }
 

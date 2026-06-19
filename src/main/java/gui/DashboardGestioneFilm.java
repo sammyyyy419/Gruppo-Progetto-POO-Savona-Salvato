@@ -22,6 +22,7 @@ public class DashboardGestioneFilm extends JFrame {
     private JTextField textDurata;
     private JTextField textGenere;
     private JComboBox<String> comboClassificazione;
+    private JComboBox<String> comboSala; // AGGIUNTO
     private JTextArea textTrama;
     private JButton btnScegliImmagine;
     private JLabel labelPathImmagine;
@@ -39,7 +40,8 @@ public class DashboardGestioneFilm extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
-        JPanel panelForm = new JPanel(new GridLayout(6, 2, 10, 10));
+        // AGGIORNATO: 7 righe invece di 6
+        JPanel panelForm = new JPanel(new GridLayout(7, 2, 10, 10));
         panelForm.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
 
         panelForm.add(new JLabel("Titolo del Film:"));
@@ -53,6 +55,13 @@ public class DashboardGestioneFilm extends JFrame {
         panelForm.add(new JLabel("Genere:"));
         textGenere = new JTextField();
         panelForm.add(textGenere);
+
+        // AGGIUNTA SALA
+        panelForm.add(new JLabel("Sala Assegnata:"));
+        String[] sale = new String[12];
+        for(int i=0; i<12; i++) sale[i] = "Sala " + (i+1);
+        comboSala = new JComboBox<>(sale);
+        panelForm.add(comboSala);
 
         panelForm.add(new JLabel("Classificazione Età:"));
         comboClassificazione = new JComboBox<>(new String[]{"T (Per Tutti)", "14+", "16+", "18+"});
@@ -115,6 +124,7 @@ public class DashboardGestioneFilm extends JFrame {
             String genere = textGenere.getText().trim();
             String classificazione = (String) comboClassificazione.getSelectedItem();
             String trama = textTrama.getText().trim();
+            String salaScelta = (String) comboSala.getSelectedItem(); // AGGIUNTO
 
             if (titolo.isEmpty() || durataStr.isEmpty() || genere.isEmpty() || trama.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Compila tutti i campi prima di salvare.", "Attenzione", JOptionPane.WARNING_MESSAGE);
@@ -125,7 +135,8 @@ public class DashboardGestioneFilm extends JFrame {
                 if (durataStr.length() == 5) durataStr += ":00";
                 LocalTime durata = LocalTime.parse(durataStr);
 
-                Film nuovoFilm = new Film(titolo, durata, genere, classificazione, trama, null, percorsoImmagineSelezionata, LocalDate.now());
+                // AGGIUNTO: salaScelta nel costruttore
+                Film nuovoFilm = new Film(titolo, durata, genere, classificazione, trama, null, percorsoImmagineSelezionata, LocalDate.now(), salaScelta);
 
                 controller.aggiungiFilm(nuovoFilm);
 

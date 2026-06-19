@@ -36,13 +36,23 @@ public class DashboardCarrello extends JFrame {
         setLocationRelativeTo(null);
 
         listaElementiCarrello.setLayout(new BoxLayout(listaElementiCarrello, BoxLayout.Y_AXIS));
+
         tornaAlMenuButton.addActionListener(e -> {
             processWindowEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
         });
 
+        // MODIFICA: Collegamento effettivo alla DashboardPagamento
         buttonPagamento.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Reindirizzamento alla procedura di pagamento di € " + String.format("%.2f", controller.calcolaTotaleCarrello()));
-            // implementare DashboardPagamento
+            this.dispose(); // Chiude la finestra del carrello
+            DashboardPagamento finestraPagamento = new DashboardPagamento(this.controller, this.clienteLoggato);
+
+            // Aggiungiamo un listener per riaprire il menu cliente quando il pagamento viene chiuso/completato
+            finestraPagamento.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent windowEvent) {
+                    new DashboardCliente(controller, clienteLoggato);
+                }
+            });
         });
 
         aggiornaCarrello();
@@ -106,7 +116,7 @@ public class DashboardCarrello extends JFrame {
                 riga.add(panelDestro, BorderLayout.EAST);
 
                 listaElementiCarrello.add(riga);
-                listaElementiCarrello.add(Box.createVerticalStrut(8)); // Distanziatore tra i biglietti
+                listaElementiCarrello.add(Box.createVerticalStrut(8));
             }
         }
 

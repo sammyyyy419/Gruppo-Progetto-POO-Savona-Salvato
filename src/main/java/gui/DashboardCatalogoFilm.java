@@ -23,7 +23,7 @@ public class DashboardCatalogoFilm extends JFrame {
         setContentPane(panelCatalogo);
         setTitle("Catalogo Film Disponibili");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setSize(900, 700); // Leggermente più grande per contenere meglio le immagini
+        setSize(900, 700);
         setLocationRelativeTo(null);
 
         panelListaFilm.setLayout(new BoxLayout(panelListaFilm, BoxLayout.Y_AXIS));
@@ -32,7 +32,6 @@ public class DashboardCatalogoFilm extends JFrame {
 
         for (Film film : filmDisponibili) {
 
-            // Pannello riga con layout moderno
             JPanel rigaFilm = new JPanel(new BorderLayout(20, 10));
             rigaFilm.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
@@ -40,11 +39,9 @@ public class DashboardCatalogoFilm extends JFrame {
             ));
             rigaFilm.setBackground(Color.WHITE);
 
-            // --- LOGICA CARICAMENTO IMMAGINE MIGLIORATA ---
             JLabel labelLocandina = new JLabel();
             labelLocandina.setPreferredSize(new Dimension(120, 180));
             labelLocandina.setHorizontalAlignment(SwingConstants.CENTER);
-            // Niente bordi aggressivi, solo spazio pulito
             labelLocandina.setBorder(BorderFactory.createEmptyBorder());
 
             if (film.getPercorsoCopertina() != null && !film.getPercorsoCopertina().isEmpty()) {
@@ -62,7 +59,6 @@ public class DashboardCatalogoFilm extends JFrame {
             }
             rigaFilm.add(labelLocandina, BorderLayout.WEST);
 
-            // Panel testo con font più leggibili
             JPanel panelTesto = new JPanel();
             panelTesto.setLayout(new BoxLayout(panelTesto, BoxLayout.Y_AXIS));
             panelTesto.setBackground(Color.WHITE);
@@ -76,15 +72,21 @@ public class DashboardCatalogoFilm extends JFrame {
             JLabel labelClassificazione = new JLabel("Classificazione Età: " + film.getClassificazioneEta());
             labelClassificazione.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
+            // NUOVA ETICHETTA DELLA SALA
+            JLabel labelSala = new JLabel("Ubicazione: " + film.getSalaAssegnata());
+            labelSala.setFont(new Font("SansSerif", Font.BOLD, 14));
+            labelSala.setForeground(new Color(41, 128, 185)); // Azzurrino per dare stile
+
             panelTesto.add(labelTitolo);
             panelTesto.add(Box.createVerticalStrut(10));
             panelTesto.add(labelInfoGenerali);
             panelTesto.add(Box.createVerticalStrut(5));
             panelTesto.add(labelClassificazione);
+            panelTesto.add(Box.createVerticalStrut(5));
+            panelTesto.add(labelSala);
 
             rigaFilm.add(panelTesto, BorderLayout.CENTER);
 
-            // Pannello bottoni
             JPanel panelPulsanti = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
             panelPulsanti.setBackground(Color.WHITE);
             JButton pulsanteTrama = new JButton("Visualizza Trama");
@@ -94,7 +96,7 @@ public class DashboardCatalogoFilm extends JFrame {
             panelPulsanti.add(pulsanteTrama);
             panelPulsanti.add(pulsanteRecensioni);
             panelPulsanti.add(pulsantePrenotazione);
-            rigaFilm.add(panelPulsanti, BorderLayout.SOUTH); // Spostato in basso nella riga per pulizia
+            rigaFilm.add(panelPulsanti, BorderLayout.SOUTH);
 
             pulsanteRecensioni.addActionListener(e -> {
                 JOptionPane.showMessageDialog(this, "Sezione Recensioni non ancora popolata.", "Recensioni: " + film.getTitolo(), JOptionPane.INFORMATION_MESSAGE);

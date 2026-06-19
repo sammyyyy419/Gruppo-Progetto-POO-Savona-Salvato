@@ -3,6 +3,8 @@ package gui;
 import controller.Controller;
 import model.Cliente;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 
 public class DashboardPagamento extends JFrame {
@@ -13,7 +15,7 @@ public class DashboardPagamento extends JFrame {
     private JLabel labelTitolo;
     private JPanel panelCentrale;
     private JLabel labelTipoPagamento;
-    private JComboBox comboTipoPagamento;
+    private JComboBox<String> comboTipoPagamento;
     private JPanel panelCampiCarta;
     private JLabel labelNumeroCarta;
     private JTextField textNumeroCarta;
@@ -27,6 +29,7 @@ public class DashboardPagamento extends JFrame {
     private JTextField textCodiceSconto;
     private JButton buttonConferma;
     private JLabel labelRiepilogo;
+
     private Controller controller;
     private Cliente clienteLoggato;
     private double totaleIniziale;
@@ -43,9 +46,31 @@ public class DashboardPagamento extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        // Popoliamo il menu a tendina
+        comboTipoPagamento.addItem("Carta di Credito");
+        comboTipoPagamento.addItem("PayPal");
+
+        // Il pulsante parte disabilitato finché non compiliamo i campi
+        buttonConferma.setEnabled(false);
+
         totaleIniziale = controller.calcolaTotaleCarrello();
         totaleScontato = totaleIniziale;
         labelRiepilogo.setText("Riepilogo Tot. : " + String.format("%.2f €", totaleScontato));
+
+        // LISTENER SUI CAMPI DI TESTO (Controllo in tempo reale)
+        DocumentListener controlloCampiListener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { controllaCampiObbligatori(); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { controllaCampiObbligatori(); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { controllaCampiObbligatori(); }
+        };
+
+        textNumeroCarta.getDocument().addDocumentListener(controlloCampiListener);
+        textIntestatario.getDocument().addDocumentListener(controlloCampiListener);
+        textCVC.getDocument().addDocumentListener(controlloCampiListener);
+        textDataScadenza.getDocument().addDocumentListener(controlloCampiListener);
 
         comboTipoPagamento.addActionListener(e -> {
             String metodoScelto = (String) comboTipoPagamento.getSelectedItem();
@@ -54,49 +79,56 @@ public class DashboardPagamento extends JFrame {
             } else {
                 toggleCampiCarta(true);
             }
+            controllaCampiObbligatori(); // Ricontrolla i campi ogni volta che cambi metodo
         });
 
-        textCodiceSconto.addActionListener(e -> {
-            applicareLogicaSconto();
-        });
+        textCodiceSconto.addActionListener(e -> applicareLogicaSconto());
 
-        tornaAlMenuButton.addActionListener(e -> {
-            this.dispose();
-        });
+        tornaAlMenuButton.addActionListener(e -> this.dispose());
+
         buttonConferma.addActionListener(e -> {
             String metodoScelto = (String) comboTipoPagamento.getSelectedItem();
 
-            if (metodoScelto == null) {
-                JOptionPane.showMessageDialog(this, "Seleziona un metodo di pagamento.", "Errore", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            if (metodoScelto.equalsIgnoreCase("Carta di Credito")) {
-                if (textNumeroCarta.getText().trim().isEmpty() ||
-                        textIntestatario.getText().trim().isEmpty() ||
-                        textCVC.getText().trim().isEmpty() ||
-                        textDataScadenza.getText().trim().isEmpty()) {
-
-                    JOptionPane.showMessageDialog(this, "Compila tutti i campi della carta di credito per proseguire.", "Campi Mancanti", JOptionPane.WARNING_MESSAGE);
-                    return;
-                }
-            }
-
+            // Riapplica lo sconto se l'utente ha scritto qualcosa ma non ha premuto "Invio"
             if (!textCodiceSconto.getText().trim().isEmpty() && percentualeScontoApplicata == 0.0) {
                 applicareLogicaSconto();
             }
+
             controller.confermaAcquistoCarrello(metodoScelto, percentualeScontoApplicata);
 
+            // --- ECCO LA MODIFICA DEL PASSO 1 ---
             JOptionPane.showMessageDialog(this,
-                    "Pagamento di " + String.format("%.2f €", totaleScontato) + " autorizzato con successo tramite " + metodoScelto + ".\n" +
-                            "La tua prenotazione è ora in stato: CONFERMATA!",
+                    "Pagamento riuscito con successo, puoi visualizzare i tuoi biglietti nell'area dedicata: Visualizza Biglietti Acquistati",
                     "Acquisto Completato",
                     JOptionPane.INFORMATION_MESSAGE);
+            // ------------------------------------
 
             this.dispose();
         });
 
+        // Esegue un primo controllo all'apertura per gestire lo stato di base
+        controllaCampiObbligatori();
         setVisible(true);
+    }
+
+    private void controllaCampiObbligatori() {
+        String metodoScelto = (String) comboTipoPagamento.getSelectedItem();
+
+        if (metodoScelto == null) {
+            buttonConferma.setEnabled(false);
+            return;
+        }
+
+        if (metodoScelto.equalsIgnoreCase("PayPal")) {
+            buttonConferma.setEnabled(true);
+        } else if (metodoScelto.equalsIgnoreCase("Carta di Credito")) {
+            boolean campiPieni = !textNumeroCarta.getText().trim().isEmpty() &&
+                    !textIntestatario.getText().trim().isEmpty() &&
+                    !textCVC.getText().trim().isEmpty() &&
+                    !textDataScadenza.getText().trim().isEmpty();
+
+            buttonConferma.setEnabled(campiPieni);
+        }
     }
 
     private void applicareLogicaSconto() {
@@ -113,7 +145,7 @@ public class DashboardPagamento extends JFrame {
             labelRiepilogo.setText("<html>Riepilogo Tot. : <s>" + String.format("%.2f €", totaleIniziale) + "</s> " +
                     "<font color='green'><b>" + String.format("%.2f €", totaleScontato) + "</b> (-" + (int)percentuale + "%)</font></html>");
 
-            textCodiceSconto.setEnabled(false); //evitare doppi sconti cumulati
+            textCodiceSconto.setEnabled(false);
             JOptionPane.showMessageDialog(this, "Codice coupon valido! Sconto del " + (int)percentuale + "% applicato.", "Sconto Attivato", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(this, "Il codice sconto inserito non è valido.", "Coupon Non Valido", JOptionPane.ERROR_MESSAGE);

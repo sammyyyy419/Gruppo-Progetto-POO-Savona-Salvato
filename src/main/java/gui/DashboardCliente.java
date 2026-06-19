@@ -47,27 +47,22 @@ public class DashboardCliente extends JFrame {
             });
         });
 
-        // ======= MODIFICA APPORTATA QUI =======
         buttonMenuBar.addActionListener(e -> {
-            this.setVisible(false); // Nasconde la dashboard del cliente
-            DashboardBar finestraBar = new DashboardBar(this.controller, this.clienteLoggato); // Apre il menù del bar
+            this.setVisible(false);
+            DashboardBar finestraBar = new DashboardBar(this.controller, this.clienteLoggato);
 
-            // Aggiungiamo un listener per sapere quando la finestra del bar viene chiusa
             finestraBar.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
                 public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                    DashboardCliente.this.setVisible(true); // Mostra di nuovo la dashboard cliente
+                    DashboardCliente.this.setVisible(true);
                 }
             });
         });
-        // ======================================
 
-        // Da inserire nel costruttore di DashboardCliente insieme agli altri listener
         buttonCarrello.addActionListener(e -> {
             this.setVisible(false);
             DashboardCarrello finestraCarrello = new DashboardCarrello(this.controller, this.clienteLoggato);
 
-            // Quando si chiude il carrello, si torna al menu cliente
             finestraCarrello.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
                 public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -75,6 +70,20 @@ public class DashboardCliente extends JFrame {
                 }
             });
         });
+
+        // --- ECCO IL PASSO 7: COLLEGAMENTO ALLA TUA NUOVA PAGINA BIGLIETTI ---
+        buttonBiglietti.addActionListener(e -> {
+            this.setVisible(false);
+            DashboardBigliettiAcquistati finestraBiglietti = new DashboardBigliettiAcquistati(this.controller, this.clienteLoggato);
+
+            finestraBiglietti.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                    DashboardCliente.this.setVisible(true);
+                }
+            });
+        });
+        // ---------------------------------------------------------------------
 
         buttonModificaCredenziali.addActionListener(e -> {
             JOptionPane.showMessageDialog(this,"Apertura procedura per modificare le credenziali...");

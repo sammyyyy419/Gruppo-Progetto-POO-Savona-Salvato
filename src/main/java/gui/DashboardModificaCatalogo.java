@@ -81,7 +81,9 @@ public class DashboardModificaCatalogo extends JFrame {
         JLabel labelTitolo = new JLabel(film.getTitolo());
         labelTitolo.setFont(new Font("Arial", Font.BOLD, 16));
         JLabel labelInfo = new JLabel("Genere: " + film.getGenere() + "  |  Durata: " + film.getDurataMinuti() + " min");
-        JLabel labelClass = new JLabel("Classificazione: " + film.getClassificazioneEta());
+
+        // AGGIUNTO: MOSTRA LA SALA ANCHE QUI!
+        JLabel labelClass = new JLabel("Classificazione: " + film.getClassificazioneEta() + "  |  Ubicazione: " + film.getSalaAssegnata());
 
         panelTesto.add(labelTitolo);
         panelTesto.add(Box.createVerticalStrut(5));
@@ -124,16 +126,23 @@ public class DashboardModificaCatalogo extends JFrame {
 
     private void mostraFinestraModifica(Film film) {
         JDialog dialog = new JDialog(this, "Modifica Film: " + film.getTitolo(), true);
-        dialog.setSize(500, 450);
+        dialog.setSize(500, 480); // Leggermente allargato
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
 
-        JPanel formPanel = new JPanel(new GridLayout(6, 2, 10, 10));
+        // AGGIORNATO A 7 RIGHE!
+        JPanel formPanel = new JPanel(new GridLayout(7, 2, 10, 10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         JTextField txtTitolo = new JTextField(film.getTitolo());
         JTextField txtDurata = new JTextField(String.format("%02d:%02d", film.getDurata().getHour(), film.getDurata().getMinute()));
         JTextField txtGenere = new JTextField(film.getGenere());
+
+        // AGGIUNTA SALA
+        String[] sale = new String[12];
+        for(int i=0; i<12; i++) sale[i] = "Sala " + (i+1);
+        JComboBox<String> cmbSala = new JComboBox<>(sale);
+        cmbSala.setSelectedItem(film.getSalaAssegnata());
 
         JComboBox<String> cmbClassificazione = new JComboBox<>(new String[]{"T (Per Tutti)", "14+", "16+", "18+"});
         cmbClassificazione.setSelectedItem(film.getClassificazioneEta());
@@ -174,6 +183,7 @@ public class DashboardModificaCatalogo extends JFrame {
         formPanel.add(new JLabel("Titolo:")); formPanel.add(txtTitolo);
         formPanel.add(new JLabel("Durata (HH:MM):")); formPanel.add(txtDurata);
         formPanel.add(new JLabel("Genere:")); formPanel.add(txtGenere);
+        formPanel.add(new JLabel("Sala Assegnata:")); formPanel.add(cmbSala); // AGGIUNTO
         formPanel.add(new JLabel("Classificazione:")); formPanel.add(cmbClassificazione);
         formPanel.add(new JLabel("Copertina:")); formPanel.add(panelImg);
         formPanel.add(new JLabel("Trama:")); formPanel.add(scrollTrama);
@@ -193,8 +203,10 @@ public class DashboardModificaCatalogo extends JFrame {
                 String nGenere = txtGenere.getText().trim();
                 String nClass = (String) cmbClassificazione.getSelectedItem();
                 String nTrama = txtTrama.getText().trim();
+                String nSala = (String) cmbSala.getSelectedItem(); // AGGIUNTO
 
-                controller.modificaFilm(film, nTitolo, nDurata, nGenere, nClass, nTrama, percorsoAggiornato[0], film.getDataInizioProgrammazione());
+                // AGGIUNTO nSala ALLA CHIAMATA DEL CONTROLLER
+                controller.modificaFilm(film, nTitolo, nDurata, nGenere, nClass, nTrama, percorsoAggiornato[0], film.getDataInizioProgrammazione(), nSala);
 
                 JOptionPane.showMessageDialog(dialog, "Film aggiornato!");
                 dialog.dispose();

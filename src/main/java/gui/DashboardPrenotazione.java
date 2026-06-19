@@ -16,7 +16,7 @@ public class DashboardPrenotazione extends JFrame {
     private JPanel panelPrenotazione;
     private JLabel labelTitoloFilm;
     private JLabel labelDettagliFilm;
-    private JComboBox<String> comboGiorni;
+    private JButton btnScegliData; // Modificato: Calendario!
     private JComboBox<Proiezione> comboOrari;
     private JComboBox<Integer> comboQuantita;
     private JLabel labelTotPagamento;
@@ -28,7 +28,8 @@ public class DashboardPrenotazione extends JFrame {
     private Film filmSelezionato;
     private double prezzoSingoloBiglietto = 8.00;
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private boolean inInizializzazione = true;
+
+    private ArrayList<Proiezione> proiezioniDelFilm; // Salvo qui le proiezioni per filtrarle
 
     public DashboardPrenotazione(Controller controller, Cliente cliente, Film film) {
         this.controller = controller;
@@ -44,7 +45,8 @@ public class DashboardPrenotazione extends JFrame {
         setLocationRelativeTo(null);
 
         labelTitoloFilm.setText(filmSelezionato.getTitolo().toUpperCase());
-        labelDettagliFilm.setText("Genere: " + filmSelezionato.getGenere() + "    Durata: " + filmSelezionato.getDurataMinuti() + " min");
+        // AGGIUNTA SALA NEI DETTAGLI
+        labelDettagliFilm.setText("Genere: " + filmSelezionato.getGenere() + " | Durata: " + filmSelezionato.getDurataMinuti() + " min | Ubicazione: " + filmSelezionato.getSalaAssegnata());
 
         for (int i = 1; i <= 10; i++) {
             comboQuantita.addItem(i);
@@ -61,10 +63,10 @@ public class DashboardPrenotazione extends JFrame {
             return;
         }
 
-        ArrayList<Proiezione> proiezioni = controller.getProiezioniPerFilm(filmSelezionato);
+        proiezioniDelFilm = controller.getProiezioniPerFilm(filmSelezionato);
         LinkedHashSet<String> giorniValidi = new LinkedHashSet<>();
 
-        for (Proiezione p : proiezioni) {
+        for (Proiezione p : proiezioniDelFilm) {
             if (p.getDataOraInizio() != null) {
                 LocalDate dataProiezione = p.getDataOraInizio().toLocalDate();
 
@@ -77,28 +79,12 @@ public class DashboardPrenotazione extends JFrame {
             }
         }
 
-        for (String giorno : giorniValidi) {
-            comboGiorni.addItem(giorno);
-        }
-
         pulsanteTorna.addActionListener(e -> {
             this.dispose();
         });
 
-        comboGiorni.addActionListener(e -> {
-            if (inInizializzazione) return;
-
-            comboOrari.removeAllItems();
-            pulsanteAggiungiCarrello.setEnabled(false);
-            String giornoSelezionato = (String) comboGiorni.getSelectedItem();
-            if (giornoSelezionato != null) {
-                for (Proiezione p : proiezioni) {
-                    if (p.getDataOraInizio() != null && p.getDataOraInizio().toLocalDate().format(dateFormatter).equals(giornoSelezionato)) {
-                        comboOrari.addItem(p);
-                    }
-                }
-            }
-        });
+        // AZIONE CALENDARIO
+        btnScegliData.addActionListener(e -> apriMiniCalendario(giorniValidi));
 
         comboOrari.addActionListener(e -> {
             if (comboOrari.getItemCount() == 0) return;
@@ -111,7 +97,6 @@ public class DashboardPrenotazione extends JFrame {
                 if (postiLiberi < 1) {
                     JOptionPane.showMessageDialog(this, "Siamo spiacenti! Non ci sono più biglietti disponibili per la data/ora scelti", "Posti Esauriti", JOptionPane.WARNING_MESSAGE);
                     pulsanteAggiungiCarrello.setEnabled(false);
-                    this.dispose();
                     return;
                 }
                 Integer quantita = (Integer) comboQuantita.getSelectedItem();
@@ -160,15 +145,38 @@ public class DashboardPrenotazione extends JFrame {
             }
         });
 
-        inInizializzazione = false;
-        if (comboGiorni.getItemCount() > 0) {
-            comboGiorni.setSelectedIndex(0);
-            if (comboOrari.getItemCount() > 0) {
-                comboOrari.setSelectedIndex(0);
-            }
-        }
-
         setVisible(true);
+    }
+
+    // Costruisce una griglia di giorni cliccabili
+    private void apriMiniCalendario(LinkedHashSet<String> giorniValidi) {
+        JDialog dialogCalendario = new JDialog(this, "Seleziona Giorno", true);
+        dialogCalendario.setSize(450, 300);
+        dialogCalendario.setLocationRelativeTo(this);
+        dialogCalendario.setLayout(new GridLayout(0, 5, 5, 5));
+
+        for (String giorno : giorniValidi) {
+            JButton btnGiorno = new JButton(giorno.substring(0, 5)); // Mostra es "22/06"
+            btnGiorno.setFont(new Font("Arial", Font.BOLD, 14));
+            btnGiorno.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+            btnGiorno.addActionListener(ev -> {
+                btnScegliData.setText(giorno);
+                btnScegliData.setBackground(new Color(46, 204, 113));
+                btnScegliData.setForeground(Color.WHITE);
+
+                comboOrari.removeAllItems();
+                pulsanteAggiungiCarrello.setEnabled(false);
+                for (Proiezione p : proiezioniDelFilm) {
+                    if (p.getDataOraInizio() != null && p.getDataOraInizio().toLocalDate().format(dateFormatter).equals(giorno)) {
+                        comboOrari.addItem(p);
+                    }
+                }
+                dialogCalendario.dispose();
+            });
+            dialogCalendario.add(btnGiorno);
+        }
+        dialogCalendario.setVisible(true);
     }
 
     private void inizializzaInterfaccia() {
@@ -179,6 +187,7 @@ public class DashboardPrenotazione extends JFrame {
         pulsanteTorna = new JButton("← Torna al Catalogo");
         pulsanteTorna.setFocusable(false);
 
+        // IL TUO WRAPPER E SPACER SONO SALVI :)
         JPanel wrapperBottone = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 10));
         wrapperBottone.add(pulsanteTorna);
 
@@ -200,12 +209,14 @@ public class DashboardPrenotazione extends JFrame {
         panelPrenotazione.add(topPanel, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel(new GridLayout(3, 2, 10, 25));
-        comboGiorni = new JComboBox<>();
+
+        btnScegliData = new JButton("Scegli Data dal Calendario 📅");
+        btnScegliData.setCursor(new Cursor(Cursor.HAND_CURSOR));
         comboOrari = new JComboBox<>();
         comboQuantita = new JComboBox<>();
 
-        centerPanel.add(new JLabel("Seleziona Giorno:", SwingConstants.RIGHT));
-        centerPanel.add(comboGiorni);
+        centerPanel.add(new JLabel("Data Spettacolo:", SwingConstants.RIGHT));
+        centerPanel.add(btnScegliData);
         centerPanel.add(new JLabel("Seleziona Orario:", SwingConstants.RIGHT));
         centerPanel.add(comboOrari);
         centerPanel.add(new JLabel("Quantità Biglietti:", SwingConstants.RIGHT));

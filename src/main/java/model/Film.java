@@ -14,7 +14,10 @@ public class Film {
     private String percorsoCopertina;
     private LocalDate dataInizioProgrammazione;
 
-    public Film(String titolo, LocalTime durata, String genere, String classificazioneEta, String trama, ArrayList<String> recensioni, String percorsoCopertina, LocalDate dataInizioProgrammazione) {
+    // NUOVO: Aggiunto l'attributo per la sala
+    private String salaAssegnata;
+
+    public Film(String titolo, LocalTime durata, String genere, String classificazioneEta, String trama, ArrayList<String> recensioni, String percorsoCopertina, LocalDate dataInizioProgrammazione, String salaAssegnata) {
         this.titolo = titolo;
         this.durata = durata;
         this.genere = genere;
@@ -23,6 +26,9 @@ public class Film {
         this.recensioni = (recensioni != null) ? recensioni : new ArrayList<>();
         this.percorsoCopertina = percorsoCopertina;
         this.dataInizioProgrammazione = (dataInizioProgrammazione != null) ? dataInizioProgrammazione : LocalDate.now();
+
+        // NUOVO: Inizializzazione della sala
+        this.salaAssegnata = salaAssegnata;
     }
 
     public int getDurataMinuti(){
@@ -48,7 +54,8 @@ public class Film {
                 "--------------------------------------------------\n" +
                 "• Genere: " + this.genere + "\n" +
                 "• Durata: " + this.getDurataMinuti() + " min\n" +
-                "• Classificazione: " + this.classificazioneEta + "\n\n" +
+                "• Classificazione: " + this.classificazioneEta + "\n" +
+                "• Sala Assegnata: " + this.salaAssegnata + "\n\n" + // NUOVO: Mostriamo la sala nei dettagli
                 "• TRAMA:\n" + this.trama + "\n" +
                 "--------------------------------------------------";
     }
@@ -69,4 +76,8 @@ public class Film {
     public void setPercorsoCopertina(String percorsoCopertina) { this.percorsoCopertina = percorsoCopertina; }
     public LocalDate getDataInizioProgrammazione() { return dataInizioProgrammazione; }
     public void setDataInizioProgrammazione(LocalDate dataInizioProgrammazione) { this.dataInizioProgrammazione = dataInizioProgrammazione; }
+
+    // NUOVO: Getter e Setter per la sala
+    public String getSalaAssegnata() { return salaAssegnata; }
+    public void setSalaAssegnata(String salaAssegnata) { this.salaAssegnata = salaAssegnata; }
 }
