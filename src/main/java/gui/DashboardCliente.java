@@ -88,9 +88,9 @@ public class DashboardCliente extends JFrame {
             });
         });
         // ---------------------------------------------------------------------
-
         buttonModificaCredenziali.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this,"Apertura procedura per modificare le credenziali...");
+            this.dispose(); // Chiude la DashboardCliente
+            new ModificaCredenziali(this.controller, this.clienteLoggato); // Apre la modifica
         });
     }
 }

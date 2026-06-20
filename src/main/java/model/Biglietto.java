@@ -65,4 +65,5 @@ public class Biglietto {
     public double getPrezzoFinale() { return prezzoFinale; }
     public void setPrezzoFinale(double prezzoFinale) { this.prezzoFinale = prezzoFinale; }
     public String getCodiceUnivoco() { return codiceUnivoco; }
+    public void setCodiceUnivoco(String codiceUnivoco) {this.codiceUnivoco = codiceUnivoco;}
 }

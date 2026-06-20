@@ -19,6 +19,7 @@ public class DashboardDipendente extends JFrame {
     private JButton buttonTornaLogin;
     private JButton buttonEsci;
     private JButton btnModificaCatalogoFilm;
+    private JButton buttonModifcaCredenziali; // Il tuo nuovo bottone
 
     private Controller controller;
     private Dipendente dipendenteLoggato;
@@ -40,7 +41,7 @@ public class DashboardDipendente extends JFrame {
         if (ruolo.equals("addetto alle pulizie")) {
             buttonConvalidaBiglietti.setEnabled(false);
             buttonInserisciFilm.setEnabled(false);
-            buttonGestioneSale.setEnabled(false);
+            buttonGestioneSale.setEnabled(true); // L'addetto pulizie ORA PUO' accedere alle sale
             btnModificaCatalogoFilm.setEnabled(false);
         } else if (ruolo.equals("cassiere")) {
             buttonInserisciFilm.setEnabled(false);
@@ -60,10 +61,17 @@ public class DashboardDipendente extends JFrame {
         buttonInviaSegnalazione.addActionListener(e -> inviaSegnalazione());
         buttonLeggiSegnalazioni.addActionListener(e -> leggiSegnalazioni());
 
-        buttonInserisciFilm.addActionListener(e -> new DashboardGestioneFilm(controller));
-        btnModificaCatalogoFilm.addActionListener(e -> new DashboardModificaCatalogo(controller));
+        buttonInserisciFilm.addActionListener(e -> {
+            DashboardGestioneFilm finestraInserimento = new DashboardGestioneFilm(controller);
+            finestraInserimento.setVisible(true);
+        });
 
-        // NUOVA LOGICA CONVALIDA TRAMITE CODICE
+        btnModificaCatalogoFilm.addActionListener(e -> {
+            DashboardModificaCatalogo finestraModifica = new DashboardModificaCatalogo(controller);
+            finestraModifica.setVisible(true);
+        });
+
+        // LOGICA CONVALIDA TRAMITE CODICE
         buttonConvalidaBiglietti.addActionListener(e -> {
             String codiceInserito = JOptionPane.showInputDialog(this, "Inserisci il CODICE UNIVOCO a 8 cifre del biglietto:", "Controllo Accessi", JOptionPane.QUESTION_MESSAGE);
 
@@ -83,17 +91,45 @@ public class DashboardDipendente extends JFrame {
             }
         });
 
+        // APERTURA MAPPA SALE
         buttonGestioneSale.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "Modulo Gestione Sale in costruzione.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            new DashboardGestioneSale(controller);
+        });
+
+        // =========================================================
+        // NUOVA LOGICA: APERTURA SCHERMATA MODIFICA CREDENZIALI
+        // =========================================================
+        buttonModifcaCredenziali.addActionListener(e -> {
+            this.dispose(); // Chiude la dashboard attuale
+            new ModificaCredenziali(this.controller, this.dipendenteLoggato); // Apre la finestra di modifica
         });
 
         setVisible(true);
     }
 
+    // METODO SOSTITUITO PER LA TENDINA DELLE SALE
     private void inviaSegnalazione() {
-        String messaggio = JOptionPane.showInputDialog(this, "Inserisci il testo della segnalazione da inviare:", "Invia Segnalazione", JOptionPane.PLAIN_MESSAGE);
+        String[] opzioniSale = new String[13];
+        opzioniSale[0] = "Generale (Nessuna sala specifica)";
+        for (int i = 1; i <= 12; i++) opzioniSale[i] = "Sala " + i;
+
+        String salaScelta = (String) JOptionPane.showInputDialog(this,
+                "A cosa si riferisce la segnalazione?",
+                "Selezione Ambiente",
+                JOptionPane.QUESTION_MESSAGE, null, opzioniSale, opzioniSale[0]);
+
+        if (salaScelta == null) return; // L'utente ha cliccato su "Annulla"
+
+        String messaggio = JOptionPane.showInputDialog(this, "Inserisci il dettaglio del problema:", "Invia Segnalazione", JOptionPane.PLAIN_MESSAGE);
         if (messaggio == null || messaggio.trim().isEmpty()) return;
-        controller.aggiungiSegnalazione(dipendenteLoggato, messaggio.trim());
+
+        if (salaScelta.equals("Generale (Nessuna sala specifica)")) {
+            controller.aggiungiSegnalazione(dipendenteLoggato, messaggio.trim());
+        } else {
+            // Segnalazione legata a una sala precisa!
+            controller.segnalaSalaGuasta(dipendenteLoggato, salaScelta, messaggio.trim());
+        }
+
         JOptionPane.showMessageDialog(this, "Segnalazione registrata con successo!", "Successo", JOptionPane.INFORMATION_MESSAGE);
     }
 

@@ -1,5 +1,7 @@
 package controller;
 
+import exception.RecensioneVuotaException;
+import exception.SalaPienaException;
 import model.Cliente;
 import model.Dipendente;
 import model.Utente;
@@ -9,12 +11,22 @@ import model.Proiezione;
 import model.Prenotazione;
 import model.Film;
 import model.StatoPrenotazione;
+
+// Import dei vecchi DAO
 import dao.FilmDAO;
 import dao.ClienteDAO;
 import implementazionePostgresDAO.FilmImplementazionePostgresDAO;
 import implementazionePostgresDAO.ClienteImplementazionePostgresDAO;
 import dao.ProiezioneDAO;
 import implementazionePostgresDAO.ProiezioneImplementazionePostgresDAO;
+
+// IMPORT DEI NUOVI DAO
+import dao.BigliettoDAO;
+import implementazionePostgresDAO.BigliettoImplementazionePostgresDAO;
+import dao.RecensioneDAO;
+import implementazionePostgresDAO.RecensioneImplementazionePostgresDAO;
+import dao.SegnalazioneDAO;
+import implementazionePostgresDAO.SegnalazioneImplementazionePostgresDAO;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,8 +43,12 @@ public class Controller {
     // Per gestire il checkout
     private Cliente utenteLoggatoTemporaneo;
 
+    // Tutti i DAO
     private FilmDAO filmDAO;
     private ClienteDAO clienteDAO;
+    private BigliettoDAO bigliettoDAO;
+    private RecensioneDAO recensioneDAO;
+    private SegnalazioneDAO segnalazioneDAO;
 
     public Controller() {
         this.listaClienti = new ArrayList<>();
@@ -44,10 +60,25 @@ public class Controller {
         this.clienteDAO = new ClienteImplementazionePostgresDAO();
         this.proiezioneDAO = new ProiezioneImplementazionePostgresDAO();
 
+        // Inizializzazione dei nuovi DAO
+        this.bigliettoDAO = new BigliettoImplementazionePostgresDAO();
+        this.recensioneDAO = new RecensioneImplementazionePostgresDAO();
+        this.segnalazioneDAO = new SegnalazioneImplementazionePostgresDAO();
+
         try {
             this.listaFilm = filmDAO.recuperaTuttiFilm();
+
+            // CARICAMENTO DELLE RECENSIONI DAL DB PER OGNI FILM
+            for (Film f : listaFilm) {
+                ArrayList<String> recensioniSalvate = recensioneDAO.recuperaRecensioniPerFilm(f.getTitolo());
+                f.setRecensioni(recensioniSalvate);
+            }
+
+            // NUOVO: CARICA I BIGLIETTI DAL DATABASE ALL'AVVIO
+            this.listaBiglietti = bigliettoDAO.recuperaTuttiBiglietti();
+
         } catch (Exception e) {
-            System.out.println("Attenzione: Impossibile caricare i film dal database. " + e.getMessage());
+            System.out.println("Attenzione: Impossibile caricare dal database. " + e.getMessage());
             this.listaFilm = new ArrayList<>();
         }
 
@@ -91,38 +122,31 @@ public class Controller {
 
     public ArrayList<Film> getListaFilm() { return listaFilm; }
 
-    /* public void aggiungiRecensioneAFilm(Film film, Cliente cliente, int voto, String commento) throws Exception {
+    public boolean aggiungiRecensioneAFilm(Film film, Cliente cliente, int voto, String commento) throws RecensioneVuotaException {
         if (film == null || cliente == null) {
-            throw new Exception("Errore: Impossibile aggiungere la recensione.");
+            throw new RecensioneVuotaException("Errore: Impossibile aggiungere la recensione.");
         }
         if (commento == null || commento.trim().isEmpty()) {
-            throw new Exception("Il commento non può essere vuoto.");
+            throw new RecensioneVuotaException("Il commento non può essere vuoto.");
         }
         String inizialeCognome = (cliente.getCognome() != null && !cliente.getCognome().isEmpty())
                 ? cliente.getCognome().substring(0, 1).toUpperCase() + "."
                 : "";
         String autore = cliente.getNome() + " " + inizialeCognome;
 
+        // Salva in RAM
         film.aggiungiFeedback(autore, voto, commento);
 
-        // la query SQL di inserimento va messa qui
-    } */
-
-    public boolean aggiungiRecensioneAFilm(Film film, Cliente cliente, int voto, String commento) {
-
-        if (film == null || cliente == null || commento == null || commento.trim().isEmpty()) {
-            return false;
+        // SALVATAGGIO NEL DATABASE POSTGRES
+        try {
+            recensioneDAO.inserisciRecensioneDB(film.getTitolo(), autore, voto, commento);
+        } catch (Exception e) {
+            System.out.println("Errore durante il salvataggio della recensione nel DB: " + e.getMessage());
         }
-
-        String inizialeCognome = (cliente.getCognome() != null && !cliente.getCognome().isEmpty())
-                ? cliente.getCognome().substring(0, 1).toUpperCase() + "."
-                : "";
-        String autore = cliente.getNome() + " " + inizialeCognome;
-
-        film.aggiungiFeedback(autore, voto, commento);
 
         return true;
     }
+
 
     public void aggiungiCliente(Cliente nuovoCliente) throws Exception {
         if (nuovoCliente != null) {
@@ -155,15 +179,39 @@ public class Controller {
         if (mittente != null && messaggio != null) {
             String segnalazioneCompleta = mittente.getNome() + " " + mittente.getCognome() + " (" + mittente.getRuolo() + ") - " + messaggio;
             listaSegnalazioni.add(segnalazioneCompleta);
+
+            // SALVATAGGIO NEL DATABASE POSTGRES
+            try {
+                segnalazioneDAO.inserisciSegnalazioneDB(mittente.getEmail(), messaggio);
+            } catch (Exception e) {
+                System.out.println("Errore durante il salvataggio della segnalazione nel DB: " + e.getMessage());
+            }
         }
     }
 
     public void aggiungiSegnalazione(Dipendente mittente, String messaggio) { this.aggiungiSegnalazione(messaggio, mittente); }
-    public ArrayList<String> getSegnalazioni() { return listaSegnalazioni; }
+
+    public ArrayList<String> getSegnalazioni() {
+        // RECUPERA DAL DATABASE POSTGRES INVECE CHE DALLA RAM!
+        try {
+            return segnalazioneDAO.recuperaTutteSegnalazioni();
+        } catch (Exception e) {
+            System.out.println("Errore recupero segnalazioni dal DB: " + e.getMessage());
+            return listaSegnalazioni; // se fallisce il DB, ritorna quelle in RAM
+        }
+    }
 
     public Biglietto acquistaBiglietto(double prezzo, Posto posto, Proiezione proiezione, Prenotazione prenotazione) {
         Biglietto nuovoBiglietto = new Biglietto(prezzo, posto, proiezione, prenotazione);
         listaBiglietti.add(nuovoBiglietto);
+
+        // SALVATAGGIO DEL BIGLIETTO NEL DATABASE POSTGRES
+        try {
+            bigliettoDAO.inserisciBigliettoDB(nuovoBiglietto);
+        } catch (Exception e) {
+            System.out.println("Errore durante il salvataggio del biglietto nel DB: " + e.getMessage());
+        }
+
         return nuovoBiglietto;
     }
 
@@ -176,7 +224,15 @@ public class Controller {
                 if (b.isValido()) {
                     throw new Exception("Attenzione! Questo biglietto (Codice: " + codiceUnivoco + ") risulta GIÀ CONVALIDATO.");
                 }
-                b.setValido(true);
+                b.setValido(true); // Memoria
+
+                // AGGIORNA LO STATO NEL DATABASE POSTGRES
+                try {
+                    bigliettoDAO.aggiornaStatoBigliettoDB(codiceUnivoco, "CONVALIDATO");
+                } catch (Exception e) {
+                    System.out.println("Errore durante l'aggiornamento del biglietto nel DB: " + e.getMessage());
+                }
+
                 return b;
             }
         }
@@ -196,6 +252,13 @@ public class Controller {
             if (pren.getBiglietti().isEmpty()) {
                 pren.setStato(StatoPrenotazione.RIMBORSATO);
             }
+        }
+
+        // CANCELLA IL BIGLIETTO DAL DATABASE POSTGRES
+        try {
+            bigliettoDAO.eliminaBigliettoDB(bigliettoDaRimborsare.getCodiceUnivoco());
+        } catch (Exception e) {
+            System.out.println("Errore durante l'eliminazione del biglietto dal DB: " + e.getMessage());
         }
     }
 
@@ -246,12 +309,12 @@ public class Controller {
         }
         return false;
     }
-
-    private ArrayList<Posto> trovaPostiVicini(Proiezione proiezione, int quantitaRichiesta) {
+    private ArrayList<Posto> trovaPostiVicini(Proiezione proiezione, int quantitaRichiesta) throws SalaPienaException {
         ArrayList<Posto> postiScelti = new ArrayList<>();
         char filaAttuale = 'A';
         int consecutivi = 0;
 
+        // TENTATIVO A: Cerchiamo posti vicini nella stessa fila
         for (Posto p : proiezione.getSala().getPosti()) {
             if (p.getFila() != filaAttuale) {
                 filaAttuale = p.getFila();
@@ -269,6 +332,7 @@ public class Controller {
             }
         }
 
+        // TENTATIVO B: La sala è quasi piena, diamo posti separati sparsi per la sala
         postiScelti.clear();
         for (Posto p : proiezione.getSala().getPosti()) {
             if (!isPostoOccupato(proiezione, p)) {
@@ -276,11 +340,27 @@ public class Controller {
                 if (postiScelti.size() == quantitaRichiesta) return postiScelti;
             }
         }
-        return postiScelti;
+
+        // SE ARRIVA QUI, SIGNIFICA CHE NON CI SONO ABBASTANZA POSTI!
+        throw new SalaPienaException("SALA PIENA! Impossibile acquistare " + quantitaRichiesta +
+                " biglietti. Posti rimanenti in questa sala: " + postiScelti.size());
+    }
+    // --- METODI PER MODIFICA CREDENZIALI ---
+
+    public void modificaCredenzialiCliente(Cliente cliente, String nuovaEmail, String nuovaPassword) throws Exception {
+        // 1. Aggiorna nel database
+        clienteDAO.aggiornaCredenzialiClienteDB(cliente.getEmail(), nuovaEmail, nuovaPassword);
+        // 2. Aggiorna in memoria (nella sessione attuale)
+        cliente.setEmail(nuovaEmail);
+        cliente.setPassword(nuovaPassword);
     }
 
+    public void modificaPasswordDipendente(Dipendente dipendente, String nuovaPassword) {
+        // I dipendenti sono salvati in memoria nel Controller, quindi basta aggiornare l'oggetto
+        dipendente.setPassword(nuovaPassword);
+    }
 
-    public void confermaAcquistoCarrello(String metodoPagamento, double percentualeSconto) {
+    public void confermaAcquistoCarrello(String metodoPagamento, double percentualeSconto) throws SalaPienaException {
         double prezzoBase = 8.00;
         double prezzoSingoloScontato = prezzoBase - (prezzoBase * (percentualeSconto / 100.0));
 
@@ -288,13 +368,13 @@ public class Controller {
             int quantita = elem.getQuantita();
             Proiezione proiezione = elem.getProiezione();
 
-            Prenotazione nuovaPrenotazione = new Prenotazione(LocalDateTime.now(), StatoPrenotazione.CONFERMATO, proiezione, new ArrayList<>(), utenteLoggatoTemporaneo, null);
-
+            // QUI PROVA A TROVARE I POSTI. SE NON CE NE SONO, LANCIA L'ECCEZIONE E SI FERMA TUTTO!
             ArrayList<Posto> postiAssegnati = trovaPostiVicini(proiezione, quantita);
 
-            for (int i = 0; i < quantita; i++) {
-                Posto postoEsatto = (i < postiAssegnati.size()) ? postiAssegnati.get(i) : null;
+            Prenotazione nuovaPrenotazione = new Prenotazione(LocalDateTime.now(), StatoPrenotazione.CONFERMATO, proiezione, new ArrayList<>(), utenteLoggatoTemporaneo, null);
 
+            for (int i = 0; i < quantita; i++) {
+                Posto postoEsatto = postiAssegnati.get(i);
                 Biglietto b = acquistaBiglietto(prezzoSingoloScontato, postoEsatto, proiezione, nuovaPrenotazione);
                 nuovaPrenotazione.getBiglietti().add(b);
             }
@@ -309,5 +389,40 @@ public class Controller {
         if (cod.equals("SENIOR")) return 50.0;
         if (cod.equals("JUNIOR")) return 25.0;
         return 0.0;
+    }
+
+    public ArrayList<String> ottieniRecensioniLiveDalDB(String titoloFilm) {
+        try {
+            return recensioneDAO.recuperaRecensioniPerFilm(titoloFilm);
+        } catch (Exception e) {
+            System.out.println("Errore caricamento recensioni live: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    // --- NUOVI METODI AGGIUNTI PER LA MAPPA DELLE SALE ---
+
+    public String verificaStatoSala(String nomeSala) {
+        try {
+            return segnalazioneDAO.ottieniProblemaSala(nomeSala);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void segnalaSalaGuasta(Dipendente mittente, String nomeSala, String messaggio) {
+        try {
+            segnalazioneDAO.inserisciSegnalazioneSalaDB(mittente.getEmail(), messaggio, nomeSala);
+        } catch (Exception e) {
+            System.out.println("Errore segnalazione sala: " + e.getMessage());
+        }
+    }
+
+    public void riparaSala(String nomeSala) {
+        try {
+            segnalazioneDAO.risolviSegnalazioneSalaDB(nomeSala);
+        } catch (Exception e) {
+            System.out.println("Errore risoluzione sala: " + e.getMessage());
+        }
     }
 }

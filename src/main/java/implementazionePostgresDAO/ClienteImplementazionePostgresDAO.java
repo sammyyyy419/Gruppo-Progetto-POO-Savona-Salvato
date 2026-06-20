@@ -49,4 +49,16 @@ public class ClienteImplementazionePostgresDAO implements ClienteDAO {
         }
         return null; // Ritorna null se la mail non esiste nel DB
     }
+    @Override
+    public void aggiornaCredenzialiClienteDB(String vecchiaEmail, String nuovaEmail, String nuovaPassword) throws SQLException {
+        String query = "UPDATE cliente SET email = ?, password = ? WHERE email = ?";
+        try (Connection con = ConnessioneDatabase.getInstance().getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setString(1, nuovaEmail);
+            ps.setString(2, nuovaPassword);
+            ps.setString(3, vecchiaEmail);
+            ps.executeUpdate();
+        }
+    }
 }

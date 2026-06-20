@@ -16,7 +16,7 @@ public class DashboardPrenotazione extends JFrame {
     private JPanel panelPrenotazione;
     private JLabel labelTitoloFilm;
     private JLabel labelDettagliFilm;
-    private JButton btnScegliData; // Modificato: Calendario!
+    private JButton btnScegliData;
     private JComboBox<Proiezione> comboOrari;
     private JComboBox<Integer> comboQuantita;
     private JLabel labelTotPagamento;

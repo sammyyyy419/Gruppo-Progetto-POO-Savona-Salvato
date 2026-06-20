@@ -45,6 +45,7 @@ public class DashboardRecensioni extends JFrame {
         btnTorna.addActionListener(e -> this.dispose());
         btnAggiungi.addActionListener(e -> apriFinestraScritturaRecensione());
 
+        // Carica le recensioni dal Database all'apertura
         aggiornaListaRecensioni();
 
         setVisible(true);
@@ -52,7 +53,9 @@ public class DashboardRecensioni extends JFrame {
 
     private void aggiornaListaRecensioni() {
         panelListaRecensioni.removeAll();
-        ArrayList<String> recensioni = filmSelezionato.getRecensioniClienti();
+
+        // RECUPERO IN TEMPO REALE DAL DATABASE!
+        ArrayList<String> recensioni = controller.ottieniRecensioniLiveDalDB(filmSelezionato.getTitolo());
 
         if (recensioni == null || recensioni.isEmpty()) {
             JLabel lblVuoto = new JLabel("Nessuna recensione presente. Sii il primo a recensire!");
@@ -62,10 +65,26 @@ public class DashboardRecensioni extends JFrame {
         } else {
             for (String recStr : recensioni) {
 
-                String[] parti = recStr.split("\\|\\|");
-                if (parti.length == 3) {
-                    panelListaRecensioni.add(creaCardRecensione(parti[0], parti[1], parti[2]));
-                    panelListaRecensioni.add(Box.createVerticalStrut(10)); // Distanziatore
+                // Gestione se la stringa è salvata nel formato "autore||voto||commento"
+                if (recStr.contains("||")) {
+                    String[] parti = recStr.split("\\|\\|");
+                    if (parti.length >= 3) {
+                        panelListaRecensioni.add(creaCardRecensione(parti[0], parti[1], parti[2]));
+                        panelListaRecensioni.add(Box.createVerticalStrut(10));
+                    }
+                }
+                // Adattamento intelligente: se la stringa arriva nel vecchio formato DAO ("Mario ha votato 5/5: Bello!")
+                else if (recStr.contains(" ha votato ") && recStr.contains("/5:")) {
+                    try {
+                        String autore = recStr.substring(0, recStr.indexOf(" ha votato "));
+                        String voto = recStr.substring(recStr.indexOf("votato ") + 7, recStr.indexOf("/5:"));
+                        String commento = recStr.substring(recStr.indexOf("/5: ") + 4);
+
+                        panelListaRecensioni.add(creaCardRecensione(autore.trim(), voto.trim(), commento.trim()));
+                        panelListaRecensioni.add(Box.createVerticalStrut(10));
+                    } catch (Exception e) {
+                        // Se fallisce l'estrazione per formati strani, lo ignora
+                    }
                 }
             }
         }
@@ -88,7 +107,11 @@ public class DashboardRecensioni extends JFrame {
         JLabel lblAutore = new JLabel("👤 " + autore);
         lblAutore.setFont(new Font("Arial", Font.BOLD, 14));
 
-        int votoInt = Integer.parseInt(voto);
+        int votoInt = 5; // Default di sicurezza
+        try {
+            votoInt = Integer.parseInt(voto);
+        } catch (NumberFormatException ignored) {}
+
         String stelline = "★".repeat(votoInt) + "☆".repeat(5 - votoInt);
         JLabel lblStelle = new JLabel(stelline);
         lblStelle.setForeground(new Color(241, 196, 15));
@@ -150,7 +173,7 @@ public class DashboardRecensioni extends JFrame {
             if (successo) {
                 JOptionPane.showMessageDialog(dialog, "Recensione aggiunta con successo!");
                 dialog.dispose();
-                aggiornaListaRecensioni();
+                aggiornaListaRecensioni(); // Ripesca dal DB per mostrarla subito!
             } else {
                 JOptionPane.showMessageDialog(dialog, "Assicurati di aver scritto un commento valido.", "Errore", JOptionPane.ERROR_MESSAGE);
             }

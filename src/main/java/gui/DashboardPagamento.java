@@ -94,16 +94,25 @@ public class DashboardPagamento extends JFrame {
                 applicareLogicaSconto();
             }
 
-            controller.confermaAcquistoCarrello(metodoScelto, percentualeScontoApplicata);
+            try {
+                // TENTA DI CONFERMARE L'ACQUISTO
+                controller.confermaAcquistoCarrello(metodoScelto, percentualeScontoApplicata);
 
-            // --- ECCO LA MODIFICA DEL PASSO 1 ---
-            JOptionPane.showMessageDialog(this,
-                    "Pagamento riuscito con successo, puoi visualizzare i tuoi biglietti nell'area dedicata: Visualizza Biglietti Acquistati",
-                    "Acquisto Completato",
-                    JOptionPane.INFORMATION_MESSAGE);
-            // ------------------------------------
+                // SE NON CI SONO ERRORI, MOSTRA IL MESSAGGIO E CHIUDI LA FINESTRA
+                JOptionPane.showMessageDialog(this,
+                        "Pagamento riuscito con successo, puoi visualizzare i tuoi biglietti nell'area dedicata: Visualizza Biglietti Acquistati",
+                        "Acquisto Completato",
+                        JOptionPane.INFORMATION_MESSAGE);
 
-            this.dispose();
+                this.dispose();
+
+            } catch (exception.SalaPienaException ex) {
+                // SE LA SALA È PIENA, MOSTRA L'ERRORE E BLOCCA IL PAGAMENTO!
+                JOptionPane.showMessageDialog(this, ex.getMessage(), "Errore - Sala Piena", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                // CATTURA QUALSIASI ALTRO ERRORE GENERICO
+                JOptionPane.showMessageDialog(this, "Errore durante l'acquisto: " + ex.getMessage(), "Errore di Sistema", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         // Esegue un primo controllo all'apertura per gestire lo stato di base
