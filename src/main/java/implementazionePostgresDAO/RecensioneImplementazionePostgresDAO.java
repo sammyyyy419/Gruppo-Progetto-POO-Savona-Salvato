@@ -32,7 +32,7 @@ public class RecensioneImplementazionePostgresDAO implements RecensioneDAO {
             ps.setString(1, titoloFilm);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    String rec = rs.getString("autore") + " ha votato " + rs.getInt("voto") + "/5: " + rs.getString("commento");
+                    String rec = rs.getString("autore") + "||" + rs.getInt("voto") + "||" + rs.getString("commento");
                     recensioni.add(rec);
                 }
             }
