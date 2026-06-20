@@ -130,7 +130,6 @@ public class DashboardModificaCatalogo extends JFrame {
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
 
-        // AGGIORNATO A 7 RIGHE!
         JPanel formPanel = new JPanel(new GridLayout(7, 2, 10, 10));
         formPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 

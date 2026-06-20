@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="gui.DashboardRecensioni">
+  <grid id="27dc6" binding="mainPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="5e999" binding="panelAlto" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="North"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="82f13" class="javax.swing.JButton" binding="btnTorna">
+            <constraints border-constraint="Center"/>
+            <properties>
+              <text value="Torna al Catalogo"/>
+            </properties>
+          </component>
+          <component id="de59f" class="javax.swing.JButton" binding="btnAggiungi">
+            <constraints border-constraint="East"/>
+            <properties>
+              <background color="-13358887"/>
+              <foreground color="-131083"/>
+              <text value="Aggiungi Recensione"/>
+            </properties>
+          </component>
+          <component id="1e5b2" class="javax.swing.JLabel" binding="labelTitolo">
+            <constraints border-constraint="North"/>
+            <properties>
+              <font size="22" style="2"/>
+              <horizontalAlignment value="0"/>
+              <text value="Cosa ne pensano gli utenti di "/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <scrollpane id="81ba9" binding="scrollRecensioni">
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="11a6c" binding="panelListaRecensioni" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints/>
+            <properties/>
+            <border type="none"/>
+            <children/>
+          </grid>
+        </children>
+      </scrollpane>
+    </children>
+  </grid>
+</form>

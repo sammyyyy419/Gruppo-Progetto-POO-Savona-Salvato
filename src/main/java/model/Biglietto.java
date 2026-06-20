@@ -4,11 +4,11 @@ import java.util.Random;
 
 public class Biglietto {
     private double prezzoFinale;
-    private boolean valido;
+    private boolean valido; // false = Da convalidare, true = Convalidato all'ingresso
     private Posto postoAssegnato;
     private Proiezione proiezione;
     private Prenotazione prenotazione;
-    private String codiceUnivoco; // NUOVO ATTRIBUTO
+    private String codiceUnivoco;
 
     public Biglietto(double prezzoFinale, Posto postoAssegnato, Proiezione proiezione, Prenotazione prenotazione) {
         this.prezzoFinale = prezzoFinale;
@@ -16,20 +16,19 @@ public class Biglietto {
         this.postoAssegnato = postoAssegnato;
         this.proiezione = proiezione;
         this.prenotazione = prenotazione;
-        this.codiceUnivoco = generaCodiceA8Cifre(); // Generazione automatica
+        this.codiceUnivoco = generaCodiceA8Cifre();
     }
 
     public Biglietto(double prezzoFinale, Posto postoAssegnato) {
         this.prezzoFinale = prezzoFinale;
         this.valido = false;
         this.postoAssegnato = postoAssegnato;
-        this.codiceUnivoco = generaCodiceA8Cifre(); // Generazione automatica
+        this.codiceUnivoco = generaCodiceA8Cifre();
     }
 
-    // Metodo per generare un numero casuale a 8 cifre
     private String generaCodiceA8Cifre() {
         Random rand = new Random();
-        int num = rand.nextInt(90000000) + 10000000; // Garantisce sempre un numero tra 10000000 e 99999999
+        int num = rand.nextInt(90000000) + 10000000;
         return String.valueOf(num);
     }
 
@@ -65,5 +64,5 @@ public class Biglietto {
     public void setValido(boolean valido) { this.valido = valido; }
     public double getPrezzoFinale() { return prezzoFinale; }
     public void setPrezzoFinale(double prezzoFinale) { this.prezzoFinale = prezzoFinale; }
-    public String getCodiceUnivoco() { return codiceUnivoco; } // Getter per il codice
+    public String getCodiceUnivoco() { return codiceUnivoco; }
 }

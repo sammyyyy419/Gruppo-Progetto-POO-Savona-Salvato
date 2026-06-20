@@ -44,10 +44,13 @@ public class DashboardBigliettiAcquistati extends JFrame {
         setVisible(true);
     }
 
+    public void aggiornaInterfaccia() {
+        caricaBiglietti();
+    }
+
     private void caricaBiglietti() {
         panelContenitoreBiglietti.removeAll();
-        // Estraiamo tutti i biglietti (Per ora stampa i biglietti globali, andrebbe filtrato per cliente)
-        ArrayList<Biglietto> biglietti = controller.getCarrello().isEmpty() ? controller.getBigliettiAcquistati() : controller.getBigliettiAcquistati();
+        ArrayList<Biglietto> biglietti = controller.getBigliettiAcquistati();
 
         if (biglietti.isEmpty()) {
             JLabel vuoto = new JLabel("Nessun biglietto acquistato al momento.");
@@ -70,7 +73,7 @@ public class DashboardBigliettiAcquistati extends JFrame {
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
         card.setBackground(new Color(250, 250, 250));
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 130));
 
         String titoloFilm = b.getProiezione() != null ? b.getProiezione().getFilm().getTitolo().toUpperCase() : "N/D";
         String dataOra = b.getProiezione() != null ? b.getProiezione().getDataOraInizio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "N/D";
@@ -78,8 +81,7 @@ public class DashboardBigliettiAcquistati extends JFrame {
         String fila = b.getPostoAssegnato() != null ? String.valueOf(b.getPostoAssegnato().getFila()) : "-";
         String numeroPosto = b.getPostoAssegnato() != null ? String.valueOf(b.getPostoAssegnato().getNumeroPosto()) : "-";
 
-        // AGGIORNATO STATO BIGLIETTO
-        String stato = b.isValido() ? "CONVALIDATO" : "DA CONVALIDARE";
+        String statoTesto = b.isValido() ? "CONVALIDATO" : "DA CONVALIDARE";
         Color coloreStato = b.isValido() ? new Color(39, 174, 96) : Color.RED;
 
         JPanel infoPanel = new JPanel(new GridLayout(3, 1));
@@ -90,8 +92,7 @@ public class DashboardBigliettiAcquistati extends JFrame {
         infoPanel.add(new JLabel("Data e Ora: " + dataOra));
         infoPanel.add(new JLabel("Ubicazione: " + sala));
 
-        // AGGIORNATA LA GRIGLIA DESTRA CON IL CODICE
-        JPanel postoPanel = new JPanel(new GridLayout(4, 1)); // 4 righe ora
+        JPanel postoPanel = new JPanel(new GridLayout(5, 1));
         postoPanel.setOpaque(false);
 
         JLabel lblPosto = new JLabel("FILA: " + fila + "  |  POSTO: " + numeroPosto);
@@ -101,14 +102,37 @@ public class DashboardBigliettiAcquistati extends JFrame {
         JLabel lblCodice = new JLabel("CODICE: " + b.getCodiceUnivoco());
         lblCodice.setFont(new Font("Monospaced", Font.BOLD, 14));
 
-        JLabel lblStato = new JLabel("Stato: " + stato);
+        JLabel lblStato = new JLabel("Stato: " + statoTesto);
         lblStato.setFont(new Font("Arial", Font.BOLD, 14));
         lblStato.setForeground(coloreStato);
 
         postoPanel.add(lblPosto);
         postoPanel.add(lblCodice);
-        postoPanel.add(new JLabel("Prezzo: " + String.format("%.2f €", b.getPrezzoFinale())));
+        postoPanel.add(new JLabel("Pagato: " + String.format("%.2f €", b.getPrezzoFinale())));
         postoPanel.add(lblStato);
+
+        // Se non è stato ancora obliterato, mostro il pulsante di rimborso
+        if (!b.isValido()) {
+            JButton btnRimborsa = new JButton("Annulla e Rimborsa");
+            btnRimborsa.setFont(new Font("Arial", Font.PLAIN, 11));
+            btnRimborsa.setForeground(Color.RED);
+            btnRimborsa.setFocusable(false);
+            btnRimborsa.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+            btnRimborsa.addActionListener(e -> {
+                int conferma = JOptionPane.showConfirmDialog(this,
+                        "Sei sicuro di voler annullare il biglietto?\nQuesta azione eliminerà il ticket e libererà il posto in sala.",
+                        "Conferma Annullamento",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+                if (conferma == JOptionPane.YES_OPTION) {
+                    new DashboardRimborso(controller, clienteLoggato, b, this);
+                }
+            });
+            postoPanel.add(btnRimborsa);
+        } else {
+            postoPanel.add(new JLabel(""));
+        }
 
         card.add(infoPanel);
         card.add(postoPanel);

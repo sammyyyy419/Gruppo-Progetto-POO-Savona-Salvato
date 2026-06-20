@@ -76,7 +76,6 @@ public class DashboardCliente extends JFrame {
             });
         });
 
-        // --- ECCO IL PASSO 7: COLLEGAMENTO ALLA TUA NUOVA PAGINA BIGLIETTI ---
         buttonBiglietti.addActionListener(e -> {
             this.setVisible(false);
             DashboardBigliettiAcquistati finestraBiglietti = new DashboardBigliettiAcquistati(this.controller, this.clienteLoggato);

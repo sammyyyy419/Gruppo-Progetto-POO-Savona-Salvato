@@ -38,9 +38,9 @@ public class Film {
         return (this.durata.getHour() * 60) + this.durata.getMinute();
     }
 
-    public void aggiungiFeedback(String commento, int voto) {
+    public void aggiungiFeedback(String autore, int voto, String commento) {
         if (commento != null && voto >= 1 && voto <= 5) {
-            String feedback = "Voto: " + voto + "/5 - " + commento;
+            String feedback = autore + "||" + voto + "||" + commento;
             this.recensioni.add(feedback);
         }
     }

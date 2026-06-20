@@ -72,10 +72,9 @@ public class DashboardCatalogoFilm extends JFrame {
             JLabel labelClassificazione = new JLabel("Classificazione Età: " + film.getClassificazioneEta());
             labelClassificazione.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
-            // NUOVA ETICHETTA DELLA SALA
             JLabel labelSala = new JLabel("Ubicazione: " + film.getSalaAssegnata());
             labelSala.setFont(new Font("SansSerif", Font.BOLD, 14));
-            labelSala.setForeground(new Color(41, 128, 185)); // Azzurrino per dare stile
+            labelSala.setForeground(new Color(41, 128, 185));
 
             panelTesto.add(labelTitolo);
             panelTesto.add(Box.createVerticalStrut(10));
@@ -99,7 +98,7 @@ public class DashboardCatalogoFilm extends JFrame {
             rigaFilm.add(panelPulsanti, BorderLayout.SOUTH);
 
             pulsanteRecensioni.addActionListener(e -> {
-                JOptionPane.showMessageDialog(this, "Sezione Recensioni non ancora popolata.", "Recensioni: " + film.getTitolo(), JOptionPane.INFORMATION_MESSAGE);
+                new DashboardRecensioni(controller, clienteLoggato, film);
             });
 
             pulsanteTrama.addActionListener(e -> {

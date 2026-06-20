@@ -8,6 +8,7 @@ import model.Posto;
 import model.Proiezione;
 import model.Prenotazione;
 import model.Film;
+import model.StatoPrenotazione;
 import dao.FilmDAO;
 import dao.ClienteDAO;
 import implementazionePostgresDAO.FilmImplementazionePostgresDAO;
@@ -15,6 +16,7 @@ import implementazionePostgresDAO.ClienteImplementazionePostgresDAO;
 import dao.ProiezioneDAO;
 import implementazionePostgresDAO.ProiezioneImplementazionePostgresDAO;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Controller {
@@ -22,9 +24,12 @@ public class Controller {
     private ArrayList<Cliente> listaClienti;
     private ArrayList<Dipendente> listaDipendenti;
     private ArrayList<String> listaSegnalazioni;
-    private ArrayList<Biglietto> listaBiglietti; // Contiene tutti i biglietti venduti!
+    private ArrayList<Biglietto> listaBiglietti;
     private ProiezioneDAO proiezioneDAO;
     private ArrayList<Film> listaFilm;
+
+    // Per gestire il checkout
+    private Cliente utenteLoggatoTemporaneo;
 
     private FilmDAO filmDAO;
     private ClienteDAO clienteDAO;
@@ -50,6 +55,11 @@ public class Controller {
         listaDipendenti.add(new Dipendente("Sammy", "Savona", "savonasammy@enterprise.com", "1236", "manager"));
     }
 
+    // Metodo helper per tracciare chi compra
+    public void impostaUtenteCorrente(Cliente c) {
+        this.utenteLoggatoTemporaneo = c;
+    }
+
     public void aggiungiFilm(Film nuovoFilm) throws Exception {
         if (nuovoFilm != null) {
             filmDAO.inserisciFilmDB(nuovoFilm);
@@ -66,9 +76,7 @@ public class Controller {
 
     public void modificaFilm(Film filmAttuale, String nTitolo, java.time.LocalTime nDurata, String nGenere, String nClass, String nTrama, String nPercorso, java.time.LocalDate nDataInizio, String nSala) throws Exception {
         String vecchioTitolo = filmAttuale.getTitolo();
-
         Film filmAggiornato = new Film(nTitolo, nDurata, nGenere, nClass, nTrama, filmAttuale.getRecensioniClienti(), nPercorso, nDataInizio, nSala);
-
         filmDAO.aggiornaFilmDB(vecchioTitolo, filmAggiornato);
 
         filmAttuale.setTitolo(nTitolo);
@@ -81,8 +89,39 @@ public class Controller {
         filmAttuale.setSalaAssegnata(nSala);
     }
 
-    public ArrayList<Film> getListaFilm() {
-        return listaFilm;
+    public ArrayList<Film> getListaFilm() { return listaFilm; }
+
+    /* public void aggiungiRecensioneAFilm(Film film, Cliente cliente, int voto, String commento) throws Exception {
+        if (film == null || cliente == null) {
+            throw new Exception("Errore: Impossibile aggiungere la recensione.");
+        }
+        if (commento == null || commento.trim().isEmpty()) {
+            throw new Exception("Il commento non può essere vuoto.");
+        }
+        String inizialeCognome = (cliente.getCognome() != null && !cliente.getCognome().isEmpty())
+                ? cliente.getCognome().substring(0, 1).toUpperCase() + "."
+                : "";
+        String autore = cliente.getNome() + " " + inizialeCognome;
+
+        film.aggiungiFeedback(autore, voto, commento);
+
+        // la query SQL di inserimento va messa qui
+    } */
+
+    public boolean aggiungiRecensioneAFilm(Film film, Cliente cliente, int voto, String commento) {
+
+        if (film == null || cliente == null || commento == null || commento.trim().isEmpty()) {
+            return false;
+        }
+
+        String inizialeCognome = (cliente.getCognome() != null && !cliente.getCognome().isEmpty())
+                ? cliente.getCognome().substring(0, 1).toUpperCase() + "."
+                : "";
+        String autore = cliente.getNome() + " " + inizialeCognome;
+
+        film.aggiungiFeedback(autore, voto, commento);
+
+        return true;
     }
 
     public void aggiungiCliente(Cliente nuovoCliente) throws Exception {
@@ -96,6 +135,10 @@ public class Controller {
         Utente utente = recuperaUtente(email);
         if (utente == null) throw new Exception("Utente non trovato con questa email.");
         if (!utente.getPassword().equals(password)) throw new Exception("Password errata.");
+
+        if (utente instanceof Cliente) {
+            impostaUtenteCorrente((Cliente) utente);
+        }
         return true;
     }
 
@@ -115,10 +158,7 @@ public class Controller {
         }
     }
 
-    public void aggiungiSegnalazione(Dipendente mittente, String messaggio) {
-        this.aggiungiSegnalazione(messaggio, mittente);
-    }
-
+    public void aggiungiSegnalazione(Dipendente mittente, String messaggio) { this.aggiungiSegnalazione(messaggio, mittente); }
     public ArrayList<String> getSegnalazioni() { return listaSegnalazioni; }
 
     public Biglietto acquistaBiglietto(double prezzo, Posto posto, Proiezione proiezione, Prenotazione prenotazione) {
@@ -127,29 +167,36 @@ public class Controller {
         return nuovoBiglietto;
     }
 
-    // NUOVO METODO: Trova il biglietto tramite il codice univoco a 8 cifre e lo convalida
     public Biglietto convalidaBigliettoPerCodice(String codiceUnivoco) throws Exception {
         if (codiceUnivoco == null || codiceUnivoco.trim().isEmpty()) {
             throw new Exception("Inserire un codice valido.");
         }
-
-        // Cerca il biglietto in tutta la lista globale dei biglietti acquistati
         for (Biglietto b : listaBiglietti) {
             if (b.getCodiceUnivoco() != null && b.getCodiceUnivoco().equals(codiceUnivoco)) {
-
-                // Se è già stato obliterato, blocca l'ingresso
                 if (b.isValido()) {
-                    throw new Exception("Attenzione! Questo biglietto (Codice: " + codiceUnivoco + ") risulta GIÀ CONVALIDATO precedentemente.");
+                    throw new Exception("Attenzione! Questo biglietto (Codice: " + codiceUnivoco + ") risulta GIÀ CONVALIDATO.");
                 }
-
-                // Convalida il biglietto
                 b.setValido(true);
                 return b;
             }
         }
+        throw new Exception("Codice inesistente. Nessun biglietto valido trovato per: " + codiceUnivoco);
+    }
 
-        // Se finisce il ciclo senza trovare nulla, il codice non esiste
-        throw new Exception("Codice inesistente. Nessun biglietto trovato per: " + codiceUnivoco);
+    public void rimborsaSingoloBiglietto(Biglietto bigliettoDaRimborsare) throws Exception {
+        if (bigliettoDaRimborsare == null) throw new Exception("Biglietto inesistente.");
+        if (bigliettoDaRimborsare.isValido()) throw new Exception("Impossibile rimborsare un biglietto già obliterato.");
+
+        listaBiglietti.remove(bigliettoDaRimborsare);
+
+        Prenotazione pren = bigliettoDaRimborsare.getPrenotazione();
+        if (pren != null && pren.getBiglietti() != null) {
+            pren.getBiglietti().remove(bigliettoDaRimborsare);
+
+            if (pren.getBiglietti().isEmpty()) {
+                pren.setStato(StatoPrenotazione.RIMBORSATO);
+            }
+        }
     }
 
     public ArrayList<Proiezione> getProiezioniPerFilm(Film filmSelezionato) {
@@ -174,9 +221,7 @@ public class Controller {
     }
 
     private ArrayList<ElementoCarrello> carrello = new ArrayList<>();
-    public void aggiungiAlCarrello(Proiezione proiezione, int quantita, double prezzoTotale) {
-        this.carrello.add(new ElementoCarrello(proiezione, quantita, prezzoTotale));
-    }
+    public void aggiungiAlCarrello(Proiezione proiezione, int quantita, double prezzoTotale) { this.carrello.add(new ElementoCarrello(proiezione, quantita, prezzoTotale)); }
     public ArrayList<ElementoCarrello> getCarrello() { return carrello; }
     public void rimuoviDalCarrello(ElementoCarrello elemento) { if (elemento != null) this.carrello.remove(elemento); }
     public double calcolaTotaleCarrello() {
@@ -186,14 +231,8 @@ public class Controller {
     }
     public void svuotaCarrello() { this.carrello.clear(); }
 
-    // METODO AGGIUNTO PER PERMETTERE ALLA GRAFICA DI VEDERE I BIGLIETTI ACQUISTATI
-    public ArrayList<Biglietto> getBigliettiAcquistati() {
-        return this.listaBiglietti;
-    }
+    public ArrayList<Biglietto> getBigliettiAcquistati() { return this.listaBiglietti; }
 
-    // --- INIZIO LOGICA ASSEGNAZIONE POSTI ---
-
-    // 1. Controllo se un posto in quella specifica ora/sala è già occupato da un biglietto venduto
     private boolean isPostoOccupato(Proiezione proiezione, Posto posto) {
         for (Biglietto b : listaBiglietti) {
             if (b.getProiezione() != null &&
@@ -202,19 +241,17 @@ public class Controller {
                     b.getPostoAssegnato() != null &&
                     b.getPostoAssegnato().getFila() == posto.getFila() &&
                     b.getPostoAssegnato().getNumeroPosto() == posto.getNumeroPosto()) {
-                return true;
+                return true; // Se il biglietto è nella lista, il posto è occupato
             }
         }
         return false;
     }
 
-    // 2. L'algoritmo che cerca N posti liberi vicini
     private ArrayList<Posto> trovaPostiVicini(Proiezione proiezione, int quantitaRichiesta) {
         ArrayList<Posto> postiScelti = new ArrayList<>();
         char filaAttuale = 'A';
         int consecutivi = 0;
 
-        // TENTATIVO A: Cerchiamo posti consecutivi nella STESSA FILA
         for (Posto p : proiezione.getSala().getPosti()) {
             if (p.getFila() != filaAttuale) {
                 filaAttuale = p.getFila();
@@ -225,11 +262,9 @@ public class Controller {
             if (!isPostoOccupato(proiezione, p)) {
                 postiScelti.add(p);
                 consecutivi++;
-                if (consecutivi == quantitaRichiesta) {
-                    return postiScelti; // Trovati! Esce subito.
-                }
+                if (consecutivi == quantitaRichiesta) return postiScelti;
             } else {
-                consecutivi = 0; // Trovato un ostacolo, si resetta il contatore
+                consecutivi = 0;
                 postiScelti.clear();
             }
         }
@@ -238,15 +273,13 @@ public class Controller {
         for (Posto p : proiezione.getSala().getPosti()) {
             if (!isPostoOccupato(proiezione, p)) {
                 postiScelti.add(p);
-                if (postiScelti.size() == quantitaRichiesta) {
-                    return postiScelti;
-                }
+                if (postiScelti.size() == quantitaRichiesta) return postiScelti;
             }
         }
         return postiScelti;
     }
 
-    // 3. Modifica del checkout per includere i posti calcolati
+
     public void confermaAcquistoCarrello(String metodoPagamento, double percentualeSconto) {
         double prezzoBase = 8.00;
         double prezzoSingoloScontato = prezzoBase - (prezzoBase * (percentualeSconto / 100.0));
@@ -255,15 +288,15 @@ public class Controller {
             int quantita = elem.getQuantita();
             Proiezione proiezione = elem.getProiezione();
 
-            // Calcoliamo i posti prima di stampare i biglietti!
+            Prenotazione nuovaPrenotazione = new Prenotazione(LocalDateTime.now(), StatoPrenotazione.CONFERMATO, proiezione, new ArrayList<>(), utenteLoggatoTemporaneo, null);
+
             ArrayList<Posto> postiAssegnati = trovaPostiVicini(proiezione, quantita);
 
             for (int i = 0; i < quantita; i++) {
-                // Prende il posto corrispondente
                 Posto postoEsatto = (i < postiAssegnati.size()) ? postiAssegnati.get(i) : null;
 
-                // Crea fisicamente il biglietto (ora genererà anche il codice univoco automaticamente in base alle tue modifiche)
-                acquistaBiglietto(prezzoSingoloScontato, postoEsatto, proiezione, null);
+                Biglietto b = acquistaBiglietto(prezzoSingoloScontato, postoEsatto, proiezione, nuovaPrenotazione);
+                nuovaPrenotazione.getBiglietti().add(b);
             }
         }
         svuotaCarrello();
