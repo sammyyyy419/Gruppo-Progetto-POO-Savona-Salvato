@@ -20,9 +20,6 @@ public class Dipendente extends Utente {
             case "proiezionista":
                 this.stipendio = 1400.00;
                 break;
-            case "addetto alle pulizie":
-                this.stipendio = 1100.00;
-                break;
             default:
                 this.stipendio = 1000.00;
                 break;

@@ -62,12 +62,12 @@ Lo scopo principale è digitalizzare e automatizzare i processi interni del cine
 \subsection{Attori principali}
 \begin{itemize}
     \item \textbf{Cliente}: Utente esterno registrato che consulta la programmazione, seleziona i posti graficamente in sala, prenota i biglietti ed effettua il pagamento (con coupon di sconto opzionali), oltre a lasciare feedback sui film.
-    \item \textbf{Dipendente}: Personale interno con mansioni operative (Manager, Cassiere, Proiezionista, Addetto alle pulizie). Gestisce il catalogo (se Manager), convalida i biglietti e registra segnalazioni di anomalie.
+    \item \textbf{Dipendente}: Personale interno con mansioni operative (Manager, Cassiere, Proiezionista, Addetto alle pulizie). Gestisce il catalogo (se Manager), convalida i biglietti e registra segnalazioni di anomalie nelle sale.
     \item \textbf{Sistema Gestionale}: Coordina le operazioni applicando sconti, verificando in tempo reale la capienza e l'occupazione dei posti e garantendo la persistenza delle informazioni nel database relazionale.
 \end{itemize}
 
 \subsection{Requisiti funzionali}
-Il sistema deve consentire di:
+Il sistema consente di:
 \begin{enumerate}
     \item Registrare e autenticare gli utenti differenziando tra clienti e dipendenti.
     \item Gestire il catalogo dei film (inserimento, modifica ed eliminazione).
@@ -139,6 +139,7 @@ Il sistema deve consentire di:
 \midrule
 \texttt{aggiungiCliente} & Registra un nuovo cliente nel DB & Cliente (oggetto) & void (salvataggio) \\
 \texttt{validaLogin} & Verifica le credenziali utente & email, password & boolean (esito) \\
+\texttt{modificaCredenzialiCliente} & Aggiorna email e password & cliente, nuovaEmail, nuovaPassword & void \\
 \texttt{aggiornareDatiPersonali} & Modifica i dati del profilo & nome, cognome, pwd & void \\
 \bottomrule
 \end{tabular}
@@ -175,6 +176,7 @@ Il sistema deve consentire di:
 \texttt{rimborsaSingoloBiglietto} & Elimina il biglietto dal DB & Biglietto (oggetto) & void \\
 \texttt{aggiungiRecensioneAFilm} & Salva voto (1-5) e commento & film, cliente, voto, comm & boolean \\
 \texttt{aggiungiSegnalazione} & Registra un problema in sala & messaggio, Dipendente & void \\
+\texttt{riparaSala} & Risolve segnalazione di una sala & nomeSala & void \\
 \bottomrule
 \end{tabular}
 \caption{Funzioni del modulo Biglietti e Feedback}
@@ -225,6 +227,8 @@ Il sistema deve consentire di:
     \item \textbf{Limiti Valutazione}: Il voto numerico inserito per una recensione deve essere compreso tra 1 e 5 (inclusi).
     \item \textbf{Rimborso Biglietti}: È vietato eliminare o rimborsare un biglietto se l'orario d'inizio dello spettacolo è già trascorso rispetto all'orario attuale.
     \item \textbf{Finestra di Convalida}: La convalida del biglietto da parte del dipendente all'ingresso del cinema è consentita a partire da 15 minuti prima dell'inizio programmato del film.
+    \item \textbf{Capienza Limite della Sala}: Il numero totale di biglietti attivi emessi per un singolo spettacolo non può superare 180 (posti disponibili).
+    \item \textbf{Coerenza della Sala}: La sala indicata sul biglietto acquistato da un utente deve necessariamente coincidere con la sala assegnata al film in quel periodo.
 \end{enumerate}
 
 \newpage
@@ -235,7 +239,7 @@ Il sistema deve consentire di:
     \item \textbf{Accorpamento della Generalizzazione}: 
     L'entità padre \textit{Utente} e la sottoclasse \textit{Cliente} sono state accorpate direttamente nella tabella fisica \texttt{cliente} nel database PostgreSQL. Poiché i dati relativi ai dipendenti (\textit{Dipendente}) sono gestiti in-memory nel codice Java (RAM), questa scelta evita tabelle vuote e riduce il costo di JOIN a livello di database.
     \item \textbf{Denormalizzazione dei Biglietti}:
-    Invece di creare relazioni complesse a livello fisico tra \textit{Biglietto}, \textit{Posto}, \textit{Sala} e \textit{Proiezione}, la tabella relazionale \texttt{biglietto} memorizza direttamente le informazioni in formato testuale denormalizzato (titolo del film, sala, orario della proiezione, fila e numero del posto). Questa scelta rispecchia l'architettura dei DAO implementata nel codice Java, ottimizzando i tempi di caricamento ed evitando l'uso di query eccessivamente nidificate.
+    Invece di creare relazioni complesse a livello fisico tra \textit{Biglietto}, \textit{Posto}, \textit{Sala} e \textit{Proiezione}, la tabella relazionale \texttt{biglietto} memorizza direttamente le informazioni in formato testuale denormalizzato (titolo del film, sala, orario della proiezione, fila e numero del posto). Questa scelta rispecchia l'architettura dei DAO del codice Java, ottimizzando i tempi di caricamento ed evitando l'uso di query eccessivamente nidificate.
     \item \textbf{Imposizione dell'unicità del posto}:
     La prevenzione di doppie prenotazioni per il medesimo posto è garantita da un vincolo \texttt{UNIQUE} composto sulle colonne \texttt{(sala, data\_orario\_proiezione, fila, numero\_posto)} all'interno della tabella \texttt{biglietto}.
 \end{enumerate}
@@ -247,11 +251,11 @@ Il sistema deve consentire di:
 
 \paragraph{Tabella CLIENTE}
 \begin{itemize}
-    \item \texttt{email} VARCHAR(100) -- \textbf{PRIMARY KEY}
-    \item \texttt{nome} VARCHAR(50) -- \textit{NOT NULL}
-    \item \texttt{cognome} VARCHAR(50) -- \textit{NOT NULL}
-    \item \texttt{password} VARCHAR(100) -- \textit{NOT NULL}
-    \item \texttt{data\_registrazione} DATE -- \textit{NOT NULL DEFAULT CURRENT\_DATE}
+    \item \texttt{email} VARCHAR(255) -- \textbf{PRIMARY KEY}
+    \item \texttt{nome} VARCHAR(100) -- \textit{NOT NULL}
+    \item \texttt{cognome} VARCHAR(100) -- \textit{NOT NULL}
+    \item \texttt{password} VARCHAR(255) -- \textit{NOT NULL}
+    \item \texttt{data\_registrazione} DATE -- \textit{NOT NULL}
 \end{itemize}
 
 \paragraph{Tabella FILM}
@@ -259,41 +263,43 @@ Il sistema deve consentire di:
     \item \texttt{titolo} VARCHAR(150) -- \textbf{PRIMARY KEY}
     \item \texttt{durata} TIME -- \textit{NOT NULL}
     \item \texttt{genere} VARCHAR(50) -- \textit{NOT NULL}
-    \item \texttt{classificazione\_eta} VARCHAR(10) -- \textit{NOT NULL}
-    \item \texttt{trama} TEXT -- \textit{NOT NULL}
-    \item \texttt{percorso\_copertina} VARCHAR(255)
-    \item \texttt{data\_inizio\_programmazione} DATE -- \textit{NOT NULL}
-    \item \texttt{sala\_assegnata} VARCHAR(50) -- \textit{NOT NULL}
+    \item \texttt{classificazione\_eta} VARCHAR(20) -- \textit{NOT NULL}
+    \item \texttt{trama} TEXT
+    \item \texttt{percorso\_copertina} VARCHAR(500)
+    \item \texttt{data\_inizio\_programmazione} DATE
+    \item \texttt{sala\_assegnata} VARCHAR(50) -- \textit{DEFAULT 'Sala 1'}
 \end{itemize}
 
 \paragraph{Tabella RECENSIONE}
 \begin{itemize}
-    \item \texttt{id\_recensione} SERIAL -- \textbf{PRIMARY KEY}
-    \item \texttt{titolo\_film} VARCHAR(150) -- \textit{NOT NULL, FOREIGN KEY REFERENCES film(titolo) ON DELETE CASCADE}
-    \item \texttt{autore} VARCHAR(100) -- \textit{NOT NULL}
-    \item \texttt{voto} INT -- \textit{NOT NULL CHECK (voto BETWEEN 1 AND 5)}
-    \item \texttt{commento} TEXT -- \textit{NOT NULL}
+    \item \texttt{id} INT -- \textbf{PRIMARY KEY} (auto-incrementale tramite sequence)
+    \item \texttt{titolo\_film} VARCHAR(150) -- \textit{FOREIGN KEY REFERENCES film(titolo) ON DELETE CASCADE}
+    \item \texttt{autore} VARCHAR(100)
+    \item \texttt{voto} INT -- \textit{CHECK (voto BETWEEN 1 AND 5)}
+    \item \texttt{commento} TEXT
 \end{itemize}
 
 \paragraph{Tabella SEGNALAZIONE}
 \begin{itemize}
-    \item \texttt{id\_segnalazione} SERIAL -- \textbf{PRIMARY KEY}
-    \item \texttt{mittente\_email} VARCHAR(100) -- \textit{NOT NULL}
-    \item \texttt{messaggio} TEXT -- \textit{NOT NULL}
-    \item \texttt{data\_invio} TIMESTAMP -- \textit{NOT NULL DEFAULT CURRENT\_TIMESTAMP}
+    \item \texttt{id} INT -- \textbf{PRIMARY KEY} (auto-incrementale tramite sequence)
+    \item \texttt{mittente\_email} VARCHAR(255)
+    \item \texttt{messaggio} TEXT
+    \item \texttt{sala} VARCHAR(50)
+    \item \texttt{risolta} BOOLEAN -- \textit{DEFAULT FALSE}
+    \item \texttt{data\_invio} TIMESTAMP -- \textit{DEFAULT CURRENT\_TIMESTAMP}
 \end{itemize}
 
 \paragraph{Tabella BIGLIETTO}
 \begin{itemize}
     \item \texttt{codice\_univoco} VARCHAR(8) -- \textbf{PRIMARY KEY}
-    \item \texttt{titolo\_film} VARCHAR(150) -- \textit{NOT NULL}
-    \item \texttt{sala} VARCHAR(50) -- \textit{NOT NULL}
-    \item \texttt{data\_orario\_proiezione} TIMESTAMP -- \textit{NOT NULL}
-    \item \texttt{fila} CHAR(1) -- \textit{NOT NULL}
-    \item \texttt{numero\_posto} INT -- \textit{NOT NULL}
-    \item \texttt{prezzo\_pagato} NUMERIC(5,2) -- \textit{NOT NULL CHECK (prezzo\_pagato >= 0)}
-    \item \texttt{stato} VARCHAR(30) -- \textit{NOT NULL DEFAULT 'DA CONVALIDARE'}
-    \item \textit{Vincoli aggiuntivi}: \texttt{UNIQUE (sala, data\_orario\_proiezione, fila, numero\_posto)}
+    \item \texttt{titolo\_film} VARCHAR(150)
+    \item \texttt{sala} VARCHAR(50)
+    \item \texttt{data\_orario\_proiezione} TIMESTAMP
+    \item \texttt{fila} CHAR(1)
+    \item \texttt{numero\_posto} INT
+    \item \texttt{prezzo\_pagato} NUMERIC(5,2) -- \textit{CHECK (prezzo\_pagato >= 0)}
+    \item \texttt{stato} VARCHAR(20) -- \textit{DEFAULT 'DA CONVALIDARE'}
+    \item \textit{Vincolo UNIQUE composto}: \texttt{UNIQUE (sala, data\_orario\_proiezione, fila, numero\_posto)}
 \end{itemize}
 
 \newpage
@@ -311,28 +317,130 @@ Email cliente unica & PRIMARY KEY & PK su colonna \texttt{email} \\
 Prezzo biglietto non negativo & CHECK & \texttt{CHECK (prezzo\_pagato >= 0)} \\
 Voto recensione valido & CHECK & \texttt{CHECK (voto BETWEEN 1 AND 5)} \\
 Unicità posto per spettacolo & UNIQUE & \texttt{UNIQUE (sala, data\_orario\_proiezione, fila, numero\_posto)} \\
-Impedire acquisto posto occupato & Trigger & \texttt{BEFORE INSERT OR UPDATE ON biglietto} \\
-Impedire rimborsi tardivi & Trigger & \texttt{BEFORE DELETE ON biglietto} \\
+Impedire acquisto posto occupato & Trigger 1 & \texttt{BEFORE INSERT OR UPDATE ON biglietto} \\
+Impedire rimborsi tardivi & Trigger 2 & \texttt{BEFORE DELETE ON biglietto} \\
+Controllare capienza sala max 180 & Trigger 3 & \texttt{BEFORE INSERT ON biglietto} \\
+Verificare coerenza sala film & Trigger 4 & \texttt{BEFORE INSERT OR UPDATE ON biglietto} \\
 \bottomrule
 \end{tabular}
 \caption{Piano implementazione vincoli}
 \end{table}
 
-\subsection{Descrizione dei Trigger}
+\subsection{Descrizione dei 4 Trigger}
 
-\paragraph{Trigger 1: Prevenzione occupazione del medesimo posto}
+\paragraph{Trigger 1: check\_posto\_occupato}
 \begin{itemize}
     \item \textbf{Evento}: \texttt{BEFORE INSERT OR UPDATE ON biglietto}
     \item \textbf{Condizione}: Se nel database è già registrato un biglietto venduto per la stessa sala, stesso orario di proiezione, stessa fila e stesso numero di posto, avente un codice univoco differente.
     \item \textbf{Azione}: Solleva un'eccezione (\texttt{RAISE EXCEPTION}) annullando l'inserimento/modifica.
 \end{itemize}
 
-\paragraph{Trigger 2: Impedire il rimborso dopo l'inizio dello spettacolo}
+\paragraph{Trigger 2: check\_rimborso\_biglietto}
 \begin{itemize}
     \item \textbf{Evento}: \texttt{BEFORE DELETE ON biglietto}
     \item \textbf{Condizione}: Se la data e l'ora correnti di sistema (\texttt{CURRENT\_TIMESTAMP}) sono maggiori o uguali all'orario previsto per l'inizio del film (\texttt{data\_orario\_proiezione}).
-    \item \textbf{Azione}: Blocca l'operazione di cancellazione e solleva un'eccezione.
+    \item \textbf{Azione}: Blocca l'operazione di cancellazione (rimborso) e solleva un'eccezione.
 \end{itemize}
+
+\paragraph{Trigger 3: check\_capienza\_sala}
+\begin{itemize}
+    \item \textbf{Evento}: \texttt{BEFORE INSERT ON biglietto}
+    \item \textbf{Condizione}: Se il conteggio dei biglietti già venduti per la sala e l'orario specificati è maggiore o uguale a 180.
+    \item \textbf{Azione}: Impedisce l'inserimento del biglietto sollevando un'eccezione per sala piena.
+\end{itemize}
+
+\paragraph{Trigger 4: check\_sala\_biglietto}
+\begin{itemize}
+    \item \textbf{Evento}: \texttt{BEFORE INSERT OR UPDATE ON biglietto}
+    \item \textbf{Condizione}: Se la sala specificata nel biglietto non corrisponde alla colonna \texttt{sala\_assegnata} del rispettivo film nella tabella \texttt{film}.
+    \item \textbf{Azione}: Impedisce l'inserimento sollevando un'eccezione di incoerenza logica.
+\end{itemize}
+
+\newpage
+\section{Interrogazioni SQL (Query Complesse)}
+
+Di seguito sono riportate 6 interrogazioni SQL complesse (che utilizzano sottoquery annidate, join, aggregazioni, raggruppamenti e clausole \texttt{HAVING}) progettate per scopi analitici:
+
+\begin{enumerate}
+    \item \textbf{Query 1: Film di genere 'Thriller' con recensioni superiori alla media globale dei voti}
+    \begin{lstlisting}
+SELECT DISTINCT f.titolo, f.genere
+FROM film f
+JOIN recensione r ON f.titolo = r.titolo_film
+WHERE f.genere = 'Thriller' AND r.voto > (
+    SELECT AVG(voto)
+    FROM recensione
+);
+    \end{lstlisting}
+
+    \item \textbf{Query 2: Film che hanno venduto singolarmente più biglietti rispetto alla media di biglietti venduti per film}
+    \begin{lstlisting}
+SELECT titolo_film, COUNT(codice_univoco) AS totale_venduti
+FROM biglietto
+GROUP BY titolo_film
+HAVING COUNT(codice_univoco) > (
+    SELECT AVG(conteggio_biglietti)
+    FROM (
+        SELECT COUNT(codice_univoco) AS conteggio_biglietti
+        FROM biglietto
+        GROUP BY titolo_film
+    ) AS subquery
+);
+    \end{lstlisting}
+
+    \item \textbf{Query 3: Biglietti venduti per spettacoli in sale con segnalazioni guasti attive non risolte}
+    \begin{lstlisting}
+SELECT DISTINCT b.sala, b.titolo_film, b.data_orario_proiezione
+FROM biglietto b
+WHERE b.sala IN (
+    SELECT s.sala
+    FROM segnalazione s
+    WHERE s.risolta = FALSE
+) AND EXISTS (
+    SELECT 1 
+    FROM segnalazione s
+    WHERE s.sala = b.sala 
+      AND s.risolta = FALSE 
+      AND s.data_invio <= b.data_orario_proiezione
+);
+    \end{lstlisting}
+
+    \item \textbf{Query 4: Sale il cui incasso totale supera l'incasso medio calcolato per sala}
+    \begin{lstlisting}
+SELECT sala, SUM(prezzo_pagato) AS ricavo_sala
+FROM biglietto
+GROUP BY sala
+HAVING SUM(prezzo_pagato) > (
+    SELECT AVG(ricavo_medio)
+    FROM (
+        SELECT SUM(prezzo_pagato) AS ricavo_medio
+        FROM biglietto
+        GROUP BY sala
+    ) AS subquery
+);
+    \end{lstlisting}
+
+    \item \textbf{Query 5: Film che hanno ricevuto feedback/recensioni ma per cui non e ancora stato venduto alcun biglietto}
+    \begin{lstlisting}
+SELECT DISTINCT r.titolo_film
+FROM recensione r
+WHERE r.titolo_film NOT IN (
+    SELECT DISTINCT b.titolo_film
+    FROM biglietto b
+);
+    \end{lstlisting}
+
+    \item \textbf{Query 6: Segnalazioni di guasto in sale che programmano film con durata superiore a 2 ore}
+    \begin{lstlisting}
+SELECT s.id, s.sala, s.messaggio, s.data_invio
+FROM segnalazione s
+WHERE s.sala IN (
+    SELECT f.sala_assegnata
+    FROM film f
+    WHERE f.durata > '02:00:00'
+);
+    \end{lstlisting}
+\end{enumerate}
 
 \newpage
 \section{Script SQL (DDL)}
@@ -343,54 +451,70 @@ Lo script DDL seguente definisce lo schema relazionale del database in PostgreSQ
 \begin{lstlisting}
 -- Creazione della tabella CLIENTE
 CREATE TABLE cliente (
-    email VARCHAR(100) PRIMARY KEY,
-    nome VARCHAR(50) NOT NULL,
-    cognome VARCHAR(50) NOT NULL,
-    password VARCHAR(100) NOT NULL,
-    data_registrazione DATE NOT NULL DEFAULT CURRENT_DATE
+    email character varying(255) NOT NULL PRIMARY KEY,
+    nome character varying(100) NOT NULL,
+    cognome character varying(100) NOT NULL,
+    password character varying(255) NOT NULL,
+    data_registrazione date NOT NULL
 );
 
 -- Creazione della tabella FILM
 CREATE TABLE film (
-    titolo VARCHAR(150) PRIMARY KEY,
-    durata TIME NOT NULL,
-    genere VARCHAR(50) NOT NULL,
-    classificazione_eta VARCHAR(10) NOT NULL,
-    trama TEXT NOT NULL,
-    percorso_copertina VARCHAR(255),
-    data_inizio_programmazione DATE NOT NULL,
-    sala_assegnata VARCHAR(50) NOT NULL
+    titolo character varying(150) NOT NULL PRIMARY KEY,
+    durata time without time zone NOT NULL,
+    genere character varying(50) NOT NULL,
+    classificazione_eta character varying(20) NOT NULL,
+    trama text,
+    percorso_copertina character varying(500),
+    data_inizio_programmazione date,
+    sala_assegnata character varying(50) DEFAULT 'Sala 1'::character varying
 );
 
--- Creazione della tabella RECENSIONE
+-- Creazione della tabella RECENSIONE e SEQUENCE associata
+CREATE SEQUENCE recensione_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
 CREATE TABLE recensione (
-    id_recensione SERIAL PRIMARY KEY,
-    titolo_film VARCHAR(150) NOT NULL,
-    autore VARCHAR(100) NOT NULL,
-    voto INT NOT NULL CHECK (voto BETWEEN 1 AND 5),
-    commento TEXT NOT NULL,
+    id integer NOT NULL DEFAULT nextval('recensione_id_seq'::regclass) PRIMARY KEY,
+    titolo_film character varying(150),
+    autore character varying(100),
+    voto integer CHECK (voto BETWEEN 1 AND 5),
+    commento text,
     CONSTRAINT fk_recensione_film FOREIGN KEY (titolo_film) 
         REFERENCES film(titolo) ON DELETE CASCADE
 );
 
--- Creazione della tabella SEGNALAZIONE
+-- Creazione della tabella SEGNALAZIONE e SEQUENCE associata
+CREATE SEQUENCE segnalazione_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
 CREATE TABLE segnalazione (
-    id_segnalazione SERIAL PRIMARY KEY,
-    mittente_email VARCHAR(100) NOT NULL,
-    messaggio TEXT NOT NULL,
-    data_invio TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    id integer NOT NULL DEFAULT nextval('segnalazione_id_seq'::regclass) PRIMARY KEY,
+    mittente_email character varying(255),
+    messaggio text,
+    sala character varying(50),
+    risolta boolean DEFAULT false,
+    data_invio timestamp without time zone DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Creazione della tabella BIGLIETTO
 CREATE TABLE biglietto (
-    codice_univoco VARCHAR(8) PRIMARY KEY,
-    titolo_film VARCHAR(150) NOT NULL,
-    sala VARCHAR(50) NOT NULL,
-    data_orario_proiezione TIMESTAMP NOT NULL,
-    fila CHAR(1) NOT NULL,
-    numero_posto INT NOT NULL,
-    prezzo_pagato NUMERIC(5,2) NOT NULL CHECK (prezzo_pagato >= 0),
-    stato VARCHAR(30) NOT NULL DEFAULT 'DA CONVALIDARE',
+    codice_univoco character varying(8) NOT NULL PRIMARY KEY,
+    titolo_film character varying(150),
+    sala character varying(50),
+    data_orario_proiezione timestamp without time zone,
+    fila character(1),
+    numero_posto integer,
+    prezzo_pagato numeric(5,2) CHECK (prezzo_pagato >= 0),
+    stato character varying(20) DEFAULT 'DA CONVALIDARE'::character varying,
     CONSTRAINT unique_posto_proiezione UNIQUE (sala, data_orario_proiezione, fila, numero_posto)
 );
 \end{lstlisting}
@@ -402,7 +526,7 @@ CREATE TABLE biglietto (
 Di seguito sono implementate le funzioni associate ai trigger ed i relativi trigger su PostgreSQL per l'applicazione delle regole di business:
 
 \begin{lstlisting}
--- Trigger 1: Controllo posto già venduto
+-- Trigger 1: Controllo posto gia venduto
 CREATE OR REPLACE FUNCTION check_posto_occupato()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -414,7 +538,7 @@ BEGIN
           AND numero_posto = NEW.numero_posto
           AND codice_univoco <> NEW.codice_univoco
     ) THEN
-        RAISE EXCEPTION 'Il posto %, fila % per la proiezione del % nella sala % è già stato venduto!', 
+        RAISE EXCEPTION 'Il posto %, fila % per la proiezione del % nella sala % e gia stato venduto!', 
             NEW.numero_posto, NEW.fila, NEW.data_orario_proiezione, NEW.sala;
     END IF;
     RETURN NEW;
@@ -432,7 +556,7 @@ CREATE OR REPLACE FUNCTION check_rimborso_biglietto()
 RETURNS TRIGGER AS $$
 BEGIN
     IF OLD.data_orario_proiezione <= CURRENT_TIMESTAMP THEN
-        RAISE EXCEPTION 'Impossibile rimborsare/eliminare il biglietto %: la proiezione è già iniziata o terminata.', 
+        RAISE EXCEPTION 'Impossibile rimborsare/eliminare il biglietto %: la proiezione e gia iniziata o terminata.', 
             OLD.codice_univoco;
     END IF;
     RETURN OLD;
@@ -443,39 +567,68 @@ CREATE TRIGGER trg_check_rimborso_biglietto
 BEFORE DELETE ON biglietto
 FOR EACH ROW
 EXECUTE FUNCTION check_rimborso_biglietto();
+
+
+-- Trigger 3: Controllo capienza sala max 180
+CREATE OR REPLACE FUNCTION check_capienza_sala()
+RETURNS TRIGGER AS $$
+DECLARE
+    posti_venduti INT;
+BEGIN
+    SELECT COUNT(*) INTO posti_venduti
+    FROM biglietto
+    WHERE sala = NEW.sala
+      AND data_orario_proiezione = NEW.data_orario_proiezione;
+      
+    IF posti_venduti >= 180 THEN
+        RAISE EXCEPTION 'Errore: La sala % per lo spettacolo del % ha raggiunto la capienza massima (180 posti)!', 
+            NEW.sala, NEW.data_orario_proiezione;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_check_capienza_sala
+BEFORE INSERT ON biglietto
+FOR EACH ROW
+EXECUTE FUNCTION check_capienza_sala();
+
+
+-- Trigger 4: Verifica coerenza sala biglietto con sala film
+CREATE OR REPLACE FUNCTION check_sala_biglietto()
+RETURNS TRIGGER AS $$
+DECLARE
+    sala_film VARCHAR(50);
+BEGIN
+    SELECT sala_assegnata INTO sala_film
+    FROM film
+    WHERE titolo = NEW.titolo_film;
+    
+    IF sala_film IS NOT NULL AND NEW.sala <> sala_film THEN
+        RAISE EXCEPTION 'Errore: Il film % e programmato in %, non puoi acquistare un biglietto per la %!', 
+            NEW.titolo_film, sala_film, NEW.sala;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_check_sala_biglietto
+BEFORE INSERT OR UPDATE ON biglietto
+FOR EACH ROW
+EXECUTE FUNCTION check_sala_biglietto();
 \end{lstlisting}
 
 \newpage
 \section{Esempi di Popolamento (DML)}
 
 \subsection{Inserimenti di Esempio}
-Lo script DML seguente popola inizialmente il database con dati coerenti con il resto del sistema (compresi i film e le locandine usate nella GUI):
+Lo script DML seguente popola inizialmente il database con i clienti registrati ed inseriti:
 
 \begin{lstlisting}
--- Inserimento Clienti
+-- Inserimento Clienti Iniziali
 INSERT INTO cliente (email, nome, cognome, password, data_registrazione) VALUES
-('mario.rossi@gmail.com', 'Mario', 'Rossi', 'mario99', '2026-06-15'),
-('luca.bianchi@yahoo.it', 'Luca', 'Bianchi', 'luca2026', '2026-06-18');
-
--- Inserimento Film
-INSERT INTO film (titolo, durata, genere, classificazione_eta, trama, percorso_copertina, data_inizio_programmazione, sala_assegnata) VALUES
-('Parasite', '02:12:00', 'Thriller', 'T', 'Una famiglia povera si insinua lentamente nella vita di una famiglia ricca.', 'parasite.jpg', '2026-06-10', 'Sala 1'),
-('The Prestige', '02:10:00', 'Mystery/Sci-Fi', 'T', 'Due illusionisti rivali ingaggiano una sfida mortale per creare il trucco definitivo.', 'the_prestige.jpg', '2026-06-12', 'Sala 2');
-
--- Inserimento Recensioni
-INSERT INTO recensione (titolo_film, autore, voto, commento) VALUES
-('Parasite', 'Salvatore S.', 5, 'Un capolavoro assoluto del cinema moderno, sceneggiatura perfetta.'),
-('The Prestige', 'Francesca V.', 5, 'Finale incredibile, regia di Nolan spettacolare.');
-
--- Inserimento Segnalazioni
-INSERT INTO segnalazione (mittente_email, messaggio) VALUES
-('francesca.volpe@enterprise.com', 'Rilevato sedile danneggiato in fila C, posto 5 nella Sala 1.'),
-('savonasammy@enterprise.com', 'Proiettore della Sala 2 necessita di calibrazione dei colori.');
-
--- Inserimento Biglietti (Acquisti simulati)
-INSERT INTO biglietto (codice_univoco, titolo_film, sala, data_orario_proiezione, fila, numero_posto, prezzo_pagato, stato) VALUES
-('18274639', 'Parasite', 'Sala 1', '2026-06-25 17:00:00', 'E', 7, 8.00, 'DA CONVALIDARE'),
-('88374621', 'The Prestige', 'Sala 2', '2026-06-26 21:00:00', 'F', 12, 8.00, 'CONVALIDATO');
+('russoluca@gmail.com', 'Luca', 'Russo', 'russo', '2026-06-21'),
+('caccavallericcardo@gmail.com', 'Riccardo', 'Caccavalle', 'caccavalle', '2026-06-21');
 \end{lstlisting}
 
 \end{document}

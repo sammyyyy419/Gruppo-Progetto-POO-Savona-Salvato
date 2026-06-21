@@ -82,8 +82,10 @@ public class Controller {
             this.listaFilm = new ArrayList<>();
         }
 
-        listaDipendenti.add(new Dipendente("Francesca", "Volpe", "francesca.volpe@enterprise.com", "sammy", "cassiere"));
-        listaDipendenti.add(new Dipendente("Sammy", "Savona", "savonasammy@enterprise.com", "1236", "manager"));
+        listaDipendenti.add(new Dipendente("Francesca", "Salvato", "salvatofrancesca@enterprise.com", "kekka", "manager"));
+        listaDipendenti.add(new Dipendente("Salvatore", "Savona", "savonasammy@enterprise.com", "1236", "manager"));
+        listaDipendenti.add(new Dipendente("Bernardo", "Breve", "brevebernardo@enterprise.com", "breve", "cassiere"));
+        listaDipendenti.add(new Dipendente("Andrea", "Cali", "caliandrea@enterprise.com", "cali", "proiezionista"));
     }
 
     // Metodo helper per tracciare chi compra
