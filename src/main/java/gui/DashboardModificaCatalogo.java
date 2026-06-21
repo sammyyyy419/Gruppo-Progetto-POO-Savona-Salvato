@@ -4,6 +4,7 @@ import controller.Controller;
 import model.Film;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
@@ -26,10 +27,13 @@ public class DashboardModificaCatalogo extends JFrame {
     public DashboardModificaCatalogo(Controller controller) {
         this.controller = controller;
 
+        sistemaGrafica();
+
         setContentPane(mainPanel);
         setTitle("Gestione Catalogo Film");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setSize(850, 600);
+        setSize(920, 660);
+        setMinimumSize(new Dimension(820, 560));
         setLocationRelativeTo(null);
 
         panelListaFilm.setLayout(new BoxLayout(panelListaFilm, BoxLayout.Y_AXIS));
@@ -40,17 +44,59 @@ public class DashboardModificaCatalogo extends JFrame {
         setVisible(true);
     }
 
+    private void sistemaGrafica() {
+        Color sfondoScuro = new Color(18, 22, 40);
+        Color sfondoPannello = new Color(28, 34, 58);
+        Color testoChiaro = Color.WHITE;
+        Color grigioScuro = new Color(50, 58, 89);
+
+        mainPanel.removeAll();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.setBackground(sfondoScuro);
+
+        JPanel panelTop = new JPanel(new BorderLayout(15, 0));
+        panelTop.setBackground(sfondoScuro);
+        panelTop.setBorder(new EmptyBorder(15, 20, 15, 20));
+
+        JLabel labelTitoloSchermata = new JLabel("Gestione Catalogo Film");
+        labelTitoloSchermata.setForeground(testoChiaro);
+        labelTitoloSchermata.setFont(new Font("SansSerif", Font.BOLD, 18));
+
+        btnTorna.setText("Indietro");
+        btnTorna.setBackground(grigioScuro);
+        btnTorna.setForeground(testoChiaro);
+        btnTorna.setFocusPainted(false);
+        btnTorna.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnTorna.setPreferredSize(new Dimension(100, 32));
+
+        panelTop.add(labelTitoloSchermata, BorderLayout.WEST);
+        panelTop.add(btnTorna, BorderLayout.EAST);
+
+        scrollPanelFilm.setBorder(BorderFactory.createEmptyBorder());
+        scrollPanelFilm.setBackground(sfondoPannello);
+        scrollPanelFilm.getViewport().setBackground(sfondoPannello);
+
+        panelListaFilm.setBackground(sfondoPannello);
+        panelListaFilm.setBorder(new EmptyBorder(15, 20, 15, 20));
+
+        mainPanel.add(panelTop, BorderLayout.NORTH);
+        mainPanel.add(scrollPanelFilm, BorderLayout.CENTER);
+    }
+
     private void aggiornaListaFilm() {
         panelListaFilm.removeAll();
         ArrayList<Film> filmDisponibili = controller.getListaFilm();
 
         if (filmDisponibili.isEmpty()) {
-            panelListaFilm.add(new JLabel("Nessun film presente nel catalogo."));
+            JLabel lblVuoto = new JLabel("Nessun film presente nel catalogo.");
+            lblVuoto.setForeground(new Color(140, 150, 180));
+            lblVuoto.setFont(new Font("SansSerif", Font.ITALIC, 14));
+            panelListaFilm.add(lblVuoto);
         } else {
             for (Film film : filmDisponibili) {
                 JPanel rigaFilm = creaRigaFilm(film);
                 panelListaFilm.add(rigaFilm);
-                panelListaFilm.add(new JSeparator(JSeparator.HORIZONTAL));
+                panelListaFilm.add(Box.createVerticalStrut(12));
             }
         }
         panelListaFilm.revalidate();
@@ -59,13 +105,18 @@ public class DashboardModificaCatalogo extends JFrame {
 
     private JPanel creaRigaFilm(Film film) {
         JPanel riga = new JPanel(new BorderLayout(15, 10));
-        riga.setBorder(BorderFactory.createEmptyBorder(12, 15, 12, 15));
+        riga.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(50, 58, 89), 1, true),
+                BorderFactory.createEmptyBorder(12, 15, 12, 15)
+        ));
+        riga.setBackground(new Color(38, 46, 78));
         riga.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
 
         JLabel labelLocandina = new JLabel();
         labelLocandina.setPreferredSize(new Dimension(60, 90));
         labelLocandina.setHorizontalAlignment(SwingConstants.CENTER);
-        labelLocandina.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        labelLocandina.setBorder(BorderFactory.createLineBorder(new Color(50, 58, 89), 1, true));
+        labelLocandina.setForeground(Color.WHITE);
 
         if (film.getPercorsoCopertina() != null && !film.getPercorsoCopertina().isEmpty()) {
             ImageIcon icon = new ImageIcon(film.getPercorsoCopertina());
@@ -73,30 +124,51 @@ public class DashboardModificaCatalogo extends JFrame {
             labelLocandina.setIcon(new ImageIcon(img));
         } else {
             labelLocandina.setText("🎬");
+            labelLocandina.setFont(new Font("SansSerif", Font.PLAIN, 24));
         }
         riga.add(labelLocandina, BorderLayout.WEST);
 
         JPanel panelTesto = new JPanel();
         panelTesto.setLayout(new BoxLayout(panelTesto, BoxLayout.Y_AXIS));
-        JLabel labelTitolo = new JLabel(film.getTitolo());
-        labelTitolo.setFont(new Font("Arial", Font.BOLD, 16));
-        JLabel labelInfo = new JLabel("Genere: " + film.getGenere() + "  |  Durata: " + film.getDurataMinuti() + " min");
+        panelTesto.setBackground(new Color(38, 46, 78));
 
-        // AGGIUNTO: MOSTRA LA SALA ANCHE QUI!
+        JLabel labelTitolo = new JLabel(film.getTitolo());
+        labelTitolo.setFont(new Font("SansSerif", Font.BOLD, 16));
+        labelTitolo.setForeground(Color.WHITE);
+
+        JLabel labelInfo = new JLabel("Genere: " + film.getGenere() + "  |  Durata: " + film.getDurataMinuti() + " min");
+        labelInfo.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        labelInfo.setForeground(new Color(200, 210, 230));
+
         JLabel labelClass = new JLabel("Classificazione: " + film.getClassificazioneEta() + "  |  Ubicazione: " + film.getSalaAssegnata());
+        labelClass.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        labelClass.setForeground(new Color(200, 210, 230));
 
         panelTesto.add(labelTitolo);
-        panelTesto.add(Box.createVerticalStrut(5));
+        panelTesto.add(Box.createVerticalStrut(6));
         panelTesto.add(labelInfo);
-        panelTesto.add(Box.createVerticalStrut(3));
+        panelTesto.add(Box.createVerticalStrut(4));
         panelTesto.add(labelClass);
         riga.add(panelTesto, BorderLayout.CENTER);
 
-        JPanel panelPulsanti = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 15));
+        JPanel panelPulsanti = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 15));
+        panelPulsanti.setBackground(new Color(38, 46, 78));
+
         JButton btnModifica = new JButton("Modifica ✏️");
+        btnModifica.setBackground(new Color(50, 58, 89));
+        btnModifica.setForeground(Color.WHITE);
+        btnModifica.setFocusPainted(false);
+        btnModifica.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnModifica.setPreferredSize(new Dimension(110, 32));
+        btnModifica.setFont(new Font("SansSerif", Font.PLAIN, 12));
+
         JButton btnElimina = new JButton("Elimina 🗑️");
-        btnElimina.setBackground(new Color(231, 76, 60));
+        btnElimina.setBackground(new Color(176, 58, 75));
         btnElimina.setForeground(Color.WHITE);
+        btnElimina.setFocusPainted(false);
+        btnElimina.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnElimina.setPreferredSize(new Dimension(110, 32));
+        btnElimina.setFont(new Font("SansSerif", Font.PLAIN, 12));
 
         panelPulsanti.add(btnModifica);
         panelPulsanti.add(btnElimina);
@@ -125,19 +197,29 @@ public class DashboardModificaCatalogo extends JFrame {
     }
 
     private void mostraFinestraModifica(Film film) {
+        Color sfondoPannello = new Color(28, 34, 58);
+        Color sfondoCard = new Color(38, 46, 78);
+        Color testoChiaro = Color.WHITE;
+        Color grigioScuro = new Color(50, 58, 89);
+        Color verdeSuccesso = new Color(46, 204, 113);
+
         JDialog dialog = new JDialog(this, "Modifica Film: " + film.getTitolo(), true);
-        dialog.setSize(500, 480); // Leggermente allargato
+        dialog.setSize(540, 540);
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
 
-        JPanel formPanel = new JPanel(new GridLayout(7, 2, 10, 10));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(sfondoPannello);
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 25, 15, 25));
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(6, 6, 6, 6);
+        c.fill = GridBagConstraints.HORIZONTAL;
 
         JTextField txtTitolo = new JTextField(film.getTitolo());
         JTextField txtDurata = new JTextField(String.format("%02d:%02d", film.getDurata().getHour(), film.getDurata().getMinute()));
         JTextField txtGenere = new JTextField(film.getGenere());
 
-        // AGGIUNTA SALA
         String[] sale = new String[12];
         for(int i=0; i<12; i++) sale[i] = "Sala " + (i+1);
         JComboBox<String> cmbSala = new JComboBox<>(sale);
@@ -149,9 +231,19 @@ public class DashboardModificaCatalogo extends JFrame {
         final String[] percorsoAggiornato = {film.getPercorsoCopertina()};
 
         JButton btnCambiaImmagine = new JButton("Cambia Foto...");
+        btnCambiaImmagine.setBackground(grigioScuro);
+        btnCambiaImmagine.setForeground(testoChiaro);
+        btnCambiaImmagine.setFocusPainted(false);
+        btnCambiaImmagine.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnCambiaImmagine.setPreferredSize(new Dimension(120, 28));
+
         String testoLabel = (film.getPercorsoCopertina() != null) ? "Immagine Presente" : "Nessuna immagine";
         JLabel lblPathImmagine = new JLabel(testoLabel);
-        JPanel panelImg = new JPanel(new BorderLayout(5, 5));
+        lblPathImmagine.setForeground(new Color(180, 190, 210));
+        lblPathImmagine.setFont(new Font("SansSerif", Font.ITALIC, 12));
+
+        JPanel panelImg = new JPanel(new BorderLayout(8, 0));
+        panelImg.setOpaque(false);
         panelImg.add(btnCambiaImmagine, BorderLayout.WEST);
         panelImg.add(lblPathImmagine, BorderLayout.CENTER);
 
@@ -177,21 +269,92 @@ public class DashboardModificaCatalogo extends JFrame {
         JTextArea txtTrama = new JTextArea(film.getTrama());
         txtTrama.setLineWrap(true);
         txtTrama.setWrapStyleWord(true);
-        JScrollPane scrollTrama = new JScrollPane(txtTrama);
+        txtTrama.setBackground(sfondoCard);
+        txtTrama.setForeground(testoChiaro);
+        txtTrama.setCaretColor(testoChiaro);
+        txtTrama.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        txtTrama.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
 
-        formPanel.add(new JLabel("Titolo:")); formPanel.add(txtTitolo);
-        formPanel.add(new JLabel("Durata (HH:MM):")); formPanel.add(txtDurata);
-        formPanel.add(new JLabel("Genere:")); formPanel.add(txtGenere);
-        formPanel.add(new JLabel("Sala Assegnata:")); formPanel.add(cmbSala); // AGGIUNTO
-        formPanel.add(new JLabel("Classificazione:")); formPanel.add(cmbClassificazione);
-        formPanel.add(new JLabel("Copertina:")); formPanel.add(panelImg);
-        formPanel.add(new JLabel("Trama:")); formPanel.add(scrollTrama);
+        JScrollPane scrollTrama = new JScrollPane(txtTrama);
+        scrollTrama.setBorder(BorderFactory.createLineBorder(grigioScuro, 1, true));
+        scrollTrama.setPreferredSize(new Dimension(200, 80));
+
+        JLabel l1 = new JLabel("Titolo:");
+        JLabel l2 = new JLabel("Durata (HH:MM):");
+        JLabel l3 = new JLabel("Genere:");
+        JLabel l4 = new JLabel("Sala Assegnata:");
+        JLabel l5 = new JLabel("Classificazione:");
+        JLabel l6 = new JLabel("Copertina:");
+        JLabel l7 = new JLabel("Trama:");
+
+        JLabel[] labels = {l1, l2, l3, l4, l5, l6, l7};
+        for (JLabel l : labels) {
+            l.setForeground(testoChiaro);
+            l.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        }
+
+        JTextField[] fields = {txtTitolo, txtDurata, txtGenere};
+        for (JTextField f : fields) {
+            f.setBackground(sfondoCard);
+            f.setForeground(testoChiaro);
+            f.setCaretColor(testoChiaro);
+            f.setFont(new Font("SansSerif", Font.PLAIN, 13));
+            f.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(grigioScuro, 1, true),
+                    BorderFactory.createEmptyBorder(6, 10, 6, 10)
+            ));
+        }
+
+        JComboBox<?>[] combos = {cmbSala, cmbClassificazione};
+        for (JComboBox<?> cb : combos) {
+            cb.setBackground(sfondoCard);
+            cb.setForeground(testoChiaro);
+            cb.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        }
+
+        c.gridx = 0; c.gridy = 0; c.weightx = 0.0; formPanel.add(l1, c);
+        c.gridx = 1; c.gridy = 0; c.weightx = 1.0; formPanel.add(txtTitolo, c);
+
+        c.gridx = 0; c.gridy = 1; c.weightx = 0.0; formPanel.add(l2, c);
+        c.gridx = 1; c.gridy = 1; c.weightx = 1.0; formPanel.add(txtDurata, c);
+
+        c.gridx = 0; c.gridy = 2; c.weightx = 0.0; formPanel.add(l3, c);
+        c.gridx = 1; c.gridy = 2; c.weightx = 1.0; formPanel.add(txtGenere, c);
+
+        c.gridx = 0; c.gridy = 3; c.weightx = 0.0; formPanel.add(l4, c);
+        c.gridx = 1; c.gridy = 3; c.weightx = 1.0; formPanel.add(cmbSala, c);
+
+        c.gridx = 0; c.gridy = 4; c.weightx = 0.0; formPanel.add(l5, c);
+        c.gridx = 1; c.gridy = 4; c.weightx = 1.0; formPanel.add(cmbClassificazione, c);
+
+        c.gridx = 0; c.gridy = 5; c.weightx = 0.0; formPanel.add(l6, c);
+        c.gridx = 1; c.gridy = 5; c.weightx = 1.0; formPanel.add(panelImg, c);
+
+        c.gridx = 0; c.gridy = 6; c.weightx = 0.0; c.anchor = GridBagConstraints.NORTH;
+        formPanel.add(l7, c);
+        c.gridx = 1; c.gridy = 6; c.weightx = 1.0; c.fill = GridBagConstraints.BOTH; c.weighty = 1.0;
+        formPanel.add(scrollTrama, c);
 
         dialog.add(formPanel, BorderLayout.CENTER);
 
-        JPanel bottoniPanel = new JPanel();
+        JPanel bottoniPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        bottoniPanel.setBackground(sfondoPannello);
+        bottoniPanel.setBorder(new EmptyBorder(5, 20, 20, 20));
+
         JButton btnSalva = new JButton("Salva Modifiche");
+        btnSalva.setBackground(verdeSuccesso);
+        btnSalva.setForeground(Color.WHITE);
+        btnSalva.setFocusPainted(false);
+        btnSalva.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnSalva.setPreferredSize(new Dimension(140, 36));
+        btnSalva.setFont(new Font("SansSerif", Font.BOLD, 12));
+
         JButton btnAnnulla = new JButton("Annulla");
+        btnAnnulla.setBackground(grigioScuro);
+        btnAnnulla.setForeground(testoChiaro);
+        btnAnnulla.setFocusPainted(false);
+        btnAnnulla.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnAnnulla.setPreferredSize(new Dimension(100, 36));
 
         btnAnnulla.addActionListener(e -> dialog.dispose());
 
@@ -202,9 +365,8 @@ public class DashboardModificaCatalogo extends JFrame {
                 String nGenere = txtGenere.getText().trim();
                 String nClass = (String) cmbClassificazione.getSelectedItem();
                 String nTrama = txtTrama.getText().trim();
-                String nSala = (String) cmbSala.getSelectedItem(); // AGGIUNTO
+                String nSala = (String) cmbSala.getSelectedItem();
 
-                // AGGIUNTO nSala ALLA CHIAMATA DEL CONTROLLER
                 controller.modificaFilm(film, nTitolo, nDurata, nGenere, nClass, nTrama, percorsoAggiornato[0], film.getDataInizioProgrammazione(), nSala);
 
                 JOptionPane.showMessageDialog(dialog, "Film aggiornato!");
@@ -218,8 +380,8 @@ public class DashboardModificaCatalogo extends JFrame {
             }
         });
 
-        bottoniPanel.add(btnSalva);
         bottoniPanel.add(btnAnnulla);
+        bottoniPanel.add(btnSalva);
         dialog.add(bottoniPanel, BorderLayout.SOUTH);
 
         dialog.setVisible(true);

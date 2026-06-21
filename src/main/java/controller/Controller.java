@@ -40,10 +40,9 @@ public class Controller {
     private ProiezioneDAO proiezioneDAO;
     private ArrayList<Film> listaFilm;
 
-    // Per gestire il checkout
     private Cliente utenteLoggatoTemporaneo;
 
-    // Tutti i DAO
+
     private FilmDAO filmDAO;
     private ClienteDAO clienteDAO;
     private BigliettoDAO bigliettoDAO;
@@ -60,7 +59,6 @@ public class Controller {
         this.clienteDAO = new ClienteImplementazionePostgresDAO();
         this.proiezioneDAO = new ProiezioneImplementazionePostgresDAO();
 
-        // Inizializzazione dei nuovi DAO
         this.bigliettoDAO = new BigliettoImplementazionePostgresDAO();
         this.recensioneDAO = new RecensioneImplementazionePostgresDAO();
         this.segnalazioneDAO = new SegnalazioneImplementazionePostgresDAO();
@@ -68,13 +66,11 @@ public class Controller {
         try {
             this.listaFilm = filmDAO.recuperaTuttiFilm();
 
-            // CARICAMENTO DELLE RECENSIONI DAL DB PER OGNI FILM
             for (Film f : listaFilm) {
                 ArrayList<String> recensioniSalvate = recensioneDAO.recuperaRecensioniPerFilm(f.getTitolo());
                 f.setRecensioni(recensioniSalvate);
             }
 
-            // NUOVO: CARICA I BIGLIETTI DAL DATABASE ALL'AVVIO
             this.listaBiglietti = bigliettoDAO.recuperaTuttiBiglietti();
 
         } catch (Exception e) {
@@ -88,7 +84,6 @@ public class Controller {
         listaDipendenti.add(new Dipendente("Andrea", "Cali", "caliandrea@enterprise.com", "cali", "proiezionista"));
     }
 
-    // Metodo helper per tracciare chi compra
     public void impostaUtenteCorrente(Cliente c) {
         this.utenteLoggatoTemporaneo = c;
     }
@@ -136,10 +131,8 @@ public class Controller {
                 : "";
         String autore = cliente.getNome() + " " + inizialeCognome;
 
-        // Salva in RAM
         film.aggiungiFeedback(autore, voto, commento);
 
-        // SALVATAGGIO NEL DATABASE POSTGRES
         try {
             recensioneDAO.inserisciRecensioneDB(film.getTitolo(), autore, voto, commento);
         } catch (Exception e) {
@@ -182,7 +175,6 @@ public class Controller {
             String segnalazioneCompleta = mittente.getNome() + " " + mittente.getCognome() + " (" + mittente.getRuolo() + ") - " + messaggio;
             listaSegnalazioni.add(segnalazioneCompleta);
 
-            // SALVATAGGIO NEL DATABASE POSTGRES
             try {
                 segnalazioneDAO.inserisciSegnalazioneDB(mittente.getEmail(), messaggio);
             } catch (Exception e) {
@@ -194,12 +186,12 @@ public class Controller {
     public void aggiungiSegnalazione(Dipendente mittente, String messaggio) { this.aggiungiSegnalazione(messaggio, mittente); }
 
     public ArrayList<String> getSegnalazioni() {
-        // RECUPERA DAL DATABASE POSTGRES INVECE CHE DALLA RAM!
+
         try {
             return segnalazioneDAO.recuperaTutteSegnalazioni();
         } catch (Exception e) {
             System.out.println("Errore recupero segnalazioni dal DB: " + e.getMessage());
-            return listaSegnalazioni; // se fallisce il DB, ritorna quelle in RAM
+            return listaSegnalazioni;
         }
     }
 
@@ -207,7 +199,6 @@ public class Controller {
         Biglietto nuovoBiglietto = new Biglietto(prezzo, posto, proiezione, prenotazione);
         listaBiglietti.add(nuovoBiglietto);
 
-        // SALVATAGGIO DEL BIGLIETTO NEL DATABASE POSTGRES
         try {
             bigliettoDAO.inserisciBigliettoDB(nuovoBiglietto);
         } catch (Exception e) {
@@ -226,9 +217,8 @@ public class Controller {
                 if (b.isValido()) {
                     throw new Exception("Attenzione! Questo biglietto (Codice: " + codiceUnivoco + ") risulta GIÀ CONVALIDATO.");
                 }
-                b.setValido(true); // Memoria
+                b.setValido(true);
 
-                // AGGIORNA LO STATO NEL DATABASE POSTGRES
                 try {
                     bigliettoDAO.aggiornaStatoBigliettoDB(codiceUnivoco, "CONVALIDATO");
                 } catch (Exception e) {
@@ -256,7 +246,7 @@ public class Controller {
             }
         }
 
-        // CANCELLA IL BIGLIETTO DAL DATABASE POSTGRES
+
         try {
             bigliettoDAO.eliminaBigliettoDB(bigliettoDaRimborsare.getCodiceUnivoco());
         } catch (Exception e) {
@@ -316,7 +306,6 @@ public class Controller {
         char filaAttuale = 'A';
         int consecutivi = 0;
 
-        // TENTATIVO A: Cerchiamo posti vicini nella stessa fila
         for (Posto p : proiezione.getSala().getPosti()) {
             if (p.getFila() != filaAttuale) {
                 filaAttuale = p.getFila();
@@ -334,7 +323,6 @@ public class Controller {
             }
         }
 
-        // TENTATIVO B: La sala è quasi piena, diamo posti separati sparsi per la sala
         postiScelti.clear();
         for (Posto p : proiezione.getSala().getPosti()) {
             if (!isPostoOccupato(proiezione, p)) {
@@ -343,23 +331,21 @@ public class Controller {
             }
         }
 
-        // SE ARRIVA QUI, SIGNIFICA CHE NON CI SONO ABBASTANZA POSTI!
         throw new SalaPienaException("SALA PIENA! Impossibile acquistare " + quantitaRichiesta +
                 " biglietti. Posti rimanenti in questa sala: " + postiScelti.size());
     }
-    // --- METODI PER MODIFICA CREDENZIALI ---
+
 
     public void modificaCredenzialiCliente(Cliente cliente, String nuovaEmail, String nuovaPassword) throws Exception {
-        // 1. Aggiorna nel database
+
         clienteDAO.aggiornaCredenzialiClienteDB(cliente.getEmail(), nuovaEmail, nuovaPassword);
-        // 2. Aggiorna in memoria (nella sessione attuale)
+
         cliente.setEmail(nuovaEmail);
         cliente.setPassword(nuovaPassword);
     }
 
     public void modificaPasswordDipendente(Dipendente dipendente, String nuovaPassword) {
-        // I dipendenti sono salvati in memoria nel Controller, quindi basta aggiornare l'oggetto
-        dipendente.setPassword(nuovaPassword);
+       dipendente.setPassword(nuovaPassword);
     }
 
     public void confermaAcquistoCarrello(String metodoPagamento, double percentualeSconto) throws SalaPienaException {
@@ -370,7 +356,6 @@ public class Controller {
             int quantita = elem.getQuantita();
             Proiezione proiezione = elem.getProiezione();
 
-            // QUI PROVA A TROVARE I POSTI. SE NON CE NE SONO, LANCIA L'ECCEZIONE E SI FERMA TUTTO!
             ArrayList<Posto> postiAssegnati = trovaPostiVicini(proiezione, quantita);
 
             Prenotazione nuovaPrenotazione = new Prenotazione(LocalDateTime.now(), StatoPrenotazione.CONFERMATO, proiezione, new ArrayList<>(), utenteLoggatoTemporaneo, null);
@@ -402,7 +387,6 @@ public class Controller {
         }
     }
 
-    // --- NUOVI METODI AGGIUNTI PER LA MAPPA DELLE SALE ---
 
     public String verificaStatoSala(String nomeSala) {
         try {

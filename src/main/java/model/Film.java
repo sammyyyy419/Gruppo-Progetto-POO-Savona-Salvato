@@ -14,7 +14,6 @@ public class Film {
     private String percorsoCopertina;
     private LocalDate dataInizioProgrammazione;
 
-    // NUOVO: Aggiunto l'attributo per la sala
     private String salaAssegnata;
 
     public Film(String titolo, LocalTime durata, String genere, String classificazioneEta, String trama, ArrayList<String> recensioni, String percorsoCopertina, LocalDate dataInizioProgrammazione, String salaAssegnata) {

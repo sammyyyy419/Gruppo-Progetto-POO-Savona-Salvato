@@ -5,6 +5,7 @@ import model.Cliente;
 import model.Film;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -26,9 +27,12 @@ public class DashboardRecensioni extends JFrame {
         this.clienteLoggato = cliente;
         this.filmSelezionato = film;
 
+        sistemaGrafica();
+
         setContentPane(mainPanel);
         setTitle("Recensioni: " + film.getTitolo());
-        setSize(600, 500);
+        setSize(720, 540);
+        setMinimumSize(new Dimension(660, 480));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -45,45 +49,92 @@ public class DashboardRecensioni extends JFrame {
         btnTorna.addActionListener(e -> this.dispose());
         btnAggiungi.addActionListener(e -> apriFinestraScritturaRecensione());
 
-        // Carica le recensioni dal Database all'apertura
         aggiornaListaRecensioni();
 
         setVisible(true);
     }
 
+    private void sistemaGrafica() {
+        Color sfondoScuro = new Color(18, 22, 40);
+        Color sfondoPannello = new Color(28, 34, 58);
+        Color testoChiaro = Color.WHITE;
+        Color bluAcceso = new Color(54, 112, 233);
+        Color grigioScuro = new Color(50, 58, 89);
+
+        mainPanel.removeAll();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.setBackground(sfondoScuro);
+
+        panelAlto.removeAll();
+        panelAlto.setLayout(new BorderLayout(15, 0));
+        panelAlto.setBackground(sfondoScuro);
+        panelAlto.setBorder(new EmptyBorder(15, 20, 15, 20));
+
+        labelTitolo.setForeground(testoChiaro);
+        labelTitolo.setFont(new Font("SansSerif", Font.BOLD, 16));
+        panelAlto.add(labelTitolo, BorderLayout.WEST);
+
+        JPanel panelBottoniTop = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        panelBottoniTop.setOpaque(false);
+
+        btnAggiungi.setText("Scrivi Recensione");
+        btnAggiungi.setBackground(bluAcceso);
+        btnAggiungi.setForeground(testoChiaro);
+        btnAggiungi.setFocusPainted(false);
+        btnAggiungi.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnAggiungi.setPreferredSize(new Dimension(150, 32));
+        btnAggiungi.setFont(new Font("SansSerif", Font.BOLD, 12));
+
+        btnTorna.setText("Indietro");
+        btnTorna.setBackground(grigioScuro);
+        btnTorna.setForeground(testoChiaro);
+        btnTorna.setFocusPainted(false);
+        btnTorna.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnTorna.setPreferredSize(new Dimension(100, 32));
+
+        panelBottoniTop.add(btnAggiungi);
+        panelBottoniTop.add(btnTorna);
+        panelAlto.add(panelBottoniTop, BorderLayout.EAST);
+
+        scrollRecensioni.setBorder(BorderFactory.createEmptyBorder());
+        scrollRecensioni.setBackground(sfondoPannello);
+        scrollRecensioni.getViewport().setBackground(sfondoPannello);
+
+        panelListaRecensioni.setBackground(sfondoPannello);
+        panelListaRecensioni.setBorder(new EmptyBorder(15, 20, 15, 20));
+
+        mainPanel.add(panelAlto, BorderLayout.NORTH);
+        mainPanel.add(scrollRecensioni, BorderLayout.CENTER);
+    }
+
     private void aggiornaListaRecensioni() {
         panelListaRecensioni.removeAll();
 
-        // RECUPERO IN TEMPO REALE DAL DATABASE!
         ArrayList<String> recensioni = controller.ottieniRecensioniLiveDalDB(filmSelezionato.getTitolo());
 
         if (recensioni == null || recensioni.isEmpty()) {
             JLabel lblVuoto = new JLabel("Nessuna recensione presente. Sii il primo a recensire!");
-            lblVuoto.setFont(new Font("Arial", Font.ITALIC, 14));
-            lblVuoto.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 0));
+            lblVuoto.setForeground(new Color(140, 150, 180));
+            lblVuoto.setFont(new Font("SansSerif", Font.ITALIC, 14));
+            lblVuoto.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
             panelListaRecensioni.add(lblVuoto);
         } else {
             for (String recStr : recensioni) {
-
-                // Gestione se la stringa è salvata nel formato "autore||voto||commento"
                 if (recStr.contains("||")) {
-                    String[] parti = recStr.split("\\|\\|");
+                    String[] parti = recStr.split("\\|\\?");
                     if (parti.length >= 3) {
                         panelListaRecensioni.add(creaCardRecensione(parti[0], parti[1], parti[2]));
-                        panelListaRecensioni.add(Box.createVerticalStrut(10));
+                        panelListaRecensioni.add(Box.createVerticalStrut(12));
                     }
-                }
-                // Adattamento intelligente: se la stringa arriva nel vecchio formato DAO ("Mario ha votato 5/5: Bello!")
-                else if (recStr.contains(" ha votato ") && recStr.contains("/5:")) {
+                } else if (recStr.contains(" ha votato ") && recStr.contains("/5:")) {
                     try {
                         String autore = recStr.substring(0, recStr.indexOf(" ha votato "));
                         String voto = recStr.substring(recStr.indexOf("votato ") + 7, recStr.indexOf("/5:"));
                         String commento = recStr.substring(recStr.indexOf("/5: ") + 4);
 
                         panelListaRecensioni.add(creaCardRecensione(autore.trim(), voto.trim(), commento.trim()));
-                        panelListaRecensioni.add(Box.createVerticalStrut(10));
+                        panelListaRecensioni.add(Box.createVerticalStrut(12));
                     } catch (Exception e) {
-                        // Se fallisce l'estrazione per formati strani, lo ignora
                     }
                 }
             }
@@ -93,21 +144,22 @@ public class DashboardRecensioni extends JFrame {
     }
 
     private JPanel creaCardRecensione(String autore, String voto, String commento) {
-        JPanel card = new JPanel(new BorderLayout(5, 5));
+        JPanel card = new JPanel(new BorderLayout(5, 8));
         card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true),
-                BorderFactory.createEmptyBorder(10, 15, 10, 15)
+                BorderFactory.createLineBorder(new Color(50, 58, 89), 1, true),
+                BorderFactory.createEmptyBorder(12, 15, 12, 15)
         ));
-        card.setBackground(Color.WHITE);
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+        card.setBackground(new Color(38, 46, 78));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 110));
 
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
         headerPanel.setOpaque(false);
 
         JLabel lblAutore = new JLabel("👤 " + autore);
-        lblAutore.setFont(new Font("Arial", Font.BOLD, 14));
+        lblAutore.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblAutore.setForeground(Color.WHITE);
 
-        int votoInt = 5; // Default di sicurezza
+        int votoInt = 5;
         try {
             votoInt = Integer.parseInt(voto);
         } catch (NumberFormatException ignored) {}
@@ -115,7 +167,7 @@ public class DashboardRecensioni extends JFrame {
         String stelline = "★".repeat(votoInt) + "☆".repeat(5 - votoInt);
         JLabel lblStelle = new JLabel(stelline);
         lblStelle.setForeground(new Color(241, 196, 15));
-        lblStelle.setFont(new Font("Arial", Font.BOLD, 16));
+        lblStelle.setFont(new Font("SansSerif", Font.BOLD, 15));
 
         headerPanel.add(lblAutore);
         headerPanel.add(lblStelle);
@@ -125,7 +177,8 @@ public class DashboardRecensioni extends JFrame {
         txtTesto.setLineWrap(true);
         txtTesto.setEditable(false);
         txtTesto.setOpaque(false);
-        txtTesto.setFont(new Font("Arial", Font.PLAIN, 13));
+        txtTesto.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        txtTesto.setForeground(new Color(210, 220, 240));
 
         card.add(headerPanel, BorderLayout.NORTH);
         card.add(txtTesto, BorderLayout.CENTER);
@@ -134,33 +187,72 @@ public class DashboardRecensioni extends JFrame {
     }
 
     private void apriFinestraScritturaRecensione() {
+        Color sfondoPannello = new Color(28, 34, 58);
+        Color sfondoCard = new Color(38, 46, 78);
+        Color testoChiaro = Color.WHITE;
+        Color grigioScuro = new Color(50, 58, 89);
+        Color verdeSuccesso = new Color(46, 204, 113);
+
         JDialog dialog = new JDialog(this, "Lascia una recensione", true);
-        dialog.setSize(400, 300);
+        dialog.setSize(440, 320);
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout(10, 10));
 
-        JPanel formPanel = new JPanel(new BorderLayout(5, 5));
+        JPanel formPanel = new JPanel(new BorderLayout(8, 8));
         formPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        formPanel.setBackground(sfondoPannello);
 
         JPanel panelStelle = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelStelle.add(new JLabel("Il tuo voto: "));
+        panelStelle.setOpaque(false);
+        JLabel lblVotoPrompt = new JLabel("Il tuo voto: ");
+        lblVotoPrompt.setForeground(testoChiaro);
+        lblVotoPrompt.setFont(new Font("SansSerif", Font.BOLD, 13));
+
         JComboBox<Integer> comboVoto = new JComboBox<>(new Integer[]{5, 4, 3, 2, 1});
+        comboVoto.setBackground(sfondoCard);
+        comboVoto.setForeground(testoChiaro);
+
+        JLabel lblStellePrompt = new JLabel(" Stelle");
+        lblStellePrompt.setForeground(testoChiaro);
+        lblStellePrompt.setFont(new Font("SansSerif", Font.PLAIN, 13));
+
+        panelStelle.add(lblVotoPrompt);
         panelStelle.add(comboVoto);
-        panelStelle.add(new JLabel(" Stelle"));
+        panelStelle.add(lblStellePrompt);
         formPanel.add(panelStelle, BorderLayout.NORTH);
 
         JTextArea txtNuovoCommento = new JTextArea();
         txtNuovoCommento.setLineWrap(true);
         txtNuovoCommento.setWrapStyleWord(true);
-        formPanel.add(new JScrollPane(txtNuovoCommento), BorderLayout.CENTER);
+        txtNuovoCommento.setBackground(sfondoCard);
+        txtNuovoCommento.setForeground(testoChiaro);
+        txtNuovoCommento.setCaretColor(testoChiaro);
+        txtNuovoCommento.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        txtNuovoCommento.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+
+        JScrollPane scrollNuovo = new JScrollPane(txtNuovoCommento);
+        scrollNuovo.setBorder(BorderFactory.createLineBorder(grigioScuro, 1, true));
+        formPanel.add(scrollNuovo, BorderLayout.CENTER);
 
         dialog.add(formPanel, BorderLayout.CENTER);
 
-        JPanel bottomPanel = new JPanel();
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        bottomPanel.setBackground(sfondoPannello);
+        bottomPanel.setBorder(new EmptyBorder(0, 0, 15, 0));
+
         JButton btnSalva = new JButton("Pubblica");
-        btnSalva.setBackground(new Color(39, 174, 96));
+        btnSalva.setBackground(verdeSuccesso);
         btnSalva.setForeground(Color.WHITE);
+        btnSalva.setFocusPainted(false);
+        btnSalva.setPreferredSize(new Dimension(120, 36));
+        btnSalva.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         JButton btnAnnulla = new JButton("Annulla");
+        btnAnnulla.setBackground(grigioScuro);
+        btnAnnulla.setForeground(Color.WHITE);
+        btnAnnulla.setFocusPainted(false);
+        btnAnnulla.setPreferredSize(new Dimension(100, 36));
+        btnAnnulla.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         btnAnnulla.addActionListener(e -> dialog.dispose());
 
@@ -173,7 +265,7 @@ public class DashboardRecensioni extends JFrame {
             if (successo) {
                 JOptionPane.showMessageDialog(dialog, "Recensione aggiunta con successo!");
                 dialog.dispose();
-                aggiornaListaRecensioni(); // Ripesca dal DB per mostrarla subito!
+                aggiornaListaRecensioni();
             } else {
                 JOptionPane.showMessageDialog(dialog, "Assicurati di aver scritto un commento valido.", "Errore", JOptionPane.ERROR_MESSAGE);
             }

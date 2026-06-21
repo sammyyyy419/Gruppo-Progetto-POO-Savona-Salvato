@@ -5,6 +5,7 @@ import model.Biglietto;
 import model.Cliente;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -24,15 +25,14 @@ public class DashboardBigliettiAcquistati extends JFrame {
         this.controller = controller;
         this.clienteLoggato = cliente;
 
+        sistemaGrafica();
+
         setContentPane(mainPanel);
         setTitle("I Tuoi Biglietti - Enterprise Cinema");
-        setSize(750, 600);
+        setSize(780, 600);
+        setMinimumSize(new Dimension(700, 520));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-
-        panelContenitoreBiglietti = new JPanel();
-        panelContenitoreBiglietti.setLayout(new BoxLayout(panelContenitoreBiglietti, BoxLayout.Y_AXIS));
-        listaBiglietti.setViewportView(panelContenitoreBiglietti);
 
         caricaBiglietti();
 
@@ -48,13 +48,57 @@ public class DashboardBigliettiAcquistati extends JFrame {
         caricaBiglietti();
     }
 
+    private void sistemaGrafica() {
+        Color sfondoScuro = new Color(18, 22, 40);
+        Color sfondoPannello = new Color(28, 34, 58);
+        Color testoChiaro = Color.WHITE;
+        Color grigioScuro = new Color(50, 58, 89);
+
+        mainPanel.removeAll();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.setBackground(sfondoScuro);
+
+        JPanel panelTop = new JPanel(new BorderLayout(15, 0));
+        panelTop.setBackground(sfondoScuro);
+        panelTop.setBorder(new EmptyBorder(15, 20, 15, 20));
+
+        labelTitolo.setForeground(testoChiaro);
+        labelTitolo.setFont(new Font("SansSerif", Font.BOLD, 18));
+        labelTitolo.setText("I Tuoi Biglietti");
+
+        btnTorna.setText("Indietro");
+        btnTorna.setBackground(grigioScuro);
+        btnTorna.setForeground(testoChiaro);
+        btnTorna.setFocusPainted(false);
+        btnTorna.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnTorna.setPreferredSize(new Dimension(100, 32));
+
+        panelTop.add(labelTitolo, BorderLayout.WEST);
+        panelTop.add(btnTorna, BorderLayout.EAST);
+
+        listaBiglietti.setBorder(BorderFactory.createEmptyBorder());
+        listaBiglietti.setBackground(sfondoPannello);
+        listaBiglietti.getViewport().setBackground(sfondoPannello);
+
+        panelContenitoreBiglietti = new JPanel();
+        panelContenitoreBiglietti.setLayout(new BoxLayout(panelContenitoreBiglietti, BoxLayout.Y_AXIS));
+        panelContenitoreBiglietti.setBackground(sfondoPannello);
+        panelContenitoreBiglietti.setBorder(new EmptyBorder(15, 20, 15, 20));
+
+        listaBiglietti.setViewportView(panelContenitoreBiglietti);
+
+        mainPanel.add(panelTop, BorderLayout.NORTH);
+        mainPanel.add(listaBiglietti, BorderLayout.CENTER);
+    }
+
     private void caricaBiglietti() {
         panelContenitoreBiglietti.removeAll();
         ArrayList<Biglietto> biglietti = controller.getBigliettiAcquistati();
 
         if (biglietti.isEmpty()) {
             JLabel vuoto = new JLabel("Nessun biglietto acquistato al momento.");
-            vuoto.setFont(new Font("Arial", Font.ITALIC, 16));
+            vuoto.setForeground(new Color(140, 150, 180));
+            vuoto.setFont(new Font("SansSerif", Font.ITALIC, 16));
             panelContenitoreBiglietti.add(vuoto);
         } else {
             for (Biglietto b : biglietti) {
@@ -69,11 +113,11 @@ public class DashboardBigliettiAcquistati extends JFrame {
     private JPanel creaCardBiglietto(Biglietto b) {
         JPanel card = new JPanel(new GridLayout(1, 2, 10, 10));
         card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.DARK_GRAY, 2, true),
+                BorderFactory.createLineBorder(new Color(50, 58, 89), 1, true),
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)
         ));
-        card.setBackground(new Color(250, 250, 250));
-        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 130));
+        card.setBackground(new Color(38, 46, 78));
+        card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 140));
 
         String titoloFilm = b.getProiezione() != null ? b.getProiezione().getFilm().getTitolo().toUpperCase() : "N/D";
         String dataOra = b.getProiezione() != null ? b.getProiezione().getDataOraInizio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "N/D";
@@ -82,40 +126,55 @@ public class DashboardBigliettiAcquistati extends JFrame {
         String numeroPosto = b.getPostoAssegnato() != null ? String.valueOf(b.getPostoAssegnato().getNumeroPosto()) : "-";
 
         String statoTesto = b.isValido() ? "CONVALIDATO" : "DA CONVALIDARE";
-        Color coloreStato = b.isValido() ? new Color(39, 174, 96) : Color.RED;
+        Color coloreStato = b.isValido() ? new Color(46, 204, 113) : new Color(231, 76, 60);
 
         JPanel infoPanel = new JPanel(new GridLayout(3, 1));
         infoPanel.setOpaque(false);
+
         JLabel lblTitolo = new JLabel(titoloFilm);
-        lblTitolo.setFont(new Font("Arial", Font.BOLD, 18));
+        lblTitolo.setFont(new Font("SansSerif", Font.BOLD, 16));
+        lblTitolo.setForeground(Color.WHITE);
         infoPanel.add(lblTitolo);
-        infoPanel.add(new JLabel("Data e Ora: " + dataOra));
-        infoPanel.add(new JLabel("Ubicazione: " + sala));
+
+        JLabel lblData = new JLabel("Data e Ora: " + dataOra);
+        lblData.setForeground(Color.WHITE);
+        lblData.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        infoPanel.add(lblData);
+
+        JLabel lblSala = new JLabel("Ubicazione: " + sala);
+        lblSala.setForeground(Color.WHITE);
+        lblSala.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        infoPanel.add(lblSala);
 
         JPanel postoPanel = new JPanel(new GridLayout(5, 1));
         postoPanel.setOpaque(false);
 
         JLabel lblPosto = new JLabel("FILA: " + fila + "  |  POSTO: " + numeroPosto);
-        lblPosto.setFont(new Font("Arial", Font.BOLD, 16));
-        lblPosto.setForeground(new Color(41, 128, 185));
+        lblPosto.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblPosto.setForeground(new Color(54, 112, 233));
 
         JLabel lblCodice = new JLabel("CODICE: " + b.getCodiceUnivoco());
-        lblCodice.setFont(new Font("Monospaced", Font.BOLD, 14));
+        lblCodice.setFont(new Font("Monospaced", Font.BOLD, 13));
+        lblCodice.setForeground(Color.WHITE);
+
+        JLabel lblPrezzo = new JLabel("Pagato: " + String.format("%.2f €", b.getPrezzoFinale()));
+        lblPrezzo.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        lblPrezzo.setForeground(Color.WHITE);
 
         JLabel lblStato = new JLabel("Stato: " + statoTesto);
-        lblStato.setFont(new Font("Arial", Font.BOLD, 14));
+        lblStato.setFont(new Font("SansSerif", Font.BOLD, 13));
         lblStato.setForeground(coloreStato);
 
         postoPanel.add(lblPosto);
         postoPanel.add(lblCodice);
-        postoPanel.add(new JLabel("Pagato: " + String.format("%.2f €", b.getPrezzoFinale())));
+        postoPanel.add(lblPrezzo);
         postoPanel.add(lblStato);
 
-        // Se non è stato ancora obliterato, mostro il pulsante di rimborso
         if (!b.isValido()) {
             JButton btnRimborsa = new JButton("Annulla e Rimborsa");
-            btnRimborsa.setFont(new Font("Arial", Font.PLAIN, 11));
-            btnRimborsa.setForeground(Color.RED);
+            btnRimborsa.setFont(new Font("SansSerif", Font.BOLD, 11));
+            btnRimborsa.setBackground(new Color(176, 58, 75));
+            btnRimborsa.setForeground(Color.WHITE);
             btnRimborsa.setFocusable(false);
             btnRimborsa.setCursor(new Cursor(Cursor.HAND_CURSOR));
 

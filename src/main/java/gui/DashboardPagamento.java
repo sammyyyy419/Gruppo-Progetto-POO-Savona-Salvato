@@ -3,6 +3,7 @@ package gui;
 import controller.Controller;
 import model.Cliente;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
@@ -40,24 +41,24 @@ public class DashboardPagamento extends JFrame {
         this.controller = controller;
         this.clienteLoggato = cliente;
 
+        sistemaGrafica();
+
         setContentPane(panelPagamento);
         setTitle("Check-out Pagamento - Enterprise Cinema");
-        setSize(580, 520);
+        setSize(640, 560);
+        setMinimumSize(new Dimension(580, 500));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Popoliamo il menu a tendina
         comboTipoPagamento.addItem("Carta di Credito");
         comboTipoPagamento.addItem("PayPal");
 
-        // Il pulsante parte disabilitato finché non compiliamo i campi
         buttonConferma.setEnabled(false);
 
         totaleIniziale = controller.calcolaTotaleCarrello();
         totaleScontato = totaleIniziale;
         labelRiepilogo.setText("Riepilogo Tot. : " + String.format("%.2f €", totaleScontato));
 
-        // LISTENER SUI CAMPI DI TESTO (Controllo in tempo reale)
         DocumentListener controlloCampiListener = new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) { controllaCampiObbligatori(); }
@@ -79,7 +80,7 @@ public class DashboardPagamento extends JFrame {
             } else {
                 toggleCampiCarta(true);
             }
-            controllaCampiObbligatori(); // Ricontrolla i campi ogni volta che cambi metodo
+            controllaCampiObbligatori();
         });
 
         textCodiceSconto.addActionListener(e -> applicareLogicaSconto());
@@ -89,16 +90,13 @@ public class DashboardPagamento extends JFrame {
         buttonConferma.addActionListener(e -> {
             String metodoScelto = (String) comboTipoPagamento.getSelectedItem();
 
-            // Riapplica lo sconto se l'utente ha scritto qualcosa ma non ha premuto "Invio"
             if (!textCodiceSconto.getText().trim().isEmpty() && percentualeScontoApplicata == 0.0) {
                 applicareLogicaSconto();
             }
 
             try {
-                // TENTA DI CONFERMARE L'ACQUISTO
                 controller.confermaAcquistoCarrello(metodoScelto, percentualeScontoApplicata);
 
-                // SE NON CI SONO ERRORI, MOSTRA IL MESSAGGIO E CHIUDI LA FINESTRA
                 JOptionPane.showMessageDialog(this,
                         "Pagamento riuscito con successo, puoi visualizzare i tuoi biglietti nell'area dedicata: Visualizza Biglietti Acquistati",
                         "Acquisto Completato",
@@ -107,17 +105,118 @@ public class DashboardPagamento extends JFrame {
                 this.dispose();
 
             } catch (exception.SalaPienaException ex) {
-                // SE LA SALA È PIENA, MOSTRA L'ERRORE E BLOCCA IL PAGAMENTO!
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Errore - Sala Piena", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
-                // CATTURA QUALSIASI ALTRO ERRORE GENERICO
                 JOptionPane.showMessageDialog(this, "Errore durante l'acquisto: " + ex.getMessage(), "Errore di Sistema", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // Esegue un primo controllo all'apertura per gestire lo stato di base
         controllaCampiObbligatori();
         setVisible(true);
+    }
+
+    private void sistemaGrafica() {
+        Color sfondoScuro = new Color(18, 22, 40);
+        Color sfondoPannello = new Color(28, 34, 58);
+        Color sfondoCard = new Color(38, 46, 78);
+        Color testoChiaro = Color.WHITE;
+        Color bluAcceso = new Color(54, 112, 233);
+        Color grigioScuro = new Color(50, 58, 89);
+
+        panelPagamento.removeAll();
+        panelPagamento.setLayout(new BorderLayout());
+        panelPagamento.setBackground(sfondoScuro);
+
+        panelAlto.removeAll();
+        panelAlto.setLayout(new BorderLayout(15, 0));
+        panelAlto.setBackground(sfondoScuro);
+        panelAlto.setBorder(new EmptyBorder(15, 20, 10, 20));
+
+        labelTitolo.setText("Check-out Pagamento");
+        labelTitolo.setForeground(testoChiaro);
+        labelTitolo.setFont(new Font("SansSerif", Font.BOLD, 18));
+
+        tornaAlMenuButton.setText("Indietro");
+        tornaAlMenuButton.setBackground(grigioScuro);
+        tornaAlMenuButton.setForeground(testoChiaro);
+        tornaAlMenuButton.setFocusPainted(false);
+        tornaAlMenuButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        tornaAlMenuButton.setPreferredSize(new Dimension(100, 32));
+
+        panelAlto.add(labelTitolo, BorderLayout.WEST);
+        panelAlto.add(tornaAlMenuButton, BorderLayout.EAST);
+
+        panelCentrale.removeAll();
+        panelCentrale.setLayout(new GridBagLayout());
+        panelCentrale.setBackground(sfondoPannello);
+        panelCentrale.setBorder(new EmptyBorder(20, 25, 20, 25));
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(6, 6, 6, 6);
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        JLabel[] labels = {labelTipoPagamento, labelNumeroCarta, labelIntestatario, labelDataScadenza, labelCVC, labelCodiceSconto};
+        for (JLabel l : labels) {
+            l.setForeground(testoChiaro);
+            l.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        }
+
+        comboTipoPagamento.setBackground(sfondoCard);
+        comboTipoPagamento.setForeground(testoChiaro);
+        comboTipoPagamento.setFont(new Font("SansSerif", Font.PLAIN, 13));
+
+        JTextField[] fields = {textNumeroCarta, textIntestatario, textDataScadenza, textCVC, textCodiceSconto};
+        for (JTextField f : fields) {
+            f.setBackground(sfondoCard);
+            f.setForeground(testoChiaro);
+            f.setCaretColor(testoChiaro);
+            f.setFont(new Font("SansSerif", Font.PLAIN, 13));
+            f.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(grigioScuro, 1, true),
+                    BorderFactory.createEmptyBorder(6, 10, 6, 10)
+            ));
+        }
+
+        c.gridx = 0; c.gridy = 0; c.weightx = 0.0; panelCentrale.add(labelTipoPagamento, c);
+        c.gridx = 1; c.gridy = 0; c.weightx = 1.0; panelCentrale.add(comboTipoPagamento, c);
+
+        c.gridx = 0; c.gridy = 1; c.weightx = 0.0; panelCentrale.add(labelNumeroCarta, c);
+        c.gridx = 1; c.gridy = 1; c.weightx = 1.0; panelCentrale.add(textNumeroCarta, c);
+
+        c.gridx = 0; c.gridy = 2; c.weightx = 0.0; panelCentrale.add(labelIntestatario, c);
+        c.gridx = 1; c.gridy = 2; c.weightx = 1.0; panelCentrale.add(textIntestatario, c);
+
+        c.gridx = 0; c.gridy = 3; c.weightx = 0.0; panelCentrale.add(labelDataScadenza, c);
+        c.gridx = 1; c.gridy = 3; c.weightx = 1.0; panelCentrale.add(textDataScadenza, c);
+
+        c.gridx = 0; c.gridy = 4; c.weightx = 0.0; panelCentrale.add(labelCVC, c);
+        c.gridx = 1; c.gridy = 4; c.weightx = 1.0; panelCentrale.add(textCVC, c);
+
+        c.gridx = 0; c.gridy = 5; c.weightx = 0.0; panelCentrale.add(labelCodiceSconto, c);
+        c.gridx = 1; c.gridy = 5; c.weightx = 1.0; panelCentrale.add(textCodiceSconto, c);
+
+        JPanel panelBottom = new JPanel();
+        panelBottom.setLayout(new BorderLayout());
+        panelBottom.setBackground(sfondoScuro);
+        panelBottom.setBorder(new EmptyBorder(12, 20, 15, 20));
+
+        labelRiepilogo.setForeground(testoChiaro);
+        labelRiepilogo.setFont(new Font("SansSerif", Font.BOLD, 15));
+
+        buttonConferma.setText("Conferma Acquisto");
+        buttonConferma.setBackground(bluAcceso);
+        buttonConferma.setForeground(testoChiaro);
+        buttonConferma.setFocusPainted(false);
+        buttonConferma.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        buttonConferma.setPreferredSize(new Dimension(160, 40));
+        buttonConferma.setFont(new Font("SansSerif", Font.BOLD, 13));
+
+        panelBottom.add(labelRiepilogo, BorderLayout.WEST);
+        panelBottom.add(buttonConferma, BorderLayout.EAST);
+
+        panelPagamento.add(panelAlto, BorderLayout.NORTH);
+        panelPagamento.add(panelCentrale, BorderLayout.CENTER);
+        panelPagamento.add(panelBottom, BorderLayout.SOUTH);
     }
 
     private void controllaCampiObbligatori() {
@@ -152,7 +251,7 @@ public class DashboardPagamento extends JFrame {
             totaleScontato = totaleIniziale - importoSconto;
 
             labelRiepilogo.setText("<html>Riepilogo Tot. : <s>" + String.format("%.2f €", totaleIniziale) + "</s> " +
-                    "<font color='green'><b>" + String.format("%.2f €", totaleScontato) + "</b> (-" + (int)percentuale + "%)</font></html>");
+                    "<font color='#2ECC71'><b>" + String.format("%.2f €", totaleScontato) + "</b> (-" + (int)percentuale + "%)</font></html>");
 
             textCodiceSconto.setEnabled(false);
             JOptionPane.showMessageDialog(this, "Codice coupon valido! Sconto del " + (int)percentuale + "% applicato.", "Sconto Attivato", JOptionPane.INFORMATION_MESSAGE);
@@ -168,7 +267,7 @@ public class DashboardPagamento extends JFrame {
         textCVC.setEnabled(enable);
         textDataScadenza.setEnabled(enable);
 
-        Color coloreSfondo = enable ? Color.WHITE : new Color(225, 225, 225);
+        Color coloreSfondo = enable ? new Color(38, 46, 78) : new Color(28, 34, 58);
         textNumeroCarta.setBackground(coloreSfondo);
         textIntestatario.setBackground(coloreSfondo);
         textCVC.setBackground(coloreSfondo);

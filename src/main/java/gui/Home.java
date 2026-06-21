@@ -1,13 +1,14 @@
 package gui;
 
 import controller.Controller;
-import model.Cliente;
-import model.Dipendente;
 import model.Utente;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 public class Home extends JFrame {
     private JPanel mainPanel;
@@ -23,10 +24,16 @@ public class Home extends JFrame {
     public Home(Controller controller) {
         this.controller = controller;
 
-        setContentPane(mainPanel);
-        setTitle("Login");
+        setTitle("Enterprise Cinema - Login");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        pack();
+
+        sistemaGrafica();
+
+        setContentPane(mainPanel);
+
+        setSize(640, 580);
+        setMinimumSize(new Dimension(580, 530));
+
         setLocationRelativeTo(null);
         setVisible(true);
 
@@ -40,9 +47,113 @@ public class Home extends JFrame {
         buttonRegistra.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new Registrazione(controller);
+                new DashboardRegistrazione(controller);
             }
         });
+    }
+
+    private void sistemaGrafica() {
+        Color pannello = new Color(28, 34, 58);
+        Color testo = Color.WHITE;
+        Color campo = new Color(235, 240, 250);
+        Color blu = new Color(70, 120, 255);
+        Color viola = new Color(126, 87, 194);
+
+        mainPanel.removeAll();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.setBackground(pannello);
+
+        applicaLogo();
+
+        labelTitolo.setText("Benvenuti in Enterprise Cinema!");
+        labelTitolo.setForeground(testo);
+        labelTitolo.setHorizontalAlignment(SwingConstants.CENTER);
+        labelTitolo.setHorizontalTextPosition(SwingConstants.CENTER);
+        labelTitolo.setVerticalTextPosition(SwingConstants.BOTTOM);
+        labelTitolo.setIconTextGap(15);
+
+        mainPanel.add(labelTitolo, BorderLayout.NORTH);
+
+        JPanel pannelloForm = new JPanel();
+        pannelloForm.setBackground(pannello);
+        pannelloForm.setLayout(new GridBagLayout());
+        pannelloForm.setBorder(new EmptyBorder(15, 35, 25, 35));
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(10, 10, 10, 10);
+        c.anchor = GridBagConstraints.CENTER;
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        labelEmail.setText("Email :");
+        labelEmail.setForeground(testo);
+
+        labelPassword.setText("Password :");
+        labelPassword.setForeground(testo);
+        textEmail.setBackground(campo);
+        textEmail.setForeground(Color.BLACK);
+        textEmail.setPreferredSize(new Dimension(320, 38));
+
+        textPassword.setBackground(campo);
+        textPassword.setForeground(Color.BLACK);
+        textPassword.setPreferredSize(new Dimension(320, 38));
+
+        buttonRegistra.setText("Registrati");
+        buttonRegistra.setBackground(viola);
+        buttonRegistra.setForeground(Color.WHITE);
+        buttonRegistra.setFocusPainted(false);
+        buttonRegistra.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        buttonRegistra.setPreferredSize(new Dimension(160, 42));
+
+        buttonAccedi.setText("Accedi");
+        buttonAccedi.setBackground(blu);
+        buttonAccedi.setForeground(Color.WHITE);
+        buttonAccedi.setFocusPainted(false);
+        buttonAccedi.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        buttonAccedi.setPreferredSize(new Dimension(160, 42));
+
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        pannelloForm.add(labelEmail, c);
+
+        c.gridx = 1;
+        pannelloForm.add(textEmail, c);
+
+        c.gridy = 1;
+        c.gridx = 0;
+        pannelloForm.add(labelPassword, c);
+
+        c.gridx = 1;
+        pannelloForm.add(textPassword, c);
+
+        JPanel pannelloBottoni = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        pannelloBottoni.setBackground(pannello);
+        pannelloBottoni.add(buttonRegistra);
+        pannelloBottoni.add(buttonAccedi);
+
+        c.gridy = 2;
+        c.gridx = 0;
+        c.gridwidth = 2;
+        c.insets = new Insets(20, 10, 10, 10);
+        pannelloForm.add(pannelloBottoni, c);
+
+        mainPanel.add(pannelloForm, BorderLayout.CENTER);
+
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
+    private void applicaLogo() {
+        String pathLogo = "locandine/logo_enterprise.png";
+        File fileLogo = new File(pathLogo);
+
+        if (fileLogo.exists()) {
+            ImageIcon logoOriginale = new ImageIcon(pathLogo);
+            Image logoRidimensionato = logoOriginale.getImage().getScaledInstance(420, 190, Image.SCALE_SMOOTH);
+            labelTitolo.setIcon(new ImageIcon(logoRidimensionato));
+        } else {
+            labelTitolo.setText("Benvenuti in Enterprise Cinema!");
+        }
     }
 
     private void eseguiLogin() {
@@ -50,24 +161,25 @@ public class Home extends JFrame {
         String password = new String(textPassword.getPassword()).trim();
 
         try {
-            // 1. Valida il login tramite il controller
             controller.validaLogin(email, password);
 
-            // 2. Recupera l'utente autenticato
             Utente u = controller.recuperaUtente(email);
 
             if (u instanceof model.Dipendente) {
-                // CORREZIONE: Passiamo 'this.controller' e facciamo il cast di 'u' a Dipendente
                 new DashboardDipendente(this.controller, (model.Dipendente) u).setVisible(true);
                 this.dispose();
             } else if (u instanceof model.Cliente) {
-                // CORREZIONE: Stessa cosa per il Cliente
                 new DashboardCliente(this.controller, (model.Cliente) u).setVisible(true);
                 this.dispose();
             }
 
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Errore di Accesso", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Errore di Accesso",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }
 }
