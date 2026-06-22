@@ -27,28 +27,11 @@ public class Dipendente extends Utente {
     }
     public void pianificareProgrammazioneDeiFilm(){}
 
-    public boolean validaBiglietto(Biglietto biglietto, Proiezione proiezione){
-        if(biglietto==null || proiezione==null){
-            return false;
-        }
-
-        if(biglietto.isValido()){
-            return false;
-        }
-
-        LocalDateTime orarioAttuale= LocalDateTime.now();
-        LocalDateTime orarioInizioProiezione=proiezione.getDataOraInizio();
-        LocalDateTime orarioIngressoConsentito=orarioInizioProiezione.minusMinutes(15);
-        int durataFilm=proiezione.getFilm().getDurataMinuti();
-        LocalDateTime orarioFineFilm = orarioInizioProiezione.plusMinutes(durataFilm);
-
-        if(orarioAttuale.isAfter(orarioIngressoConsentito) && orarioAttuale.isBefore(orarioFineFilm)){
-            biglietto.setValido(true);
-            return true;
-        }
-        else{
-            return false;
-        }
+    public boolean validaBiglietto(Biglietto biglietto) {
+        if (biglietto == null) return false;
+        if (biglietto.isValido()) return false;
+        biglietto.setValido(true);
+        return true;
     }
 
     public double getStipendio() {

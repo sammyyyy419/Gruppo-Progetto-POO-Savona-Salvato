@@ -26,7 +26,6 @@ public class Film {
         this.percorsoCopertina = percorsoCopertina;
         this.dataInizioProgrammazione = (dataInizioProgrammazione != null) ? dataInizioProgrammazione : LocalDate.now();
 
-        // NUOVO: Inizializzazione della sala
         this.salaAssegnata = salaAssegnata;
     }
 
@@ -76,7 +75,6 @@ public class Film {
     public LocalDate getDataInizioProgrammazione() { return dataInizioProgrammazione; }
     public void setDataInizioProgrammazione(LocalDate dataInizioProgrammazione) { this.dataInizioProgrammazione = dataInizioProgrammazione; }
 
-    // NUOVO: Getter e Setter per la sala
     public String getSalaAssegnata() { return salaAssegnata; }
     public void setSalaAssegnata(String salaAssegnata) { this.salaAssegnata = salaAssegnata; }
 }

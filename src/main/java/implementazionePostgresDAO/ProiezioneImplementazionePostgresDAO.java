@@ -17,14 +17,13 @@ public class ProiezioneImplementazionePostgresDAO implements ProiezioneDAO {
         ArrayList<Proiezione> listaProiezioni = new ArrayList<>();
         if (film == null || film.getDataInizioProgrammazione() == null) return listaProiezioni;
 
-        // "Risvegliamo" la sala dal database
-        Sala salaDelFilm = new Sala(film.getSalaAssegnata(), 50, "Standard");
+        String tipo = film.getSalaAssegnata().equals("Sala 1") ? "IMAX" : "Standard";
+        Sala salaDelFilm = new Sala(film.getSalaAssegnata(), 50, tipo);
         LocalDate dataInizio = film.getDataInizioProgrammazione();
 
         for (int i = 0; i <= 45; i++) {
             LocalDate dataCorrente = dataInizio.plusDays(i);
 
-            // Generiamo orari in base al numero della sala per dare realismo
             int minutiOffset = 0;
             if (film.getSalaAssegnata().startsWith("Sala ")) {
                 try { minutiOffset = Integer.parseInt(film.getSalaAssegnata().replace("Sala ", "").trim()) * 15; }

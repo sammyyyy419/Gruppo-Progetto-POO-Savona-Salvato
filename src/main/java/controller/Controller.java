@@ -217,8 +217,12 @@ public class Controller {
                 if (b.isValido()) {
                     throw new Exception("Attenzione! Questo biglietto (Codice: " + codiceUnivoco + ") risulta GIÀ CONVALIDATO.");
                 }
-                b.setValido(true);
+                // PRIMA (buggato credo): b.setValido(true);
 
+                Dipendente dipendenteGenerico = listaDipendenti.get(0);
+                if (!dipendenteGenerico.validaBiglietto(b)) {
+                    throw new Exception("Biglietto già convalidato.");
+                }
                 try {
                     bigliettoDAO.aggiornaStatoBigliettoDB(codiceUnivoco, "CONVALIDATO");
                 } catch (Exception e) {
@@ -235,22 +239,15 @@ public class Controller {
         if (bigliettoDaRimborsare == null) throw new Exception("Biglietto inesistente.");
         if (bigliettoDaRimborsare.isValido()) throw new Exception("Impossibile rimborsare un biglietto già obliterato.");
 
-        listaBiglietti.remove(bigliettoDaRimborsare);
+        bigliettoDAO.eliminaBigliettoDB(bigliettoDaRimborsare.getCodiceUnivoco());
 
+        listaBiglietti.remove(bigliettoDaRimborsare);
         Prenotazione pren = bigliettoDaRimborsare.getPrenotazione();
         if (pren != null && pren.getBiglietti() != null) {
             pren.getBiglietti().remove(bigliettoDaRimborsare);
-
             if (pren.getBiglietti().isEmpty()) {
                 pren.setStato(StatoPrenotazione.RIMBORSATO);
             }
-        }
-
-
-        try {
-            bigliettoDAO.eliminaBigliettoDB(bigliettoDaRimborsare.getCodiceUnivoco());
-        } catch (Exception e) {
-            System.out.println("Errore durante l'eliminazione del biglietto dal DB: " + e.getMessage());
         }
     }
 
@@ -355,6 +352,10 @@ public class Controller {
         for (ElementoCarrello elem : carrello) {
             int quantita = elem.getQuantita();
             Proiezione proiezione = elem.getProiezione();
+
+            if ("IMAX".equalsIgnoreCase(elem.getProiezione().getSala().getTipoSala())) {
+                prezzoBase = 12.00;
+            }
 
             ArrayList<Posto> postiAssegnati = trovaPostiVicini(proiezione, quantita);
 

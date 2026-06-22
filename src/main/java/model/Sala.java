@@ -7,25 +7,31 @@ public class Sala {
     private String numeroSala;
     private int capienza;
     private String tipoSala;
-
     private ArrayList<Posto> posti;
     private ArrayList<Proiezione> proiezioni;
 
     public Sala(String numeroSala, int capienzaGenerica, String tipoSala) {
         this.numeroSala = numeroSala;
-        // Imponiamo la tua regola fissa: 180 posti totali per ogni sala!
-        this.capienza = 180;
         this.tipoSala = tipoSala;
+
+        if ("IMAX".equalsIgnoreCase(tipoSala)) {
+            this.capienza = 80;
+        } else {
+            this.capienza = 180;
+        }
+
         this.posti = new ArrayList<>();
         this.proiezioni = new ArrayList<>();
 
-        // Generazione esatta delle poltrone: File da 'A' ad 'L' (12 file) e Posti da 1 a 15
+        int numFile = ("IMAX".equalsIgnoreCase(tipoSala)) ? 8 : 12;
+        int postiPerFila = ("IMAX".equalsIgnoreCase(tipoSala)) ? 10 : 15;
+
         char filaCorrente = 'A';
-        for (int i = 0; i < 12; i++) { // Ciclo per le 12 file
-            for (int numPosto = 1; numPosto <= 15; numPosto++) { // Ciclo per i 15 posti per fila
+        for (int i = 0; i < numFile; i++) {
+            for (int numPosto = 1; numPosto <= postiPerFila; numPosto++) {
                 this.posti.add(new Posto(numPosto, filaCorrente));
             }
-            filaCorrente++; // Passa alla lettera successiva (A -> B -> C...)
+            filaCorrente++;
         }
     }
 
