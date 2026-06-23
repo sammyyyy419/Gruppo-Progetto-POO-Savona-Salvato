@@ -2,19 +2,21 @@
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
 \usepackage{geometry}
-\geometry{a4paper, margin=2.5cm}
+\geometry{a4paper, margin=2.3cm}
 \usepackage{hyperref}
 \usepackage{booktabs}
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{amsmath}
 \usepackage{indentfirst}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, positioning, arrows.meta, fit, backgrounds}
 
 % Configurazione stile sezioni e sottosezioni (Numeri Romani per Sezioni, Lettere per Sottosezioni)
 \renewcommand{\thesection}{\Roman{section}}
 \renewcommand{\thesubsection}{\thesection.\Alph{subsection}}
 
-% Configurazione per la formattazione del codice SQL/PLpgSQL
+% Configurazione per la formattazione del codice SQL/PLpgSQL/Java
 \lstset{
   language=SQL,
   basicstyle=\ttfamily\footnotesize,
@@ -25,20 +27,21 @@
   frame=single,
   backgroundcolor=\color{gray!5},
   showstringspaces=false,
-  tabsize=4
+  tabsize=2
 }
 
 \title{
-  \large \textbf{Documentazione del Progetto: Programmazione Object-Oriented e Basi di Dati} \\
+  \large \textbf{Relazione Tecnica del Progetto: Programmazione Object-Oriented e Basi di Dati} \\
   \vspace{10mm}
-  \Huge \textbf{EnterpriseCinema}
+  \Huge \textbf{EnterpriseCinema} \\
+  \large \textit{Sistema di Gestione per Cinema Multisala}
 }
 \author{
-  Savona Salvatore DE1000064 \\
-  \small Università degli Studi di Napoli Federico II, Laurea Triennale in Informatica \\
-  \vspace{3mm}
-  Salvato Francesca N86005865 \\
-  \small Università degli Studi di Napoli Federico II, Laurea Triennale in Informatica
+  Savona Salvatore (DE1000064) \\
+  \small Università degli Studi di Napoli Federico II \\
+  \and
+  Salvato Francesca (N86005865) \\
+  \small Università degli Studi di Napoli Federico II
 }
 \date{}
 
@@ -50,23 +53,19 @@
 \tableofcontents
 \newpage
 
-\section{Introduzione}
+\section{Specifica dei Requisiti}
 
-\subsection{Presentazione del dominio scelto}
-Il sistema \textbf{EnterpriseCinema} si occupa della gestione e dell'organizzazione delle attività operative di un cinema multisala. 
-L'applicazione coordina la vendita dei biglietti per gli spettacoli, la gestione del catalogo dei film e delle relative proiezioni nelle sale fisiche, l'assegnazione e il tracciamento dei turni operativi del personale e la gestione delle recensioni e delle segnalazioni di guasti/anomalie nelle sale.
+\subsection{Scopo e ambito del sistema}
+Il sistema \textbf{EnterpriseCinema} si occupa della gestione delle attività operative di un cinema multisala. L'applicazione coordina la vendita dei biglietti per gli spettacoli, la gestione del catalogo dei film e delle relative proiezioni nelle sale fisiche, l'assegnazione e il tracciamento dei turni operativi del personale e la gestione delle recensioni e delle segnalazioni di guasti/anomalie nelle sale.
 
-\subsection{Scopo del progetto}
-Lo scopo principale è digitalizzare e automatizzare i processi interni del cinema. Creando un sistema integrato basato sul pattern MVC e persistenza in database relazionale PostgreSQL, il software è in grado di gestire le richieste di acquisto dei clienti e le mansioni operative dei dipendenti in totale autonomia, salvaguardando l'integrità e la coerenza dei dati.
-
-\subsection{Attori principali}
+\subsection{Attori primari}
 \begin{itemize}
     \item \textbf{Cliente}: Utente esterno registrato che consulta la programmazione, seleziona i posti graficamente in sala, prenota i biglietti ed effettua il pagamento (con coupon di sconto opzionali), oltre a lasciare feedback sui film.
     \item \textbf{Dipendente}: Personale interno con mansioni operative (Manager, Cassiere, Proiezionista, Addetto alle pulizie). Gestisce il catalogo (se Manager), convalida i biglietti e registra segnalazioni di anomalie nelle sale.
-    \item \textbf{Sistema Gestionale}: Coordina le operazioni applicando sconti, verificando in tempo reale la capienza e l'occupazione dei posti e garantendo la persistenza delle informazioni nel database relazionale.
+    \item \textbf{Sistema Gestionale (PostgreSQL + Java Controller)}: Coordina le operazioni applicando sconti, verificando in tempo reale la capienza e l'occupazione dei posti e garantendo la persistenza delle informazioni nel database relazionale.
 \end{itemize}
 
-\subsection{Requisiti funzionali}
+\subsection{Requisiti funzionali (Casi d'Uso)}
 Il sistema consente di:
 \begin{enumerate}
     \item Registrare e autenticare gli utenti differenziando tra clienti e dipendenti.
@@ -91,364 +90,574 @@ Il sistema consente di:
 \end{itemize}
 
 \newpage
-\section{Casi d'Uso}
+\section{Diagramma dei Casi d'Uso}
 
-\subsection{Attori}
+\subsection{Rappresentazione Grafica}
+Di seguito viene mostrato il diagramma dei casi d'uso che descrive le interazioni tra i tre ruoli di attori (Cliente, Dipendente e Manager) e il sistema EnterpriseCinema.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    actor/.style={circle, draw, minimum size=15pt, thick, fill=blue!10},
+    usecase/.style={ellipse, draw, minimum width=2.5cm, minimum height=1cm, align=center, thick, fill=gray!5, font=\footnotesize},
+    connection/.style={draw, ->, >=stealth, thick}
+]
+    % Actors
+    \node[actor] (cliente) at (0,3) {};
+    \node[below=2pt of cliente] {Cliente};
+    
+    \node[actor] (dipendente) at (10,4.5) {};
+    \node[below=2pt of dipendente] {Dipendente};
+    
+    \node[actor] (manager) at (10,1) {};
+    \node[below=2pt of manager] {Manager};
+    
+    % Inheritance
+    \draw[connection, -{Triangle[open]}] (manager) -- (dipendente);
+    
+    % Use Cases Cliente
+    \node[usecase] (uc_reg) at (3.5, 5.5) {Registrazione \\ e Login};
+    \node[usecase] (uc_acq) at (3.5, 4) {Selezione Posto \\ e Acquisto};
+    \node[usecase] (uc_rimb) at (3.5, 2.5) {Richiesta \\ Rimborso};
+    \node[usecase] (uc_rec) at (3.5, 1) {Scrittura \\ Recensione};
+    
+    % Use Cases Dipendente
+    \node[usecase] (uc_conv) at (6.5, 5) {Convalida \\ Biglietto};
+    \node[usecase] (uc_seg) at (6.5, 3.5) {Segnalazione \\ Guasto};
+    
+    % Use Cases Manager
+    \node[usecase] (uc_film) at (6.5, 2) {Gestione \\ Catalogo Film};
+    \node[usecase] (uc_view_seg) at (6.5, 0.5) {Supervisione \\ Segnalazioni};
+
+    % Connections Cliente
+    \draw[connection] (cliente) -- (uc_reg);
+    \draw[connection] (cliente) -- (uc_acq);
+    \draw[connection] (cliente) -- (uc_rimb);
+    \draw[connection] (cliente) -- (uc_rec);
+    
+    % Connections Dipendente
+    \draw[connection] (dipendente) -- (uc_conv);
+    \draw[connection] (dipendente) -- (uc_seg);
+    
+    % Connections Manager
+    \draw[connection] (manager) -- (uc_film);
+    \draw[connection] (manager) -- (uc_view_seg);
+    
+    % Boundary Box (System)
+    \begin{scope}[on background layer]
+        \node[draw, rectangle, dashed, inner sep=15pt, label={above:EnterpriseCinema System}] [fit=(uc_reg) (uc_acq) (uc_rimb) (uc_rec) (uc_conv) (uc_seg) (uc_film) (uc_view_seg)] {};
+    \end{scope}
+\end{tikzpicture}
+\caption{Diagramma dei Casi d'Uso del sistema EnterpriseCinema}
+\label{fig:use_case}
+\end{figure}
+
+\subsection{Descrizioni testuali dei casi d'uso critici}
+
+\paragraph{UC1: Selezione Posto e Acquisto Biglietto}
 \begin{itemize}
-    \item \textbf{Cliente} (Utente esterno)
-    \item \textbf{Dipendente} (Utente interno)
-    \item \textbf{Manager} (Sotto-ruolo di Dipendente con privilegi amministrativi)
+    \item \textbf{Attori}: Cliente (primario).
+    \item \textbf{Pre-condizioni}: Il cliente è autenticato e ha selezionato uno spettacolo (proiezione).
+    \item \textbf{Flusso principale}:
+        1. Il cliente visualizza la griglia della sala (A-L, 1-15).
+        2. Il cliente seleziona graficamente uno o più posti.
+        3. Il sistema verifica la disponibilità (nessuna prenotazione esistente).
+        4. Il cliente aggiunge i biglietti al carrello.
+        5. Il cliente inserisce un codice sconto (es. \textit{ENTERPRISE}, \textit{SENIOR}).
+        6. Il cliente procede al checkout, simulando il pagamento elettronico.
+        7. Il database valida i dati tramite il trigger \texttt{check\_posto\_occupato} e il vincolo UNIQUE composto.
+        8. Il sistema persiste il biglietto con stato "DA CONVALIDARE" e genera un codice a 8 cifre.
+    \item \textbf{Post-condizioni}: I posti sono acquistati e non sono più disponibili per la stessa proiezione.
 \end{itemize}
 
-\subsection{Casi d'uso principali}
+\paragraph{UC2: Convalida Biglietto all'Ingresso}
 \begin{itemize}
-    \item \textbf{Cliente}:
-    \begin{itemize}
-        \item Registrazione e Login.
-        \item Consultazione del catalogo dei film e dei relativi dettagli.
-        \item Selezione del posto in sala per una determinata proiezione.
-        \item Gestione del carrello (aggiunta/rimozione biglietti).
-        \item Checkout, inserimento codice sconto ed effettuazione del pagamento.
-        \item Storico dei biglietti acquistati e richiesta di rimborso.
-        \item Pubblicazione di una recensione su un film.
-    \end{itemize}
-    \item \textbf{Dipendente}:
-    \begin{itemize}
-        \item Autenticazione ed accesso all'area riservata.
-        \item Convalida dei biglietti degli spettatori tramite codice a 8 cifre.
-        \item Invio di segnalazioni per problemi o guasti in sala.
-        \item Visualizzazione delle mansioni e dei turni assegnati.
-    \end{itemize}
-    \item \textbf{Manager}:
-    \begin{itemize}
-        \item Privilegi di aggiunta, modifica ed eliminazione dei film e delle sale associate.
-        \item Supervisione dell'elenco delle segnalazioni inviate dallo staff.
-    \end{itemize}
+    \item \textbf{Attori}: Dipendente (Cassiere/Proiezionista/Manager).
+    \item \textbf{Pre-condizioni}: Lo spettatore presenta il biglietto cartaceo/digitale con il codice a 8 cifre.
+    \item \textbf{Flusso principale}:
+        1. Il dipendente inserisce il codice univoco del biglietto nell'applicazione.
+        2. Il sistema esegue la ricerca del biglietto nel database.
+        3. Il dipendente avvia la validazione tramite il metodo \texttt{validaBiglietto} della classe \texttt{Dipendente}.
+        4. Il sistema verifica se l'orario attuale è compreso tra 15 minuti prima dell'inizio dello spettacolo e la fine del film.
+        5. Se valido, lo stato del biglietto viene aggiornato in "CONVALIDATO".
+    \item \textbf{Post-condizioni}: Il biglietto viene registrato come utilizzato, impedendo doppie convalide.
+\end{itemize}
+
+\paragraph{UC3: Richiesta di Rimborso Biglietto}
+\begin{itemize}
+    \item \textbf{Attori}: Cliente.
+    \item \textbf{Pre-condizioni}: Il cliente visualizza lo storico dei suoi biglietti attivi non ancora convalidati.
+    \item \textbf{Flusso principale}:
+        1. Il cliente seleziona il biglietto che intende rimborsare.
+        2. Il cliente clicca sul pulsante "Chiedi Rimborso".
+        3. Il sistema invia una richiesta di cancellazione (\texttt{DELETE}) della riga del biglietto nel DB.
+        4. Il trigger \texttt{check\_rimborso\_biglietto} intercetta la cancellazione e confronta l'orario dello spettacolo con \texttt{CURRENT\_TIMESTAMP}.
+        5. Se l'orario dello spettacolo è nel futuro, il record viene rimosso dal DB.
+    \item \textbf{Post-condizioni}: Il biglietto viene eliminato fisicamente e il posto viene liberato.
+\end{itemize}
+
+\paragraph{UC4: Invio Segnalazione Sala Guasta}
+\begin{itemize}
+    \item \textbf{Attori}: Dipendente.
+    \item \textbf{Pre-condizioni}: Il dipendente riscontra un problema (es. proiettore rotto, poltrone danneggiate) in una sala durante il turno.
+    \item \textbf{Flusso principale}:
+        1. Il dipendente accede all'interfaccia delle segnalazioni.
+        2. Il dipendente seleziona la sala e scrive un testo descrittivo dell'anomalia.
+        3. Il dipendente invia la segnalazione.
+        4. Il sistema inserisce la segnalazione nel DB con stato \texttt{risolta = FALSE} e timestamp corrente.
+    \item \textbf{Post-condizioni}: La segnalazione è inserita e resa visibile al Manager.
 \end{itemize}
 
 \newpage
-\section{Funzioni ad Alto Livello}
+\section{Lista delle Funzioni ad Alto Livello}
 
-\subsection{Modulo Gestione Utenti ed Autenticazione}
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{llll}
-\toprule
-\textbf{Funzione} & \textbf{Descrizione} & \textbf{Input} & \textbf{Output} \\
-\midrule
-\texttt{aggiungiCliente} & Registra un nuovo cliente nel DB & Cliente (oggetto) & void (salvataggio) \\
-\texttt{validaLogin} & Verifica le credenziali utente & email, password & boolean (esito) \\
-\texttt{modificaCredenzialiCliente} & Aggiorna email e password & cliente, nuovaEmail, nuovaPassword & void \\
-\texttt{aggiornareDatiPersonali} & Modifica i dati del profilo & nome, cognome, pwd & void \\
-\bottomrule
-\end{tabular}
-\caption{Funzioni del modulo Utenti}
-\end{table}
+Le funzioni ad alto livello sono raggruppate nei tre moduli logici che governano il sistema gestionale:
 
-\subsection{Modulo Gestione Film e Programmazione}
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{llll}
-\toprule
-\textbf{Funzione} & \textbf{Descrizione} & \textbf{Input} & \textbf{Output} \\
-\midrule
-\texttt{aggiungiFilm} & Inserisce un film nel database & Film (oggetto) & void (salvataggio) \\
-\texttt{modificaFilm} & Aggiorna i dati di un film nel DB & film, nuovi parametri & void \\
-\texttt{eliminaFilm} & Rimuove il film dal DB & Film (oggetto) & void \\
-\texttt{getProiezioniPerFilm} & Recupera le proiezioni attive & Film (oggetto) & Lista Proiezioni \\
-\bottomrule
-\end{tabular}
-\caption{Funzioni del modulo Film}
-\end{table}
+\subsection{Modulo 1: Gestione Utenti ed Autenticazione}
+\begin{itemize}
+    \item \textbf{\texttt{aggiungiCliente}}:
+        \begin{itemize}
+            \item \textit{Descrizione}: Registra un nuovo account cliente nel database relazionale.
+            \item \textit{Input}: Oggetto \texttt{Cliente} contenente email, nome, cognome, password e data di registrazione.
+            \item \textit{Output}: \texttt{void} (inserimento eseguito).
+        \end{itemize}
+    \item \textbf{\texttt{validaLogin}}:
+        \begin{itemize}
+            \item \textit{Descrizione}: Verifica la corrispondenza delle credenziali inserite dall'utente per l'autenticazione.
+            \item \textit{Input}: \texttt{email} (String), \texttt{password} (String).
+            \item \textit{Output}: \texttt{boolean} (esito dell'autenticazione).
+        \end{itemize}
+    \item \textbf{\texttt{modificaCredenzialiCliente}}:
+        \begin{itemize}
+            \item \textit{Descrizione}: Permette ad un cliente di aggiornare il proprio indirizzo email di accesso e la password.
+            \item \textit{Input}: Oggetto \texttt{Cliente}, \texttt{nuovaEmail} (String), \texttt{nuovaPassword} (String).
+            \item \textit{Output}: \texttt{void} (aggiornamento eseguito).
+        \end{itemize}
+\end{itemize}
 
-\subsection{Modulo Gestione Acquisti, Biglietti e Recensioni}
-\begin{table}[h]
-\centering
-\small
-\begin{tabular}{llll}
-\toprule
-\textbf{Funzione} & \textbf{Descrizione} & \textbf{Input} & \textbf{Output} \\
-\midrule
-\texttt{confermaAcquistoCarrello} & Esegue acquisto e genera biglietti & metodo, sconto & void \\
-\texttt{convalidaBigliettoPerCodice} & Convalida il codice all'ingresso & codiceUnivoco & Biglietto modificato \\
-\texttt{rimborsaSingoloBiglietto} & Elimina il biglietto dal DB & Biglietto (oggetto) & void \\
-\texttt{aggiungiRecensioneAFilm} & Salva voto (1-5) e commento & film, cliente, voto, comm & boolean \\
-\texttt{aggiungiSegnalazione} & Registra un problema in sala & messaggio, Dipendente & void \\
-\texttt{riparaSala} & Risolve segnalazione di una sala & nomeSala & void \\
-\bottomrule
-\end{tabular}
-\caption{Funzioni del modulo Biglietti e Feedback}
-\end{table}
+\subsection{Modulo 2: Gestione Film e Programmazione}
+\begin{itemize}
+    \item \textbf{\texttt{aggiungiFilm}}:
+        \begin{itemize}
+            \item \textit{Descrizione}: Inserisce una nuova pellicola all'interno del catalogo del cinema (riservata ai Manager).
+            \item \textit{Input}: Oggetto \texttt{Film} (titolo, durata, genere, classificazione età, trama, copertina, data inizio programmazione, sala assegnata).
+            \item \textit{Output}: \texttt{void}.
+        \end{itemize}
+    \item \textbf{\texttt{eliminaFilm}}:
+        \begin{itemize}
+            \item \textit{Descrizione}: Rimuove un film dal catalogo cancellandolo fisicamente dal database.
+            \item \textit{Input}: Oggetto \texttt{Film}.
+            \item \textit{Output}: \texttt{void}.
+        \end{itemize}
+    \item \textbf{\texttt{getProiezioniPerFilm}}:
+        \begin{itemize}
+            \item \textit{Descrizione}: Recupera dal database le proiezioni e gli spettacoli attivi pianificati per il film specificato.
+            \item \textit{Input}: Oggetto \texttt{Film}.
+            \item \textit{Output}: \texttt{ArrayList<Proiezione>}.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Modulo 3: Gestione Acquisti, Biglietti e Feedback}
+\begin{itemize}
+    \item \textbf{\texttt{confermaAcquistoCarrello}}:
+        \begin{itemize}
+            \item \textit{Descrizione}: Esegue la transazione di checkout del carrello, assegna i posti e crea i biglietti.
+            \item \textit{Input}: \texttt{metodoPagamento} (String), \texttt{percentualeSconto} (double).
+            \item \textit{Output}: \texttt{void} (acquisti registrati e carrello svuotato).
+        \end{itemize}
+    \item \textbf{\texttt{convalidaBigliettoPerCodice}}:
+        \begin{itemize}
+            \item \textit{Descrizione}: Convalida all'ingresso lo spettatore tramite inserimento del codice univoco del biglietto.
+            \item \textit{Input}: \texttt{codiceUnivoco} (String).
+            \item \textit{Output}: Oggetto \texttt{Biglietto} (stato aggiornato a "CONVALIDATO").
+        \end{itemize}
+    \item \textbf{\texttt{rimborsaSingoloBiglietto}}:
+        \begin{itemize}
+            \item \textit{Descrizione}: Rimuove dal database un biglietto acquistato liberando il posto in sala.
+            \item \textit{Input}: Oggetto \texttt{Biglietto}.
+            \item \textit{Output}: \texttt{void}.
+        \end{itemize}
+    \item \textbf{\texttt{aggiungiRecensioneAFilm}}:
+        \begin{itemize}
+            \item \textit{Descrizione}: Associa ad un film il feedback (voto e commento) rilasciato da un cliente.
+            \item \textit{Input}: \texttt{film} (Film), \texttt{cliente} (Cliente), \texttt{voto} (int), \texttt{commento} (String).
+            \item \textit{Output}: \texttt{boolean} (esito inserimento).
+        \end{itemize}
+\end{itemize}
 
 \newpage
-\section{Schema Concettuale (Modello E-R)}
+\section{Schema Concettuale (Modello E-R Iniziale)}
 
-\subsection{Entità Principali}
+Lo schema concettuale rappresenta il dominio applicativo in formato astratto. In questa fase iniziale, la gerarchia degli utenti e le entità fisiche della sala cinematografica (Sale, Posti e Proiezioni) sono modellate in modo esaustivo per rappresentare fedelmente lo scenario reale del cinema multisala.
+
+\subsection{Entità e Attributi}
 \begin{itemize}
-    \item \textbf{Utente} (Astratta): contiene \textit{email} (PK), \textit{nome}, \textit{cognome}, \textit{password}.
-    \item \textbf{Cliente} (Sottoclasse di Utente): aggiunge \textit{dataRegistrazione}.
-    \item \textbf{Dipendente} (Sottoclasse di Utente): aggiunge \textit{stipendio}, \textit{ruolo}.
-    \item \textbf{Film}: contiene \textit{titolo} (PK), \textit{durata}, \textit{genere}, \textit{classificazioneEta}, \textit{trama}, \textit{percorsoCopertina}, \textit{dataInizioProgrammazione}, \textit{salaAssegnata}.
-    \item \textbf{Sala}: contiene \textit{numeroSala} (PK), \textit{capienza} (pari a 180), \textit{tipoSala}.
-    \item \textbf{Posto}: identificato da \textit{fila}, \textit{numeroPosto} e \textit{numeroSala}.
-    \item \textbf{Proiezione}: identificato da \textit{idProiezione} (PK), contiene \textit{dataOraInizio}, \textit{dataOraFine}, \textit{prezzoBase}.
-    \item \textbf{Prenotazione}: identificato da \textit{idPrenotazione} (PK), contiene \textit{dataPrenotazione}, \textit{stato}.
-    \item \textbf{Pagamento}: identificato da \textit{idPagamento} (PK), contiene \textit{importo}, \textit{dataPagamento}, \textit{metodoPagamento}, \textit{statoPagamento}.
-    \item \textbf{Biglietto}: identificato da \textit{codiceUnivoco} (PK), contiene \textit{prezzoFinale}, \textit{valido}.
+    \item \textbf{Utente} (Astratta): contiene \textit{email} (Identificativo PK), \textit{nome}, \textit{cognome}, \textit{password}.
+    \item \textbf{Cliente} (Sotto-entità): eredita gli attributi di Utente e aggiunge \textit{data\_registrazione}.
+    \item \textbf{Dipendente} (Sotto-entità): eredita gli attributi di Utente e aggiunge \textit{stipendio}, \textit{ruolo}.
+    \item \textbf{Film}: contiene \textit{titolo} (Identificativo PK), \textit{durata}, \textit{genere}, \textit{classificazione\_eta}, \textit{trama}, \textit{percorso\_copertina}, \textit{data\_inizio\_programmazione}, \textit{sala\_assegnata}.
+    \item \textbf{Sala}: contiene \textit{numero\_sala} (PK), \textit{capienza} (pari a 180), \textit{tipoSala}.
+    \item \textbf{Posto}: identificato debolmente da \textit{fila}, \textit{numero\_posto} in associazione a \textit{Sala}.
+    \item \textbf{Proiezione}: identificato da \textit{id\_proiezione} (PK), contiene \textit{dataOraInizio}, \textit{prezzoBase}.
+    \item \textbf{Prenotazione}: identificato da \textit{id\_prenotazione} (PK), contiene \textit{data\_prenotazione}, \textit{stato}.
+    \item \textbf{Pagamento}: identificato da \textit{id\_pagamento} (PK), contiene \textit{importo}, \textit{data\_pagamento}, \textit{metodo\_pagamento}.
+    \item \textbf{Biglietto}: identificato da \textit{codice\_univoco} (PK), contiene \textit{prezzo\_pagato}, \textit{stato}.
+    \item \textbf{Recensione}: identificato da \textit{id} (PK), contiene \textit{voto}, \textit{commento}, \textit{autore}.
+    \item \textbf{Segnalazione}: identificato da \textit{id} (PK), contiene \textit{messaggio}, \textit{sala}, \textit{risolta}, \textit{data\_invio}.
 \end{itemize}
 
-\subsection{Generalizzazioni}
+\subsection{Associazioni e Cardinalità}
 \begin{itemize}
-    \item \textbf{Utente} si specializza in \textbf{Cliente} e \textbf{Dipendente}. La generalizzazione è totale ed esclusiva.
-\end{itemize}
-
-\subsection{Associazioni e Relazioni}
-\begin{itemize}
-    \item \textbf{Cliente - Prenotazione} (1 a $0..*$): un cliente effettua zero o più prenotazioni.
-    \item \textbf{Prenotazione - Biglietto} (1 a $1..*$): una prenotazione include uno o più biglietti.
-    \item \textbf{Prenotazione - Pagamento} (1 a $0..1$): una prenotazione prevede al massimo un pagamento.
-    \item \textbf{Biglietto - Posto} (1 a 1): ciascun biglietto è associato a un posto specifico.
-    \item \textbf{Biglietto - Proiezione} (1 a 1): ciascun biglietto si riferisce a una proiezione specifica.
-    \item \textbf{Film - Proiezione} (1 a $0..*$): un film ha zero o più proiezioni nel tempo.
-    \item \textbf{Sala - Proiezione} (1 a $0..*$): una sala ospita più proiezioni giornaliere.
-    \item \textbf{Dipendente - Proiezione (Gestisce)} (Molti-a-Molti): descritta dall'associazione \textit{Gestisce} contenente gli attributi \textit{orarioInizioTurno}, \textit{orarioFineTurno} e \textit{segnalazioni}.
+    \item \textbf{Generalizzazione Utente}: \textbf{Utente} si specializza in \textbf{Cliente} e \textbf{Dipendente}. Si tratta di una generalizzazione totale (tutti gli utenti appartengono ad una delle categorie) ed esclusiva (un utente non può essere contemporaneamente cliente e dipendente).
+    \item \textbf{Cliente - Prenotazione} (1 a $0..*$): un cliente può effettuare zero o più prenotazioni nel tempo. Ciascuna prenotazione appartiene ad un unico cliente.
+    \item \textbf{Prenotazione - Biglietto} (1 a $1..*$): una prenotazione raggruppa uno o più biglietti acquistati nello stesso checkout.
+    \item \textbf{Prenotazione - Pagamento} (1 a $0..1$): una prenotazione ha al massimo un pagamento ad essa associato.
+    \item \textbf{Biglietto - Posto} (1 a 1): ciascun biglietto è associato ad un unico posto fisico e specifico.
+    \item \textbf{Biglietto - Proiezione} (1 a 1): ciascun biglietto si riferisce ad una specifica proiezione.
+    \item \textbf{Film - Proiezione} (1 a $0..*$): un film ha più proiezioni pianificate. Ciascuna proiezione si riferisce ad un unico film.
+    \item \textbf{Sala - Proiezione} (1 a $0..*$): una sala ospita più proiezioni. Ciascuna proiezione avviene in un'unica sala.
+    \item \textbf{Posto - Sala} (molti a 1): molti posti appartengono ad un'unica sala fisica.
 \end{itemize}
 
 \newpage
 \section{Regole di Business}
 
-\subsection{Catalogo delle regole di business}
+Le regole di business definiscono i vincoli semantici e di dominio che la base di dati e l'applicazione devono garantire a livello di consistenza logica:
+
 \begin{enumerate}
-    \item \textbf{Unicità Account}: Ogni utente/cliente deve registrarsi con un'email univoca.
-    \item \textbf{Prezzo Positivo}: Il prezzo pagato per il biglietto deve essere non negativo.
-    \item \textbf{Unicità Assegnazione Posto}: Lo stesso posto (stessa sala, fila, numero) per la stessa data e orario non può essere assegnato a più biglietti contemporaneamente.
-    \item \textbf{Limiti Valutazione}: Il voto numerico inserito per una recensione deve essere compreso tra 1 e 5 (inclusi).
-    \item \textbf{Rimborso Biglietti}: È vietato eliminare o rimborsare un biglietto se l'orario d'inizio dello spettacolo è già trascorso rispetto all'orario attuale.
-    \item \textbf{Finestra di Convalida}: La convalida del biglietto da parte del dipendente all'ingresso del cinema è consentita a partire da 15 minuti prima dell'inizio programmato del film.
-    \item \textbf{Capienza Limite della Sala}: Il numero totale di biglietti attivi emessi per un singolo spettacolo non può superare 180 (posti disponibili).
-    \item \textbf{Coerenza della Sala}: La sala indicata sul biglietto acquistato da un utente deve necessariamente coincidere con la sala assegnata al film in quel periodo.
+    \item \textbf{Vincolo di unicità dell'account}: Ogni utente (cliente o dipendente) deve potersi registrare esclusivamente con un indirizzo email univoco e non nullo.
+    \item \textbf{Prezzo valido}: Il prezzo pagato registrato per l'acquisto di un biglietto o calcolato all'interno del carrello non può in nessun caso assumere valori negativi.
+    \item \textbf{Unicità dell'assegnazione del posto}: Lo stesso posto (definito univocamente dalla combinazione di fila e numero di poltrona) nella stessa sala, per lo stesso spettacolo (data e orario di proiezione), non può essere assegnato a più biglietti contemporaneamente (prevenzione dell'overbooking fisico).
+    \item \textbf{Limiti semantici di feedback (Voto)}: Il voto numerico espresso da un utente in una recensione ad un film deve risiedere rigorosamente all'interno del range chiuso $[1, 5]$.
+    \item \textbf{Finestra temporale di rimborso}: La richiesta di rimborso (cancellazione fisica) di un biglietto da parte di un cliente è consentita esclusivamente se l'orario di inizio programmato dello spettacolo è strettamente successivo al timestamp corrente.
+    \item \textbf{Finestra temporale di convalida}: Un dipendente può convalidare un biglietto d'ingresso a partire da 15 minuti prima dell'inizio programmato del film e fino all'orario previsto di fine proiezione.
+    \item \textbf{Capienza massima fisica}: Il numero totale di biglietti attivi venduti per una singola proiezione non può eccedere i 180 posti, ovvero la capienza massima stabilita per le sale del cinema.
+    \item \textbf{Coerenza della sala cinematografica}: La sala fisica indicata per l'emissione di un biglietto deve coincidere esattamente con la sala in cui è programmata la programmazione del film in quel determinato intervallo.
+    \item \textbf{Calcolo automatico dello sconto tessera}: Se il cliente possiede una tessera promozionale specifica (es. Senior, Junior), il prezzo calcolato nel carrello deve essere ridotto della percentuale associata (Senior = 50\% sconto, Junior = 25\% sconto, Enterprise = 10\% sconto).
 \end{enumerate}
 
 \newpage
 \section{Schema Concettuale Ristrutturato}
 
-\subsection{Scelte di ristrutturazione}
+Prima di convertire lo schema E-R iniziale in tabelle relazionali per il DBMS PostgreSQL, si applicano alcune scelte di ristrutturazione per ottimizzare l'I/O e semplificare lo schema:
+
+\subsection{Decisioni di Ristrutturazione}
 \begin{enumerate}
-    \item \textbf{Accorpamento della Generalizzazione}: 
-    L'entità padre \textit{Utente} e la sottoclasse \textit{Cliente} sono state accorpate direttamente nella tabella fisica \texttt{cliente} nel database PostgreSQL. Poiché i dati relativi ai dipendenti (\textit{Dipendente}) sono gestiti in-memory nel codice Java (RAM), questa scelta evita tabelle vuote e riduce il costo di JOIN a livello di database.
-    \item \textbf{Denormalizzazione dei Biglietti}:
-    Invece di creare relazioni complesse a livello fisico tra \textit{Biglietto}, \textit{Posto}, \textit{Sala} e \textit{Proiezione}, la tabella relazionale \texttt{biglietto} memorizza direttamente le informazioni in formato testuale denormalizzato (titolo del film, sala, orario della proiezione, fila e numero del posto). Questa scelta rispecchia l'architettura dei DAO del codice Java, ottimizzando i tempi di caricamento ed evitando l'uso di query eccessivamente nidificate.
-    \item \textbf{Imposizione dell'unicità del posto}:
-    La prevenzione di doppie prenotazioni per il medesimo posto è garantita da un vincolo \texttt{UNIQUE} composto sulle colonne \texttt{(sala, data\_orario\_proiezione, fila, numero\_posto)} all'interno della tabella \texttt{biglietto}.
+    \item \textbf{Accorpamento e parziale eliminazione delle gerarchie}:
+        L'entità astratta \textit{Utente} e la sottoclasse \textit{Cliente} sono state fuse direttamente all'interno dell'unica tabella fisica \texttt{cliente}. La sottoclasse \textit{Dipendente} è stata ristrutturata rimuovendola dal database fisico: i dipendenti dello staff (essendo numericamente fissi ed esigui) vengono gestiti interamente in-memory all'interno della classe \texttt{Controller.java} in Java. Questa scelta riduce il sovraccarico di JOIN tra tabelle vuote e semplifica notevolmente lo schema logico del DBMS.
+    \item \textbf{Denormalizzazione delle tabelle Sala, Posto e Proiezione}:
+        Nel database relazionale non sono state create tabelle fisiche per \textit{Sala}, \textit{Posto} e \textit{Proiezione}. Le informazioni relative a sala, orario dello spettacolo e coordinate della poltrona sono state denormalizzate e inserite direttamente all'interno delle colonne della tabella \texttt{biglietto} (es. colonna \texttt{sala}, \texttt{fila}, \texttt{numero\_posto}, \texttt{data\_orario\_proiezione}). Questa ristrutturazione velocizza enormemente le query di lettura (non necessitano di JOIN su 4 tabelle diverse) a livello di DAO.
+    \item \textbf{Accorpamento di Prenotazione e Pagamento}:
+        Le entità \textit{Prenotazione} e \textit{Pagamento} sono state accorpate all'interno dell'entità \texttt{biglietto}. Le informazioni sul pagamento (metodo e prezzo) e sullo stato della prenotazione (valido, da convalidare) sono rappresentate dagli attributi del biglietto stesso.
 \end{enumerate}
+
+\subsection{Rappresentazione del Modello Ristrutturato}
+Lo schema ristrutturato contiene 5 relazioni persistite sul DBMS:
+\begin{figure}[h]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[
+    entity/.style={rectangle, draw, fill=blue!10, minimum width=2.5cm, minimum height=1cm, thick, align=center},
+    attribute/.style={ellipse, draw, fill=yellow!10, minimum width=1.8cm, minimum height=0.7cm, align=center, font=\footnotesize},
+    relationship/.style={diamond, draw, fill=red!10, minimum width=2cm, minimum height=1cm, align=center, thick, font=\footnotesize},
+    line/.style={draw, thick}
+]
+    % Entities
+    \node[entity] (cliente) at (0, 4) {CLIENTE};
+    \node[entity] (biglietto) at (5, 4) {BIGLIETTO};
+    \node[entity] (film) at (10, 4) {FILM};
+    \node[entity] (recensione) at (10, 0) {RECENSIONE};
+    \node[entity] (segnalazione) at (0, 0) {SEGNALAZIONE};
+    
+    % Attributes
+    \node[attribute] (c_email) at (-2, 5.5) {\underline{email}};
+    \node[attribute] (b_cod) at (5, 5.5) {\underline{codice\_univ}};
+    \node[attribute] (f_tit) at (12, 5.5) {\underline{titolo}};
+    \draw (cliente) -- (c_email);
+    \draw (biglietto) -- (b_cod);
+    \draw (film) -- (f_tit);
+
+    % Relationships
+    \node[relationship] (rel_acq) at (2.5, 4) {Acquista};
+    \node[relationship] (rel_ref) at (7.5, 4) {Riferito};
+    \node[relationship] (rel_rec) at (10, 2) {Recensisce};
+    \node[relationship] (rel_seg) at (0, 2) {Invia};
+    
+    % Lines
+    \draw (cliente) -- node[above] {1} (rel_acq);
+    \draw (rel_acq) -- node[above] {N} (biglietto);
+    \draw (biglietto) -- node[above] {N} (rel_ref);
+    \draw (rel_ref) -- node[above] {1} (film);
+    \draw (film) -- node[right] {1} (rel_rec);
+    \draw (rel_rec) -- node[right] {N} (recensione);
+    \draw (cliente) -- node[left] {1} (rel_seg);
+    \draw (rel_seg) -- node[left] {N} (segnalazione);
+\end{tikzpicture}
+}
+\caption{Modello Concettuale Ristrutturato pronto per la traduzione logica}
+\label{fig:restructured_er}
+\end{figure}
 
 \newpage
 \section{Schema Logico del Database}
 
-\subsection{Definizione delle Tabelle e Chiavi}
+Lo schema logico relazionale per PostgreSQL definisce le chiavi primarie (PK), chiavi esterne (FK) e vincoli di base:
 
-\paragraph{Tabella CLIENTE}
+\subsection{Tabelle e Relazioni}
+
+\paragraph{1. CLIENTE}
 \begin{itemize}
-    \item \texttt{email} VARCHAR(255) -- \textbf{PRIMARY KEY}
-    \item \texttt{nome} VARCHAR(100) -- \textit{NOT NULL}
-    \item \texttt{cognome} VARCHAR(100) -- \textit{NOT NULL}
-    \item \texttt{password} VARCHAR(255) -- \textit{NOT NULL}
-    \item \texttt{data\_registrazione} DATE -- \textit{NOT NULL}
+    \item \texttt{email} VARCHAR(255) \textbf{PRIMARY KEY}
+    \item \texttt{nome} VARCHAR(100) \textit{NOT NULL}
+    \item \texttt{cognome} VARCHAR(100) \textit{NOT NULL}
+    \item \texttt{password} VARCHAR(255) \textit{NOT NULL}
+    \item \texttt{data\_registrazione} DATE \textit{NOT NULL}
 \end{itemize}
 
-\paragraph{Tabella FILM}
+\paragraph{2. FILM}
 \begin{itemize}
-    \item \texttt{titolo} VARCHAR(150) -- \textbf{PRIMARY KEY}
-    \item \texttt{durata} TIME -- \textit{NOT NULL}
-    \item \texttt{genere} VARCHAR(50) -- \textit{NOT NULL}
-    \item \texttt{classificazione\_eta} VARCHAR(20) -- \textit{NOT NULL}
+    \item \texttt{titolo} VARCHAR(150) \textbf{PRIMARY KEY}
+    \item \texttt{durata} TIME WITHOUT TIME ZONE \textit{NOT NULL}
+    \item \texttt{genere} VARCHAR(50) \textit{NOT NULL}
+    \item \texttt{classificazione\_eta} VARCHAR(20) \textit{NOT NULL}
     \item \texttt{trama} TEXT
     \item \texttt{percorso\_copertina} VARCHAR(500)
     \item \texttt{data\_inizio\_programmazione} DATE
-    \item \texttt{sala\_assegnata} VARCHAR(50) -- \textit{DEFAULT 'Sala 1'}
+    \item \texttt{sala\_assegnata} VARCHAR(50) \textit{DEFAULT 'Sala 1'}
 \end{itemize}
 
-\paragraph{Tabella RECENSIONE}
+\paragraph{3. RECENSIONE}
 \begin{itemize}
-    \item \texttt{id} INT -- \textbf{PRIMARY KEY} (auto-incrementale tramite sequence)
-    \item \texttt{titolo\_film} VARCHAR(150) -- \textit{FOREIGN KEY REFERENCES film(titolo) ON DELETE CASCADE}
+    \item \texttt{id} INTEGER \textbf{PRIMARY KEY} (Autoincrementale tramite SEQUENCE)
+    \item \texttt{titolo\_film} VARCHAR(150) \textit{FOREIGN KEY REFERENCES film(titolo) ON DELETE CASCADE}
     \item \texttt{autore} VARCHAR(100)
-    \item \texttt{voto} INT -- \textit{CHECK (voto BETWEEN 1 AND 5)}
+    \item \texttt{voto} INTEGER \textit{CHECK (voto BETWEEN 1 AND 5)}
     \item \texttt{commento} TEXT
 \end{itemize}
 
-\paragraph{Tabella SEGNALAZIONE}
+\paragraph{4. SEGNALAZIONE}
 \begin{itemize}
-    \item \texttt{id} INT -- \textbf{PRIMARY KEY} (auto-incrementale tramite sequence)
+    \item \texttt{id} INTEGER \textbf{PRIMARY KEY} (Autoincrementale tramite SEQUENCE)
     \item \texttt{mittente\_email} VARCHAR(255)
     \item \texttt{messaggio} TEXT
     \item \texttt{sala} VARCHAR(50)
-    \item \texttt{risolta} BOOLEAN -- \textit{DEFAULT FALSE}
-    \item \texttt{data\_invio} TIMESTAMP -- \textit{DEFAULT CURRENT\_TIMESTAMP}
+    \item \texttt{risolta} BOOLEAN \textit{DEFAULT FALSE}
+    \item \texttt{data\_invio} TIMESTAMP WITHOUT TIME ZONE \textit{DEFAULT CURRENT\_TIMESTAMP}
 \end{itemize}
 
-\paragraph{Tabella BIGLIETTO}
+\paragraph{5. BIGLIETTO}
 \begin{itemize}
-    \item \texttt{codice\_univoco} VARCHAR(8) -- \textbf{PRIMARY KEY}
+    \item \texttt{codice\_univoco} VARCHAR(8) \textbf{PRIMARY KEY}
     \item \texttt{titolo\_film} VARCHAR(150)
     \item \texttt{sala} VARCHAR(50)
-    \item \texttt{data\_orario\_proiezione} TIMESTAMP
+    \item \texttt{data\_orario\_proiezione} TIMESTAMP WITHOUT TIME ZONE
     \item \texttt{fila} CHAR(1)
-    \item \texttt{numero\_posto} INT
-    \item \texttt{prezzo\_pagato} NUMERIC(5,2) -- \textit{CHECK (prezzo\_pagato >= 0)}
-    \item \texttt{stato} VARCHAR(20) -- \textit{DEFAULT 'DA CONVALIDARE'}
-    \item \textit{Vincolo UNIQUE composto}: \texttt{UNIQUE (sala, data\_orario\_proiezione, fila, numero\_posto)}
+    \item \texttt{numero\_posto} INTEGER
+    \item \texttt{prezzo\_pagato} NUMERIC(5,2) \textit{CHECK (prezzo\_pagato >= 0)}
+    \item \texttt{stato} VARCHAR(20) \textit{DEFAULT 'DA CONVALIDARE'}
+    \item \textbf{Vincolo UNIQUE composto}: \texttt{UNIQUE (sala, data\_orario\_proiezione, fila, numero\_posto)}
 \end{itemize}
 
 \newpage
-\section{Vincoli e Piano di Implementazione}
+\section{Piano di Implementazione dei Vincoli}
 
-\subsection{Vincoli sui dati}
+Per ciascuna regola di business (vincolo semantico) definita al punto V, viene presentato il piano dettagliato di implementazione indicando dove avviene la convalida:
+
 \begin{table}[h]
 \centering
-\small
-\begin{tabular}{lll}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llll}
 \toprule
-\textbf{Regola} & \textbf{Tipo Vincolo} & \textbf{Implementazione} \\
+\textbf{Regola} & \textbf{Collocazione} & \textbf{Tecnologia} & \textbf{Dettaglio Classe / Metodo} \\
 \midrule
-Email cliente unica & PRIMARY KEY & PK su colonna \texttt{email} \\
-Prezzo biglietto non negativo & CHECK & \texttt{CHECK (prezzo\_pagato >= 0)} \\
-Voto recensione valido & CHECK & \texttt{CHECK (voto BETWEEN 1 AND 5)} \\
-Unicità posto per spettacolo & UNIQUE & \texttt{UNIQUE (sala, data\_orario\_proiezione, fila, numero\_posto)} \\
-Impedire acquisto posto occupato & Trigger 1 & \texttt{BEFORE INSERT OR UPDATE ON biglietto} \\
-Impedire rimborsi tardivi & Trigger 2 & \texttt{BEFORE DELETE ON biglietto} \\
-Controllare capienza sala max 180 & Trigger 3 & \texttt{BEFORE INSERT ON biglietto} \\
-Verificare coerenza sala film & Trigger 4 & \texttt{BEFORE INSERT OR UPDATE ON biglietto} \\
+Unicità email & Database (Fisico) & \texttt{PRIMARY KEY} & Tabella \texttt{cliente}, PK su \texttt{email}. \\
+Prezzo positivo & Database (Fisico) & \texttt{CHECK} constraint & Tabella \texttt{biglietto}, \texttt{CHECK (prezzo\_pagato >= 0)}. \\
+Voto valido & Database (Fisico) & \texttt{CHECK} constraint & Tabella \texttt{recensione}, \texttt{CHECK (voto BETWEEN 1 AND 5)}. \\
+Unicità posto & Database (Fisico) & \texttt{UNIQUE} composto & Tabella \texttt{biglietto}, su \texttt{(sala, data\_ora, fila, posto)}. \\
+Prevenzione overbooking & Database (Attivo) & PL/pgSQL Trigger & \texttt{trg\_check\_posto\_occupato} (\texttt{BEFORE INSERT/UPDATE}). \\
+Rimborso tardivo & Database (Attivo) & PL/pgSQL Trigger & \texttt{trg\_check\_rimborso\_biglietto} (\texttt{BEFORE DELETE}). \\
+Capienza massima sala & Database (Attivo) & PL/pgSQL Trigger & \texttt{trg\_check\_capienza\_sala} (\texttt{BEFORE INSERT}). \\
+Coerenza sala film & Database (Attivo) & PL/pgSQL Trigger & \texttt{trg\_check\_sala\_biglietto} (\texttt{BEFORE INSERT/UPDATE}). \\
+Sconti coupon & Applicazione (Java) & Logic Control & Classe \texttt{Controller}, metodo \texttt{valutaCodiceSconto()}. \\
+Formato email & Applicazione (Java) & Input Validation & Classe \texttt{RegistrazioneGUI}, validazione in Swing. \\
+Finestra convalida (15m) & Applicazione (Java) & Business Logic & Classe \texttt{Dipendente}, metodo \texttt{validaBiglietto()}. \\
 \bottomrule
 \end{tabular}
-\caption{Piano implementazione vincoli}
+}
+\caption{Piano di collocamento dei vincoli nel sistema}
+\label{tab:constraints}
 \end{table}
 
-\subsection{Descrizione dei 4 Trigger}
+\newpage
+\section{Diagramma delle Classi dell'Applicazione}
 
-\paragraph{Trigger 1: check\_posto\_occupato}
-\begin{itemize}
-    \item \textbf{Evento}: \texttt{BEFORE INSERT OR UPDATE ON biglietto}
-    \item \textbf{Condizione}: Se nel database è già registrato un biglietto venduto per la stessa sala, stesso orario di proiezione, stessa fila e stesso numero di posto, avente un codice univoco differente.
-    \item \textbf{Azione}: Solleva un'eccezione (\texttt{RAISE EXCEPTION}) annullando l'inserimento/modifica.
-\end{itemize}
+L'applicazione segue un'architettura disaccoppiata basata sul pattern **Boundary-Control-Entity (BCE)** con l'integrazione dello strato **DAO (Data Access Object)** per l'accesso ai dati persistiti.
 
-\paragraph{Trigger 2: check\_rimborso\_biglietto}
-\begin{itemize}
-    \item \textbf{Evento}: \texttt{BEFORE DELETE ON biglietto}
-    \item \textbf{Condizione}: Se la data e l'ora correnti di sistema (\texttt{CURRENT\_TIMESTAMP}) sono maggiori o uguali all'orario previsto per l'inizio del film (\texttt{data\_orario\_proiezione}).
-    \item \textbf{Azione}: Blocca l'operazione di cancellazione (rimborso) e solleva un'eccezione.
-\end{itemize}
+\subsection{Rappresentazione Architetturale}
+Di seguito viene raffigurata la struttura delle classi e dei relativi package dell'applicazione:
 
-\paragraph{Trigger 3: check\_capienza\_sala}
-\begin{itemize}
-    \item \textbf{Evento}: \texttt{BEFORE INSERT ON biglietto}
-    \item \textbf{Condizione}: Se il conteggio dei biglietti già venduti per la sala e l'orario specificati è maggiore o uguale a 180.
-    \item \textbf{Azione}: Impedisce l'inserimento del biglietto sollevando un'eccezione per sala piena.
-\end{itemize}
+\begin{figure}[h]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[
+    package/.style={rectangle, draw, dashed, fill=gray!5, inner sep=15pt, font=\bfseries},
+    class/.style={rectangle, draw, fill=white, minimum width=4cm, align=left, font=\footnotesize, thick},
+    dep/.style={draw, -{Stealth}, dashed, thick},
+    real/.style={draw, -{Triangle[open]}, thick}
+]
+    % GUI Package
+    \node[class] (gui) at (0,4) {
+        \textbf{package gui (Boundary)} \\
+        \hline
+        - controller: Controller \\
+        \hline
+        + RegistrazioneGUI() \\
+        + DashboardCliente() \\
+        + DashboardDipendente() \\
+        + DashboardCarrello()
+    };
+    
+    % Controller Package
+    \node[class] (ctrl) at (5.5,4) {
+        \textbf{package controller (Control)} \\
+        \hline
+        - clienteDAO: ClienteDAO \\
+        - filmDAO: FilmDAO \\
+        - bigliettoDAO: BigliettoDAO \\
+        \hline
+        + aggiungiCliente(c) \\
+        + validaLogin(e, p) \\
+        + confermaAcquistoCarrello() \\
+        + rimborsaSingoloBiglietto()
+    };
 
-\paragraph{Trigger 4: check\_sala\_biglietto}
-\begin{itemize}
-    \item \textbf{Evento}: \texttt{BEFORE INSERT OR UPDATE ON biglietto}
-    \item \textbf{Condizione}: Se la sala specificata nel biglietto non corrisponde alla colonna \texttt{sala\_assegnata} del rispettivo film nella tabella \texttt{film}.
-    \item \textbf{Azione}: Impedisce l'inserimento sollevando un'eccezione di incoerenza logica.
-\end{itemize}
+    % DAO Interfaces Package
+    \node[class] (dao) at (11.5,4) {
+        \textbf{package dao (Interfaces)} \\
+        \hline
+        \textit{<<interface>>} \\
+        \textbf{ClienteDAO} \\
+        \hline
+        + inserisciClienteDB() \\
+        + recuperaClienteDaDB() \\
+        \hline
+        \textit{<<interface>>} \\
+        \textbf{BigliettoDAO} \\
+        \hline
+        + inserisciBigliettoDB()
+    };
+
+    % Implementazioni concrete package
+    \node[class] (imp) at (11.5,0.5) {
+        \textbf{package implementazionePostgresDAO} \\
+        \hline
+        \textbf{ClienteImplementazionePostgresDAO} \\
+        \textbf{BigliettoImplementazionePostgresDAO} \\
+        \hline
+        + inserisciClienteDB() \\
+        + recuperaClienteDaDB() \\
+        + inserisciBigliettoDB()
+    };
+
+    % Dependencies and Realizations
+    \draw[dep] (gui) -- (ctrl);
+    \draw[dep] (ctrl) -- (dao);
+    \draw[real] (imp) -- (dao);
+\end{tikzpicture}
+}
+\caption{Diagramma architetturale delle classi e dei package (BCE + DAO)}
+\label{fig:class_diagram}
+\end{figure}
 
 \newpage
-\section{Interrogazioni SQL (Query Complesse)}
+\section{Specifiche Dettagliate delle Operazioni Critiche}
 
-Di seguito sono riportate 6 interrogazioni SQL complesse (che utilizzano sottoquery annidate, join, aggregazioni, raggruppamenti e clausole \texttt{HAVING}) progettate per scopi analitici:
+Vengono analizzate nel dettaglio le tre operazioni più sensibili del sistema, illustrando segnatura, logica di business, pseudo-codice e operazioni corrispondenti sulla base di dati:
 
-\begin{enumerate}
-    \item \textbf{Query 1: Film di genere 'Thriller' con recensioni superiori alla media globale dei voti}
-    \begin{lstlisting}
-SELECT DISTINCT f.titolo, f.genere
-FROM film f
-JOIN recensione r ON f.titolo = r.titolo_film
-WHERE f.genere = 'Thriller' AND r.voto > (
-    SELECT AVG(voto)
-    FROM recensione
-);
-    \end{lstlisting}
+\subsection{Operazione 1: confermaAcquistoCarrello}
+\begin{itemize}
+    \item \textbf{Segnatura}: \texttt{public void confermaAcquistoCarrello(String metodoPagamento, double percentualeSconto) throws SalaPienaException}
+    \item \textbf{Logica di Business}: Riceve il checkout del carrello da parte dell'utente. Cerca i posti liberi (preferendo quelli vicini/consecutivi) tramite \texttt{trovaPostiVicini()}, crea un oggetto \texttt{Prenotazione} confermato, e acquista i singoli biglietti inserendoli nel DB. Infine svuota il carrello.
+    \item \textbf{Operazioni DB}: Esegue query di \texttt{INSERT} per ogni tupla biglietto tramite il DAO.
+    \item \textbf{Pseudo-codice}:
+\end{itemize}
+\begin{lstlisting}[language=Java]
+PER OGNI ElementoCarrello elem IN carrello DO
+    quantita = elem.getQuantita()
+    proiezione = elem.getProiezione()
+    postiAssegnati = trovaPostiVicini(proiezione, quantita) // solleva eccezione se piena
+    
+    nuovaPrenotazione = NEW Prenotazione(LocalDateTime.now(), StatoPrenotazione.CONFERMATO, proiezione, utenteLoggato)
+    
+    PER i = 0 TO quantita - 1 DO
+        posto = postiAssegnati.get(i)
+        biglietto = NEW Biglietto(prezzoScontato, posto, proiezione, nuovaPrenotazione)
+        
+        // Operazione DB tramite DAO
+        bigliettoDAO.inserisciBigliettoDB(biglietto)
+        listaBiglietti.add(biglietto)
+        nuovaPrenotazione.getBiglietti().add(biglietto)
+    ROUTINE
+ROUTINE
+svuotaCarrello()
+\end{lstlisting}
 
-    \item \textbf{Query 2: Film che hanno venduto singolarmente più biglietti rispetto alla media di biglietti venduti per film}
-    \begin{lstlisting}
-SELECT titolo_film, COUNT(codice_univoco) AS totale_venduti
-FROM biglietto
-GROUP BY titolo_film
-HAVING COUNT(codice_univoco) > (
-    SELECT AVG(conteggio_biglietti)
-    FROM (
-        SELECT COUNT(codice_univoco) AS conteggio_biglietti
-        FROM biglietto
-        GROUP BY titolo_film
-    ) AS subquery
-);
-    \end{lstlisting}
+\subsection{Operazione 2: validaBiglietto (nel Dipendente)}
+\begin{itemize}
+    \item \textbf{Segnatura}: \texttt{public boolean validaBiglietto(Biglietto biglietto, Proiezione proiezione)}
+    \item \textbf{Logica di Business}: Controlla che il biglietto non sia nullo, non sia già stato convalidato e che l'orario attuale rientri nella finestra consentita (da 15 minuti prima dell'inizio dello spettacolo a fine spettacolo). Se valido, lo stato in Java e DB viene aggiornato.
+    \item \textbf{Operazioni DB}: Esegue un \texttt{UPDATE} sul database aggiornando lo stato in 'CONVALIDATO'.
+    \item \textbf{Pseudo-codice}:
+\end{itemize}
+\begin{lstlisting}[language=Java]
+IF biglietto == null OR proiezione == null THEN RETURN false
+IF biglietto.isValido() THEN RETURN false // Gia convalidato
 
-    \item \textbf{Query 3: Biglietti venduti per spettacoli in sale con segnalazioni guasti attive non risolte}
-    \begin{lstlisting}
-SELECT DISTINCT b.sala, b.titolo_film, b.data_orario_proiezione
-FROM biglietto b
-WHERE b.sala IN (
-    SELECT s.sala
-    FROM segnalazione s
-    WHERE s.risolta = FALSE
-) AND EXISTS (
-    SELECT 1 
-    FROM segnalazione s
-    WHERE s.sala = b.sala 
-      AND s.risolta = FALSE 
-      AND s.data_invio <= b.data_orario_proiezione
-);
-    \end{lstlisting}
+orarioAttuale = LocalDateTime.now()
+orarioInizio = proiezione.getDataOraInizio()
+orarioIngressoConsentito = orarioInizio.minusMinutes(15)
+orarioFine = orarioInizio.plusMinutes(proiezione.getFilm().getDurataMinuti())
 
-    \item \textbf{Query 4: Sale il cui incasso totale supera l'incasso medio calcolato per sala}
-    \begin{lstlisting}
-SELECT sala, SUM(prezzo_pagato) AS ricavo_sala
-FROM biglietto
-GROUP BY sala
-HAVING SUM(prezzo_pagato) > (
-    SELECT AVG(ricavo_medio)
-    FROM (
-        SELECT SUM(prezzo_pagato) AS ricavo_medio
-        FROM biglietto
-        GROUP BY sala
-    ) AS subquery
-);
-    \end{lstlisting}
+IF orarioAttuale.isAfter(orarioIngressoConsentito) AND orarioAttuale.isBefore(orarioFine) THEN
+    biglietto.setValido(true)
+    // Operazione DB tramite DAO
+    bigliettoDAO.aggiornaStatoBigliettoDB(biglietto.getCodiceUnivoco(), "CONVALIDATO")
+    RETURN true
+ELSE
+    RETURN false
+ENDIF
+\end{lstlisting}
 
-    \item \textbf{Query 5: Film che hanno ricevuto feedback/recensioni ma per cui non e ancora stato venduto alcun biglietto}
-    \begin{lstlisting}
-SELECT DISTINCT r.titolo_film
-FROM recensione r
-WHERE r.titolo_film NOT IN (
-    SELECT DISTINCT b.titolo_film
-    FROM biglietto b
-);
-    \end{lstlisting}
+\subsection{Operazione 3: rimborsaSingoloBiglietto}
+\begin{itemize}
+    \item \textbf{Segnatura}: \texttt{public void rimborsaSingoloBiglietto(Biglietto bigliettoDaRimborsare) throws Exception}
+    \item \textbf{Logica di Business}: Verifica che il biglietto esista e non sia già stato convalidato. Rimuove il biglietto dalla memoria in Java e invia la richiesta di cancellazione al DAO. Se l'orario dello spettacolo è superato, il database rifiuterà l'operazione tramite il trigger.
+    \item \textbf{Operazioni DB}: Esegue una query di \texttt{DELETE} sulla tabella biglietto.
+    \item \textbf{Pseudo-codice}:
+\end{itemize}
+\begin{lstlisting}[language=Java]
+IF bigliettoDaRimborsare == null THEN THROW Exception("Inesistente")
+IF bigliettoDaRimborsare.isValido() THEN THROW Exception("Gia obliterato")
 
-    \item \textbf{Query 6: Segnalazioni di guasto in sale che programmano film con durata superiore a 2 ore}
-    \begin{lstlisting}
-SELECT s.id, s.sala, s.messaggio, s.data_invio
-FROM segnalazione s
-WHERE s.sala IN (
-    SELECT f.sala_assegnata
-    FROM film f
-    WHERE f.durata > '02:00:00'
-);
-    \end{lstlisting}
-\end{enumerate}
+listaBiglietti.remove(bigliettoDaRimborsare)
+prenotazione = bigliettoDaRimborsare.getPrenotazione()
+IF prenotazione != null THEN
+    prenotazione.getBiglietti().remove(bigliettoDaRimborsare)
+    IF prenotazione.getBiglietti().isEmpty() THEN
+        prenotazione.setStato(StatoPrenotazione.RIMBORSATO)
+    ENDIF
+ENDIF
+
+// Operazione DB tramite DAO (lancia il trigger BEFORE DELETE)
+bigliettoDAO.eliminaBigliettoDB(bigliettoDaRimborsare.getCodiceUnivoco())
+\end{lstlisting}
 
 \newpage
-\section{Script SQL (DDL)}
+\section{Script SQL per la Creazione dello Schema (DDL)}
 
-\subsection{Creazione del Database e Tabelle}
-Lo script DDL seguente definisce lo schema relazionale del database in PostgreSQL:
+Lo script DDL seguente definisce la struttura fisica del database, le tabelle e i relativi vincoli in PostgreSQL:
 
-\begin{lstlisting}
+\begin{lstlisting}[language=SQL]
 -- Creazione della tabella CLIENTE
 CREATE TABLE cliente (
     email character varying(255) NOT NULL PRIMARY KEY,
@@ -520,12 +729,11 @@ CREATE TABLE biglietto (
 \end{lstlisting}
 
 \newpage
-\section{Script Trigger PostgreSQL (PL/pgSQL)}
+\section{Script dei Trigger in PostgreSQL (PL/pgSQL)}
 
-\subsection{Implementazione Stored Procedure e Trigger}
-Di seguito sono implementate le funzioni associate ai trigger ed i relativi trigger su PostgreSQL per l'applicazione delle regole di business:
+Vengono definiti i codici per la creazione delle stored procedure e l'associazione dei 4 trigger su PostgreSQL:
 
-\begin{lstlisting}
+\begin{lstlisting}[language=SQL]
 -- Trigger 1: Controllo posto gia venduto
 CREATE OR REPLACE FUNCTION check_posto_occupato()
 RETURNS TRIGGER AS $$
@@ -619,16 +827,31 @@ EXECUTE FUNCTION check_sala_biglietto();
 \end{lstlisting}
 
 \newpage
-\section{Esempi di Popolamento (DML)}
+\section{Script DML e Popolamento Dati}
 
-\subsection{Inserimenti di Esempio}
-Lo script DML seguente popola inizialmente il database con i clienti registrati ed inseriti:
+Lo script DML popola il database con record coerenti per clienti e film:
 
-\begin{lstlisting}
--- Inserimento Clienti Iniziali
+\begin{lstlisting}[language=SQL]
+-- Svuotamento preventivo tabelle per test puliti
+DELETE FROM biglietto;
+DELETE FROM recensione;
+DELETE FROM segnalazione;
+DELETE FROM film;
+DELETE FROM cliente;
+
+-- Inserimento Clienti Richiesti
 INSERT INTO cliente (email, nome, cognome, password, data_registrazione) VALUES
 ('russoluca@gmail.com', 'Luca', 'Russo', 'russo', '2026-06-21'),
 ('caccavallericcardo@gmail.com', 'Riccardo', 'Caccavalle', 'caccavalle', '2026-06-21');
+
+-- Inserimento Film di Esempio nel catalogo
+INSERT INTO film (titolo, durata, genere, classificazione_eta, trama, percorso_copertina, data_inizio_programmazione, sala_assegnata) VALUES
+('Inception', '02:28:00', 'Sci-Fi', 'T', 'Un ladro che ruba segreti attraverso l''uso della tecnologia...', 'inception.jpg', '2026-06-20', 'Sala 1'),
+('The Dark Knight', '02:32:00', 'Action', 'VM12', 'Batman deve combattere il Joker in una Gotham corrotta...', 'dark_knight.jpg', '2026-06-20', 'Sala 2'),
+('Interstellar', '02:49:00', 'Sci-Fi', 'T', 'Un gruppo di astronauti viaggia attraverso un tunnel spaziale...', 'interstellar.jpg', '2026-06-20', 'Sala 3'),
+('Shutter Island', '02:18:00', 'Thriller', 'VM14', 'Due agenti federali indagano sulla scomparsa di un paziente...', 'shutter_island.jpg', '2026-06-20', 'Sala 4'),
+('Pulp Fiction', '02:34:00', 'Crime', 'VM18', 'Le vite di due sicari, un pugile e una coppia di banditi...', 'pulp_fiction.jpg', '2026-06-20', 'Sala 5'),
+('The Matrix', '02:16:00', 'Sci-Fi', 'T', 'Un programmatore scopre che la sua realta e una simulazione...', 'matrix.jpg', '2026-06-20', 'Sala 6');
 \end{lstlisting}
 
 \end{document}

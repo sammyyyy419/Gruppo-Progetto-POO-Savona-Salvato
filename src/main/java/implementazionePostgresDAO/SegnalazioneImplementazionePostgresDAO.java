@@ -32,7 +32,6 @@ public class SegnalazioneImplementazionePostgresDAO implements SegnalazioneDAO {
 
     @Override
     public String ottieniProblemaSala(String sala) throws SQLException {
-        // Cerca se c'è un problema NON risolto per questa specifica sala
         String query = "SELECT messaggio FROM segnalazione WHERE sala = ? AND risolta = FALSE LIMIT 1";
         try (Connection con = ConnessioneDatabase.getInstance().getConnection();
              PreparedStatement ps = con.prepareStatement(query)) {
@@ -41,7 +40,7 @@ public class SegnalazioneImplementazionePostgresDAO implements SegnalazioneDAO {
                 if (rs.next()) return rs.getString("messaggio");
             }
         }
-        return null; // Se ritorna null, la sala è verde (tutto ok)
+        return null;
     }
 
     @Override

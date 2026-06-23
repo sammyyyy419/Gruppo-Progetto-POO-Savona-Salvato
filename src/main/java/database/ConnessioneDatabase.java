@@ -9,13 +9,11 @@ public class ConnessioneDatabase {
 	public Connection connection = null;
 
 	private String nome = "postgres";
-	private String password = "password"; // <-- CAMBIA QUESTO SE LA TUA PASSWORD DI PGADMIN È DIVERSA
+	private String password = "password";
 
-	// NOTA: Se su pgAdmin il database si chiama "EnterpriseCinema", sostituisci "CinemaDB" con "EnterpriseCinema"
 	private String url = "jdbc:postgresql://localhost:5432/Cinema";
 	private String driver = "org.postgresql.Driver";
 
-	// Costruttore privato (Pattern Singleton)
 	private ConnessioneDatabase() throws SQLException {
 		try {
 			Class.forName(driver);
@@ -27,7 +25,6 @@ public class ConnessioneDatabase {
 		}
 	}
 
-	// Ritorna l'istanza della classe ConnessioneDatabase (gestisce il riciclo della connessione)
 	public static ConnessioneDatabase getInstance() throws SQLException {
 		if (instance == null) {
 			instance = new ConnessioneDatabase();
@@ -37,15 +34,10 @@ public class ConnessioneDatabase {
 		return instance;
 	}
 
-	// Getter per l'oggetto Connection dell'istanza
 	public Connection getConnection() {
 		return connection;
 	}
 
-	/**
-	 * Questo metodo permette ai tuoi DAO (come FilmImplementazionePostgresDAO)
-	 * di richiamare la connessione al volo scrivendo semplicemente: ConnessioneDatabase.getConnessione()
-	 */
 	public static Connection getConnessione() throws SQLException {
 		return getInstance().getConnection();
 	}

@@ -59,8 +59,7 @@ public class BigliettoImplementazionePostgresDAO implements BigliettoDAO {
         }
     }
 
-    // NUOVO METODO AGGIUNTO: Ricostruisce i biglietti dal database
-    @Override
+  @Override
     public ArrayList<Biglietto> recuperaTuttiBiglietti() throws SQLException {
         ArrayList<Biglietto> lista = new ArrayList<>();
         String query = "SELECT * FROM biglietto";
@@ -70,7 +69,7 @@ public class BigliettoImplementazionePostgresDAO implements BigliettoDAO {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                // Ricostruiamo i dati finti per non far crashare la grafica
+
                 Film fintoFilm = new Film(rs.getString("titolo_film"), java.time.LocalTime.MIDNIGHT, "", "", "", null, "", java.time.LocalDate.now(), rs.getString("sala"));
                 Sala fintaSala = new Sala(rs.getString("sala"), 180, "");
 

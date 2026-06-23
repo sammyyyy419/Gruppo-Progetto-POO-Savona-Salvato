@@ -11,22 +11,22 @@ import model.Proiezione;
 import model.Prenotazione;
 import model.Film;
 import model.StatoPrenotazione;
+import model.Carrello;
 
-// Import dei vecchi DAO
 import dao.FilmDAO;
 import dao.ClienteDAO;
 import implementazionePostgresDAO.FilmImplementazionePostgresDAO;
 import implementazionePostgresDAO.ClienteImplementazionePostgresDAO;
 import dao.ProiezioneDAO;
 import implementazionePostgresDAO.ProiezioneImplementazionePostgresDAO;
-
-// IMPORT DEI NUOVI DAO
 import dao.BigliettoDAO;
 import implementazionePostgresDAO.BigliettoImplementazionePostgresDAO;
 import dao.RecensioneDAO;
 import implementazionePostgresDAO.RecensioneImplementazionePostgresDAO;
 import dao.SegnalazioneDAO;
 import implementazionePostgresDAO.SegnalazioneImplementazionePostgresDAO;
+import dao.DipendenteDAO;
+import implementazionePostgresDAO.DipendenteImplementazionePostgresDAO;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,13 +41,15 @@ public class Controller {
     private ArrayList<Film> listaFilm;
 
     private Cliente utenteLoggatoTemporaneo;
-
+    private DipendenteDAO dipendenteDAO;
 
     private FilmDAO filmDAO;
     private ClienteDAO clienteDAO;
     private BigliettoDAO bigliettoDAO;
     private RecensioneDAO recensioneDAO;
     private SegnalazioneDAO segnalazioneDAO;
+
+    private ArrayList<Carrello> listaCarrello = new ArrayList<>();
 
     public Controller() {
         this.listaClienti = new ArrayList<>();
@@ -58,30 +60,24 @@ public class Controller {
         this.filmDAO = new FilmImplementazionePostgresDAO();
         this.clienteDAO = new ClienteImplementazionePostgresDAO();
         this.proiezioneDAO = new ProiezioneImplementazionePostgresDAO();
-
+        this.dipendenteDAO = new DipendenteImplementazionePostgresDAO();
         this.bigliettoDAO = new BigliettoImplementazionePostgresDAO();
         this.recensioneDAO = new RecensioneImplementazionePostgresDAO();
         this.segnalazioneDAO = new SegnalazioneImplementazionePostgresDAO();
 
         try {
             this.listaFilm = filmDAO.recuperaTuttiFilm();
-
             for (Film f : listaFilm) {
                 ArrayList<String> recensioniSalvate = recensioneDAO.recuperaRecensioniPerFilm(f.getTitolo());
                 f.setRecensioni(recensioniSalvate);
             }
-
             this.listaBiglietti = bigliettoDAO.recuperaTuttiBiglietti();
+            this.listaDipendenti = dipendenteDAO.recuperaTuttiDipendenti();
 
         } catch (Exception e) {
             System.out.println("Attenzione: Impossibile caricare dal database. " + e.getMessage());
             this.listaFilm = new ArrayList<>();
         }
-
-        listaDipendenti.add(new Dipendente("Francesca", "Salvato", "salvatofrancesca@enterprise.com", "kekka", "manager"));
-        listaDipendenti.add(new Dipendente("Salvatore", "Savona", "savonasammy@enterprise.com", "1236", "manager"));
-        listaDipendenti.add(new Dipendente("Bernardo", "Breve", "brevebernardo@enterprise.com", "breve", "cassiere"));
-        listaDipendenti.add(new Dipendente("Andrea", "Cali", "caliandrea@enterprise.com", "cali", "proiezionista"));
     }
 
     public void impostaUtenteCorrente(Cliente c) {
@@ -142,7 +138,6 @@ public class Controller {
         return true;
     }
 
-
     public void aggiungiCliente(Cliente nuovoCliente) throws Exception {
         if (nuovoCliente != null) {
             clienteDAO.inserisciClienteDB(nuovoCliente);
@@ -183,9 +178,7 @@ public class Controller {
         }
     }
 
-
     public ArrayList<String> getSegnalazioni() {
-
         try {
             return segnalazioneDAO.recuperaTutteSegnalazioni();
         } catch (Exception e) {
@@ -258,28 +251,27 @@ public class Controller {
         return new ArrayList<>();
     }
 
-    public static class ElementoCarrello {
-        private Proiezione proiezione;
-        private int quantita;
-        private double prezzoTotale;
-        public ElementoCarrello(Proiezione proiezione, int quantita, double prezzoTotale) {
-            this.proiezione = proiezione; this.quantita = quantita; this.prezzoTotale = prezzoTotale;
-        }
-        public Proiezione getProiezione() { return proiezione; }
-        public int getQuantita() { return quantita; }
-        public double getPrezzoTotale() { return prezzoTotale; }
+    public void aggiungiAlCarrello(Proiezione proiezione, int quantita, double prezzoTotale) {
+        this.listaCarrello.add(new Carrello(proiezione, quantita, prezzoTotale));
     }
 
-    private ArrayList<ElementoCarrello> carrello = new ArrayList<>();
-    public void aggiungiAlCarrello(Proiezione proiezione, int quantita, double prezzoTotale) { this.carrello.add(new ElementoCarrello(proiezione, quantita, prezzoTotale)); }
-    public ArrayList<ElementoCarrello> getCarrello() { return carrello; }
-    public void rimuoviDalCarrello(ElementoCarrello elemento) { if (elemento != null) this.carrello.remove(elemento); }
+    public ArrayList<Carrello> getCarrello() {
+        return listaCarrello;
+    }
+
+    public void rimuoviDalCarrello(Carrello elemento) {
+        if (elemento != null) this.listaCarrello.remove(elemento);
+    }
+
     public double calcolaTotaleCarrello() {
         double totale = 0;
-        for (ElementoCarrello elem : carrello) totale += elem.getPrezzoTotale();
+        for (Carrello elem : listaCarrello) totale += elem.getPrezzoTotale();
         return totale;
     }
-    public void svuotaCarrello() { this.carrello.clear(); }
+
+    public void svuotaCarrello() {
+        this.listaCarrello.clear();
+    }
 
     public ArrayList<Biglietto> getBigliettiAcquistati() { return this.listaBiglietti; }
 
@@ -291,11 +283,12 @@ public class Controller {
                     b.getPostoAssegnato() != null &&
                     b.getPostoAssegnato().getFila() == posto.getFila() &&
                     b.getPostoAssegnato().getNumeroPosto() == posto.getNumeroPosto()) {
-                return true; // Se il biglietto è nella lista, il posto è occupato
+                return true;
             }
         }
         return false;
     }
+
     private ArrayList<Posto> trovaPostiVicini(Proiezione proiezione, int quantitaRichiesta) throws SalaPienaException {
         ArrayList<Posto> postiScelti = new ArrayList<>();
         char filaAttuale = 'A';
@@ -330,24 +323,22 @@ public class Controller {
                 " biglietti. Posti rimanenti in questa sala: " + postiScelti.size());
     }
 
-
     public void modificaCredenzialiCliente(Cliente cliente, String nuovaEmail, String nuovaPassword) throws Exception {
-
         clienteDAO.aggiornaCredenzialiClienteDB(cliente.getEmail(), nuovaEmail, nuovaPassword);
-
         cliente.setEmail(nuovaEmail);
         cliente.setPassword(nuovaPassword);
     }
 
-    public void modificaPasswordDipendente(Dipendente dipendente, String nuovaPassword) {
-       dipendente.setPassword(nuovaPassword);
+    public void modificaPasswordDipendente(Dipendente dipendente, String nuovaPassword) throws Exception {
+        dipendenteDAO.aggiornaPasswordDipendenteDB(dipendente.getEmail(), nuovaPassword);
+        dipendente.setPassword(nuovaPassword);
     }
 
     public void confermaAcquistoCarrello(String metodoPagamento, double percentualeSconto) throws SalaPienaException {
         double prezzoBase = 8.00;
         double prezzoSingoloScontato = prezzoBase - (prezzoBase * (percentualeSconto / 100.0));
 
-        for (ElementoCarrello elem : carrello) {
+        for (Carrello elem : listaCarrello) {
             int quantita = elem.getQuantita();
             Proiezione proiezione = elem.getProiezione();
 
@@ -385,7 +376,6 @@ public class Controller {
             return new ArrayList<>();
         }
     }
-
 
     public String verificaStatoSala(String nomeSala) {
         try {

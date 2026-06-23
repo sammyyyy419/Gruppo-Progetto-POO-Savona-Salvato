@@ -47,7 +47,7 @@ public class ClienteImplementazionePostgresDAO implements ClienteDAO {
                 }
             }
         }
-        return null; // Ritorna null se la mail non esiste nel DB
+        return null;
     }
     @Override
     public void aggiornaCredenzialiClienteDB(String vecchiaEmail, String nuovaEmail, String nuovaPassword) throws SQLException {

@@ -2,6 +2,7 @@ package gui;
 
 import controller.Controller;
 import model.Cliente;
+import model.Carrello;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -123,7 +124,7 @@ public class DashboardCarrello extends JFrame {
 
     private void aggiornaCarrello() {
         listaElementiCarrello.removeAll();
-        ArrayList<Controller.ElementoCarrello> elementi = controller.getCarrello();
+        ArrayList<Carrello> elementi = controller.getCarrello();
 
         Color sfondoRiga = new Color(38, 46, 78);
         Color testoChiaro = Color.WHITE;
@@ -140,7 +141,7 @@ public class DashboardCarrello extends JFrame {
         } else {
             buttonPagamento.setEnabled(true);
 
-            for (Controller.ElementoCarrello elem : elementi) {
+            for (Carrello elem : elementi) {
                 JPanel riga = new JPanel(new BorderLayout(15, 5));
                 riga.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
                 riga.setBackground(sfondoRiga);
