@@ -183,7 +183,6 @@ public class Controller {
         }
     }
 
-    public void aggiungiSegnalazione(Dipendente mittente, String messaggio) { this.aggiungiSegnalazione(messaggio, mittente); }
 
     public ArrayList<String> getSegnalazioni() {
 
@@ -217,7 +216,6 @@ public class Controller {
                 if (b.isValido()) {
                     throw new Exception("Attenzione! Questo biglietto (Codice: " + codiceUnivoco + ") risulta GIÀ CONVALIDATO.");
                 }
-                // PRIMA (buggato credo): b.setValido(true);
 
                 Dipendente dipendenteGenerico = listaDipendenti.get(0);
                 if (!dipendenteGenerico.validaBiglietto(b)) {
