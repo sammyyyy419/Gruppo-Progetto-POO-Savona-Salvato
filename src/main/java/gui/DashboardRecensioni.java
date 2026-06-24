@@ -110,7 +110,7 @@ public class DashboardRecensioni extends JFrame {
     private void aggiornaListaRecensioni() {
         panelListaRecensioni.removeAll();
 
-        ArrayList<String> recensioni = controller.ottieniRecensioniLiveDalDB(filmSelezionato.getTitolo());
+        ArrayList<String> recensioni = controller.ottieniRecensioniDalDB(filmSelezionato.getTitolo());
 
         if (recensioni == null || recensioni.isEmpty()) {
             JLabel lblVuoto = new JLabel("Nessuna recensione presente. Sii il primo a recensire!");

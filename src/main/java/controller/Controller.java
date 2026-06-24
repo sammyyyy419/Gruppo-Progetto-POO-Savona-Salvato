@@ -368,7 +368,7 @@ public class Controller {
         return 0.0;
     }
 
-    public ArrayList<String> ottieniRecensioniLiveDalDB(String titoloFilm) {
+    public ArrayList<String> ottieniRecensioniDalDB(String titoloFilm) {
         try {
             return recensioneDAO.recuperaRecensioniPerFilm(titoloFilm);
         } catch (Exception e) {
