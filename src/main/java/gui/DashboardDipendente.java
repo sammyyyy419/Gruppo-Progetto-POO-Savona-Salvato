@@ -244,7 +244,7 @@ public class DashboardDipendente extends JFrame {
         if (messaggio == null || messaggio.trim().isEmpty()) return;
 
         if (salaScelta.equals("Generale (Nessuna sala specifica)")) {
-            controller.aggiungiSegnalazione(dipendenteLoggato, messaggio.trim());
+            controller.aggiungiSegnalazione(messaggio.trim(), dipendenteLoggato);
         } else {
             controller.segnalaSalaGuasta(dipendenteLoggato, salaScelta, messaggio.trim());
         }
