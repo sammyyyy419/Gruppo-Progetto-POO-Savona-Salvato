@@ -29,6 +29,8 @@ public class DipendenteImplementazionePostgresDAO implements DipendenteDAO {
 						rs.getString("password"),
 						rs.getString("ruolo")
 				);
+                d.setStipendio(rs.getDouble("stipendio"));
+
 				dipendenti.add(d);
 			}
 		}

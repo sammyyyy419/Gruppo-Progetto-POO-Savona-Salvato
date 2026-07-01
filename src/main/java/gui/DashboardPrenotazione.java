@@ -88,6 +88,14 @@ public class DashboardPrenotazione extends JFrame {
             Proiezione proiezioneSelezionata = (Proiezione) comboOrari.getSelectedItem();
 
             if (proiezioneSelezionata != null) {
+
+                // CORREZIONE: Aggiorna dinamicamente il prezzo in base al tipo di sala dello spettacolo scelto
+                if ("IMAX".equalsIgnoreCase(proiezioneSelezionata.getSala().getTipoSala())) {
+                    prezzoSingoloBiglietto = 12.00;
+                } else {
+                    prezzoSingoloBiglietto = 8.00;
+                }
+
                 Sala sala = proiezioneSelezionata.getSala();
                 int postiLiberi = sala.controllareCapienzaPostiResidua(proiezioneSelezionata);
 

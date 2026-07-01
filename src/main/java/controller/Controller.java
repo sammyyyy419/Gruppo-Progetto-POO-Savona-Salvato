@@ -335,19 +335,18 @@ public class Controller {
     }
 
     public void confermaAcquistoCarrello(String metodoPagamento, double percentualeSconto) throws SalaPienaException {
-        double prezzoBase = 8.00;
-        double prezzoSingoloScontato = prezzoBase - (prezzoBase * (percentualeSconto / 100.0));
-
         for (Carrello elem : listaCarrello) {
             int quantita = elem.getQuantita();
             Proiezione proiezione = elem.getProiezione();
 
-            if ("IMAX".equalsIgnoreCase(elem.getProiezione().getSala().getTipoSala())) {
+            double prezzoBase = 8.00;
+            if ("IMAX".equalsIgnoreCase(proiezione.getSala().getTipoSala())) {
                 prezzoBase = 12.00;
             }
 
-            ArrayList<Posto> postiAssegnati = trovaPostiVicini(proiezione, quantita);
+            double prezzoSingoloScontato = prezzoBase - (prezzoBase * (percentualeSconto / 100.0));
 
+            ArrayList<Posto> postiAssegnati = trovaPostiVicini(proiezione, quantita);
             Prenotazione nuovaPrenotazione = new Prenotazione(LocalDateTime.now(), StatoPrenotazione.CONFERMATO, proiezione, new ArrayList<>(), utenteLoggatoTemporaneo, null);
 
             for (int i = 0; i < quantita; i++) {

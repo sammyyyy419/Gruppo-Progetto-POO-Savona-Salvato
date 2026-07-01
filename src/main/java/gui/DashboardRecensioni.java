@@ -121,7 +121,7 @@ public class DashboardRecensioni extends JFrame {
         } else {
             for (String recStr : recensioni) {
                 if (recStr.contains("||")) {
-                    String[] parti = recStr.split("\\|\\?");
+                    String[] parti = recStr.split("\\|\\|");
                     if (parti.length >= 3) {
                         panelListaRecensioni.add(creaCardRecensione(parti[0], parti[1], parti[2]));
                         panelListaRecensioni.add(Box.createVerticalStrut(12));
