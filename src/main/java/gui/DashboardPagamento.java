@@ -8,9 +8,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 
-/**
- * The type Dashboard pagamento.
- */
+
 public class DashboardPagamento extends JFrame {
 
     private JPanel panelPagamento;
@@ -41,10 +39,12 @@ public class DashboardPagamento extends JFrame {
     private double percentualeScontoApplicata = 0.0;
 
     /**
-     * Instantiates a new Dashboard pagamento.
+     * Crea una nuova istanza della dashboard di pagamento.
+     * Inizializza i calcoli del totale, configura i listener per la validazione dinamica dei campi
+     * e gestisce la logica di attivazione del pulsante di conferma.
      *
-     * @param controller the controller
-     * @param cliente    the cliente
+     * @param controller il controller principale che gestisce la logica di business e l'interazione con il database.
+     * @param cliente il {@link Cliente} che sta effettuando l'acquisto.
      */
     public DashboardPagamento(Controller controller, Cliente cliente) {
         this.controller = controller;

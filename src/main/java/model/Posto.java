@@ -10,10 +10,10 @@ public class Posto {
     private boolean occupato;
 
     /**
-     * Instantiates a new Posto.
+     * Crea una nuova istanza di Posto.
      *
-     * @param numero the numero
-     * @param fila   the fila
+     * @param numero il numero identificativo del posto nella fila.
+     * @param fila   il carattere identificativo della fila (es. 'A', 'B').
      */
     public Posto(int numero, char fila) {
         this.numeroPosto = numero;
@@ -21,10 +21,12 @@ public class Posto {
     }
 
     /**
-     * Verificar se la poltrona e occupata boolean.
+     * Verifica se il posto risulta occupato per una specifica proiezione.
+     * Scansiona le prenotazioni confermate o pendenti associate alla proiezione
+     * per controllare se il posto è già stato assegnato.
      *
-     * @param proiezioneCorrente the proiezione corrente
-     * @return the boolean
+     * @param proiezioneCorrente l'oggetto {@link Proiezione} di riferimento.
+     * @return {@code true} se il posto è occupato, {@code false} altrimenti.
      */
     public boolean verificarSeLaPoltronaEOccupata(Proiezione proiezioneCorrente) {
         if (proiezioneCorrente == null || proiezioneCorrente.getPrenotazioniRicevute() == null) {
@@ -45,44 +47,38 @@ public class Posto {
     }
 
     /**
-     * Gets numero posto.
-     *
-     * @return the numero posto
+     * Restituisce il numero del posto.
+     * @return il numero identificativo.
      */
     public int getNumeroPosto() { return numeroPosto; }
 
     /**
-     * Sets numero posto.
-     *
-     * @param numeroPosto the numero posto
+     * Imposta il numero del posto.
+     * @param numeroPosto il numero da assegnare.
      */
     public void setNumeroPosto(int numeroPosto) { this.numeroPosto = numeroPosto; }
 
     /**
-     * Gets fila.
-     *
-     * @return the fila
+     * Restituisce la fila del posto.
+     * @return il carattere della fila.
      */
     public char getFila() { return fila; }
 
     /**
-     * Sets fila.
-     *
-     * @param fila the fila
+     * Imposta la fila del posto.
+     * @param fila il carattere della fila da assegnare.
      */
     public void setFila(char fila) { this.fila = fila; }
 
     /**
-     * Is occupato boolean.
-     *
-     * @return the boolean
+     * Verifica lo stato di occupazione locale del posto.
+     * @return {@code true} se il posto è contrassegnato come occupato.
      */
     public boolean isOccupato() { return occupato; }
 
     /**
-     * Sets occupato.
-     *
-     * @param occupato the occupato
+     * Imposta lo stato di occupazione locale del posto.
+     * @param occupato lo stato da assegnare.
      */
     public void setOccupato(boolean occupato) { this.occupato = occupato; }
 }

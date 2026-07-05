@@ -5,9 +5,7 @@ import database.ConnessioneDatabase;
 import java.sql.*;
 import java.util.ArrayList;
 
-/**
- * The type Segnalazione implementazione postgres dao.
- */
+
 public class SegnalazioneImplementazionePostgresDAO implements SegnalazioneDAO {
 
     @Override

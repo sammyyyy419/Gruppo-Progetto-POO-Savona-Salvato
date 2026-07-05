@@ -14,13 +14,13 @@ public class Gestisce {
     private Proiezione proiezione;
 
     /**
-     * Instantiates a new Gestisce.
+     * Crea una nuova istanza di Gestisce per associare un dipendente a una specifica proiezione.
      *
-     * @param orarioInizioTurno the orario inizio turno
-     * @param orarioFineTurno   the orario fine turno
-     * @param segnalazioni      the segnalazioni
-     * @param dipendente        the dipendente
-     * @param proiezione        the proiezione
+     * @param orarioInizioTurno l'orario di inizio del turno lavorativo.
+     * @param orarioFineTurno   l'orario di fine del turno lavorativo.
+     * @param segnalazioni      eventuali note o segnalazioni iniziali.
+     * @param dipendente        l'oggetto {@link Dipendente} assegnato al turno.
+     * @param proiezione        l'oggetto {@link Proiezione} gestita durante il turno.
      */
     public Gestisce(LocalTime orarioInizioTurno, LocalTime orarioFineTurno, String segnalazioni, Dipendente dipendente, Proiezione proiezione) {
         this.orarioInizioTurno = orarioInizioTurno;
@@ -31,90 +31,45 @@ public class Gestisce {
     }
 
     /**
-     * Definire ruolo operativo del dipendente in quel turno.
+     * Definisce e concatena il ruolo operativo ricoperto dal dipendente durante questo specifico turno.
      *
-     * @param ruolo the ruolo
+     * @param ruolo il ruolo lavorativo da assegnare (es. "biglietteria", "controllo sala").
      */
     public void definireRuoloOperativoDelDipendenteInQuelTurno(String ruolo) {
         this.segnalazioni += " [Ruolo: " + ruolo + "]";
     }
 
     /**
-     * Registrare eventuali anomalie in sala.
+     * Registra o sovrascrive eventuali anomalie riscontrate durante il turno di lavoro.
      *
-     * @param anomalia the anomalia
+     * @param anomalia una stringa descrittiva dell'anomalia rilevata in sala.
      */
     public void registrareEventualiAnomalieInSala(String anomalia) {
         this.segnalazioni = anomalia;
     }
 
-    /**
-     * Gets orario inizio turno.
-     *
-     * @return the orario inizio turno
-     */
+    /** @return l'orario di inizio del turno. */
     public LocalTime getOrarioInizioTurno() { return orarioInizioTurno; }
-
-    /**
-     * Sets orario inizio turno.
-     *
-     * @param orarioInizioTurno the orario inizio turno
-     */
+    /** @param orarioInizioTurno imposta l'orario di inizio turno. */
     public void setOrarioInizioTurno(LocalTime orarioInizioTurno) { this.orarioInizioTurno = orarioInizioTurno; }
 
-    /**
-     * Gets orario fine turno.
-     *
-     * @return the orario fine turno
-     */
+    /** @return l'orario di fine del turno. */
     public LocalTime getOrarioFineTurno() { return orarioFineTurno; }
-
-    /**
-     * Sets orario fine turno.
-     *
-     * @param orarioFineTurno the orario fine turno
-     */
+    /** @param orarioFineTurno imposta l'orario di fine turno. */
     public void setOrarioFineTurno(LocalTime orarioFineTurno) { this.orarioFineTurno = orarioFineTurno; }
 
-    /**
-     * Gets segnalazioni.
-     *
-     * @return the segnalazioni
-     */
+    /** @return le segnalazioni registrate. */
     public String getSegnalazioni() { return segnalazioni; }
-
-    /**
-     * Sets segnalazioni.
-     *
-     * @param segnalazioni the segnalazioni
-     */
+    /** @param segnalazioni imposta le segnalazioni per il turno. */
     public void setSegnalazioni(String segnalazioni) { this.segnalazioni = segnalazioni; }
 
-    /**
-     * Gets dipendente.
-     *
-     * @return the dipendente
-     */
+    /** @return il dipendente assegnato al turno. */
     public Dipendente getDipendente() { return dipendente; }
-
-    /**
-     * Sets dipendente.
-     *
-     * @param dipendente the dipendente
-     */
+    /** @param dipendente associa il dipendente al turno. */
     public void setDipendente(Dipendente dipendente) { this.dipendente = dipendente; }
 
-    /**
-     * Gets proiezione.
-     *
-     * @return the proiezione
-     */
+    /** @return la proiezione gestita. */
     public Proiezione getProiezione() { return proiezione; }
-
-    /**
-     * Sets proiezione.
-     *
-     * @param proiezione the proiezione
-     */
+    /** @param proiezione associa la proiezione al turno. */
     public void setProiezione(Proiezione proiezione) { this.proiezione = proiezione; }
 }

@@ -2,22 +2,21 @@ package model;
 
 import java.time.LocalDateTime;
 
-/**
- * The type Dipendente.
- */
+
 public class Dipendente extends Utente {
 
     private double stipendio;
     private String ruolo;
 
     /**
-     * Instantiates a new Dipendente.
+     * Crea una nuova istanza di Dipendente.
+     * Il valore dello stipendio viene assegnato automaticamente in base al ruolo specificato.
      *
-     * @param nomeDipendente     the nome dipendente
-     * @param cognomeDipendente  the cognome dipendente
-     * @param emailDipendente    the email dipendente
-     * @param passwordDipendente the password dipendente
-     * @param ruolo              the ruolo
+     * @param nomeDipendente     il nome del dipendente.
+     * @param cognomeDipendente  il cognome del dipendente.
+     * @param emailDipendente    l'email aziendale del dipendente.
+     * @param passwordDipendente la password di accesso.
+     * @param ruolo              il ruolo lavorativo (es. "cassiere", "manager", "proiezionista").
      */
     public Dipendente(String nomeDipendente, String cognomeDipendente, String emailDipendente, String passwordDipendente, String ruolo) {
         super(nomeDipendente, cognomeDipendente, emailDipendente, passwordDipendente);
@@ -44,10 +43,10 @@ public class Dipendente extends Utente {
     public void pianificareProgrammazioneDeiFilm(){}
 
     /**
-     * Valida biglietto boolean.
+     * Valida un biglietto d'ingresso se non è già stato convalidato.
      *
-     * @param biglietto the biglietto
-     * @return the boolean
+     * @param biglietto l'oggetto {@link Biglietto} da convalidare.
+     * @return {@code true} se la validazione è avvenuta con successo, {@code false} se il biglietto è nullo o già valido.
      */
     public boolean validaBiglietto(Biglietto biglietto) {
         if (biglietto == null) return false;
@@ -57,36 +56,32 @@ public class Dipendente extends Utente {
     }
 
     /**
-     * Gets stipendio.
-     *
-     * @return the stipendio
+     * Restituisce lo stipendio del dipendente.
+     * @return il valore dello stipendio.
      */
     public double getStipendio() {
         return stipendio;
     }
 
     /**
-     * Sets stipendio.
-     *
-     * @param stipendio the stipendio
+     * Imposta un nuovo stipendio per il dipendente.
+     * @param stipendio il valore dello stipendio da assegnare.
      */
     public void setStipendio(double stipendio) {
         this.stipendio = stipendio;
     }
 
     /**
-     * Gets ruolo.
-     *
-     * @return the ruolo
+     * Restituisce il ruolo lavorativo del dipendente.
+     * @return una stringa rappresentante il ruolo.
      */
     public String getRuolo() {
         return ruolo;
     }
 
     /**
-     * Sets ruolo.
-     *
-     * @param ruolo the ruolo
+     * Imposta il ruolo lavorativo del dipendente.
+     * @param ruolo il nuovo ruolo da assegnare.
      */
     public void setRuolo(String ruolo) {
         this.ruolo = ruolo;

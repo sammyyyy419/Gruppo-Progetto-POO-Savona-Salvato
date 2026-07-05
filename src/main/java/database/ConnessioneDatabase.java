@@ -4,13 +4,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- * The type Connessione database.
- */
+
 public class ConnessioneDatabase {
 	private static ConnessioneDatabase instance;
 	/**
-	 * The Connection.
+	 * La connessione.
 	 */
 	public Connection connection = null;
 
@@ -32,10 +30,10 @@ public class ConnessioneDatabase {
 	}
 
 	/**
-	 * Gets instance.
+	 * Ottiene l'istanza univoca della classe ConnessioneDatabase, creandola se non esiste o se la connessione è stata chiusa.
 	 *
-	 * @return the instance
-	 * @throws SQLException the sql exception
+	 * @return l'istanza corrente di {@link ConnessioneDatabase}.
+	 * @throws SQLException se si verifica un errore durante la creazione della connessione al database.
 	 */
 	public static ConnessioneDatabase getInstance() throws SQLException {
 		if (instance == null) {
@@ -47,19 +45,20 @@ public class ConnessioneDatabase {
 	}
 
 	/**
-	 * Gets connection.
+	 * Restituisce l'oggetto {@link Connection} attualmente gestito dall'istanza Singleton.
 	 *
-	 * @return the connection
+	 * @return l'oggetto {@link Connection} attivo.
 	 */
 	public Connection getConnection() {
 		return connection;
 	}
 
 	/**
-	 * Gets connessione.
+	 * Metodo statico di utilità per ottenere direttamente l'oggetto {@link Connection} dal database.
+	 * Gestisce internamente l'ottenimento dell'istanza Singleton.
 	 *
-	 * @return the connessione
-	 * @throws SQLException the sql exception
+	 * @return l'oggetto {@link Connection} pronto all'uso.
+	 * @throws SQLException se si verifica un errore durante il recupero della connessione.
 	 */
 	public static Connection getConnessione() throws SQLException {
 		return getInstance().getConnection();

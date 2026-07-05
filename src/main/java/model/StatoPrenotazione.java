@@ -1,8 +1,6 @@
 package model;
 
-/**
- * The enum Stato prenotazione.
- */
+
 public enum StatoPrenotazione {
     /**
      * Pendente stato prenotazione.

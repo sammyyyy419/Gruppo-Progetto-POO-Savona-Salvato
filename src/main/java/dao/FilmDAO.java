@@ -4,41 +4,38 @@ import model.Film;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-/**
- * The interface Film dao.
- */
 public interface FilmDAO {
 
     /**
-     * Inserisci film db.
+     * Inserisce un nuovo film all'interno del database.
      *
-     * @param film the film
-     * @throws SQLException the sql exception
+     * @param film l'oggetto {@link Film} da registrare.
+     * @throws SQLException se si verifica un errore durante l'interazione con il database.
      */
     void inserisciFilmDB(Film film) throws SQLException;
 
     /**
-     * Recupera tutti film array list.
+     * Recupera l'elenco completo di tutti i film presenti nel database.
      *
-     * @return the array list
-     * @throws SQLException the sql exception
+     * @return un {@link ArrayList} contenente tutti i film registrati.
+     * @throws SQLException se si verifica un errore durante l'interazione con il database.
      */
     ArrayList<Film> recuperaTuttiFilm() throws SQLException;
 
     /**
-     * Elimina film db.
+     * Elimina un film specifico dal database.
      *
-     * @param film the film
-     * @throws SQLException the sql exception
+     * @param film l'oggetto {@link Film} da rimuovere.
+     * @throws SQLException se si verifica un errore durante l'interazione con il database.
      */
     void eliminaFilmDB(Film film) throws SQLException;
 
     /**
-     * Aggiorna film db.
+     * Aggiorna le informazioni di un film esistente nel database, identificandolo tramite il suo titolo originale.
      *
-     * @param vecchioTitolo the vecchio titolo
-     * @param nuovoFilm     the nuovo film
-     * @throws SQLException the sql exception
+     * @param vecchioTitolo il titolo del film prima dell'aggiornamento.
+     * @param nuovoFilm l'oggetto {@link Film} contenente i dati aggiornati.
+     * @throws SQLException se si verifica un errore durante l'interazione con il database.
      */
     void aggiornaFilmDB(String vecchioTitolo, Film nuovoFilm) throws SQLException;
 }

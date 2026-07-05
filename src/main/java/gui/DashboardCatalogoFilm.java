@@ -9,9 +9,6 @@ import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 
-/**
- * The type Dashboard catalogo film.
- */
 public class DashboardCatalogoFilm extends JFrame {
     private JPanel panelCatalogo;
     private JButton tornaAlMenuButton;
@@ -21,10 +18,10 @@ public class DashboardCatalogoFilm extends JFrame {
     private Cliente clienteLoggato;
 
     /**
-     * Instantiates a new Dashboard catalogo film.
+     * Crea una nuova istanza della dashboard del catalogo film.
      *
-     * @param controller the controller
-     * @param cliente    the cliente
+     * @param controller il controller principale che gestisce la logica del sistema.
+     * @param cliente il {@link Cliente} che sta visualizzando il catalogo.
      */
     public DashboardCatalogoFilm(Controller controller, Cliente cliente) {
         this.controller = controller;

@@ -9,9 +9,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
 
-/**
- * The type Dashboard recensioni.
- */
+
 public class DashboardRecensioni extends JFrame {
     private JPanel mainPanel;
     private JPanel panelAlto;
@@ -26,11 +24,12 @@ public class DashboardRecensioni extends JFrame {
     private Film filmSelezionato;
 
     /**
-     * Instantiates a new Dashboard recensioni.
+     * Crea una nuova istanza della dashboard recensioni. Configura il layout, inizializza i listener
+     * e carica dinamicamente le recensioni esistenti dal controller in base al film selezionato.
      *
-     * @param controller the controller
-     * @param cliente    the cliente
-     * @param film       the film
+     * @param controller il controller principale che gestisce la logica di sistema.
+     * @param cliente    l'oggetto {@link Cliente} che ha effettuato l'accesso.
+     * @param film       l'oggetto {@link Film} su cui si desidera operare.
      */
     public DashboardRecensioni(Controller controller, Cliente cliente, Film film) {
         this.controller = controller;

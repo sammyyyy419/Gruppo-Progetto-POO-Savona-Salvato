@@ -1,13 +1,11 @@
 package exception;
 
-/**
- * The type Sala piena exception.
- */
+
 public class SalaPienaException extends RuntimeException {
     /**
-     * Instantiates a new Sala piena exception.
+     * Crea una nuova istanza di {@link SalaPienaException} con il messaggio di errore specificato.
      *
-     * @param message the message
+     * @param message il messaggio che descrive la condizione di sala piena.
      */
     public SalaPienaException(String message) {
         super(message);

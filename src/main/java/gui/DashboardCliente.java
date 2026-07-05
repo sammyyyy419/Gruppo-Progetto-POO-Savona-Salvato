@@ -8,9 +8,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * The type Dashboard cliente.
- */
+
 public class DashboardCliente extends JFrame {
     private JPanel mainPanel;
     private JButton buttonCatalogoFilm;
@@ -25,10 +23,11 @@ public class DashboardCliente extends JFrame {
     private Cliente clienteLoggato;
 
     /**
-     * Instantiates a new Dashboard cliente.
+     * Inizializza la dashboard per il cliente autenticato, configurando il layout e gli ascoltatori
+     * per gli eventi dei bottoni che permettono di passare alle altre schermate dell'applicazione.
      *
-     * @param controller the controller
-     * @param cliente    the cliente
+     * @param controller il controller di sistema per gestire la logica di business.
+     * @param cliente il {@link Cliente} che ha effettuato l'accesso.
      */
     public DashboardCliente(Controller controller, Cliente cliente) {
         this.controller = controller;

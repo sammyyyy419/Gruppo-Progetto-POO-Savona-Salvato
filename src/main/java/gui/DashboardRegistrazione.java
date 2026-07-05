@@ -6,9 +6,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-/**
- * The type Dashboard registrazione.
- */
+
 public class DashboardRegistrazione extends JFrame {
     private JPanel mainPanel;
     private JLabel labelTitolo;
@@ -25,9 +23,11 @@ public class DashboardRegistrazione extends JFrame {
     private Controller controller;
 
     /**
-     * Instantiates a new Dashboard registrazione.
+     * Crea una nuova istanza della dashboard di registrazione.
+     * Inizializza l'interfaccia, configura i listener per il pulsante di conferma
+     * e prepara la finestra per l'input dell'utente.
      *
-     * @param controller the controller
+     * @param controller il controller principale di sistema per la gestione dei dati.
      */
     public DashboardRegistrazione(Controller controller) {
         this.controller = controller;

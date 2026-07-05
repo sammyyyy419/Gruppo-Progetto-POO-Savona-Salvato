@@ -1,14 +1,11 @@
 package exception;
 
-/**
- * The type Utente non trovato exception.
- */
 public class UtenteNonTrovatoException extends Exception {
 
     /**
-     * Instantiates a new Utente non trovato exception.
+     * Crea una nuova istanza di {@link UtenteNonTrovatoException} con il messaggio di errore specificato.
      *
-     * @param messaggio the messaggio
+     * @param messaggio il messaggio che descrive i dettagli dell'utente non trovato.
      */
     public UtenteNonTrovatoException(String messaggio) {
 

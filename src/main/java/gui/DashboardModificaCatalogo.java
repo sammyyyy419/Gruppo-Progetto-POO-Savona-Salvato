@@ -16,9 +16,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
-/**
- * The type Dashboard modifica catalogo.
- */
+
 public class DashboardModificaCatalogo extends JFrame {
 
     private JPanel mainPanel;
@@ -32,9 +30,10 @@ public class DashboardModificaCatalogo extends JFrame {
     private Controller controller;
 
     /**
-     * Instantiates a new Dashboard modifica catalogo.
+     * Crea una nuova istanza della dashboard di modifica catalogo, configurando il layout
+     * e inizializzando la lista dei film prelevata dal sistema.
      *
-     * @param controller the controller
+     * @param controller il controller principale che gestisce la logica del sistema.
      */
     public DashboardModificaCatalogo(Controller controller) {
         this.controller = controller;

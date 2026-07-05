@@ -2,9 +2,7 @@ package model;
 
 import java.util.Random;
 
-/**
- * The type Biglietto.
- */
+
 public class Biglietto {
     private double prezzoFinale;
     private boolean valido;
@@ -14,12 +12,13 @@ public class Biglietto {
     private String codiceUnivoco;
 
     /**
-     * Instantiates a new Biglietto.
+     * Crea una nuova istanza di Biglietto associata a una prenotazione e a una proiezione specifica.
+     * Genera automaticamente un codice univoco identificativo.
      *
-     * @param prezzoFinale   the prezzo finale
-     * @param postoAssegnato the posto assegnato
-     * @param proiezione     the proiezione
-     * @param prenotazione   the prenotazione
+     * @param prezzoFinale   il costo finale del biglietto.
+     * @param postoAssegnato l'oggetto {@link Posto} assegnato.
+     * @param proiezione     l'oggetto {@link Proiezione} di riferimento.
+     * @param prenotazione   l'oggetto {@link Prenotazione} a cui appartiene il biglietto.
      */
     public Biglietto(double prezzoFinale, Posto postoAssegnato, Proiezione proiezione, Prenotazione prenotazione) {
         this.prezzoFinale = prezzoFinale;
@@ -31,10 +30,10 @@ public class Biglietto {
     }
 
     /**
-     * Instantiates a new Biglietto.
+     * Crea una nuova istanza di Biglietto semplificata, utilizzata per configurazioni preliminari.
      *
-     * @param prezzoFinale   the prezzo finale
-     * @param postoAssegnato the posto assegnato
+     * @param prezzoFinale   il costo finale del biglietto.
+     * @param postoAssegnato l'oggetto {@link Posto} assegnato.
      */
     public Biglietto(double prezzoFinale, Posto postoAssegnato) {
         this.prezzoFinale = prezzoFinale;
@@ -42,17 +41,21 @@ public class Biglietto {
         this.postoAssegnato = postoAssegnato;
         this.codiceUnivoco = generaCodiceA8Cifre();
     }
+    /**
+     * Genera un codice numerico casuale composto da 8 cifre per identificare univocamente il biglietto.
+     *
+     * @return una stringa contenente il codice generato.
+     */
 
     private String generaCodiceA8Cifre() {
         Random rand = new Random();
         int num = rand.nextInt(90000000) + 10000000;
         return String.valueOf(num);
     }
-
     /**
-     * Applica sconto.
+     * Applica una percentuale di sconto al prezzo del biglietto.
      *
-     * @param percentualeSconto the percentuale sconto
+     * @param percentualeSconto la percentuale da sottrarre al prezzo originale (0-100).
      */
     public void applicaSconto(double percentualeSconto) {
         if(percentualeSconto > 0 && percentualeSconto <= 100) {
@@ -61,9 +64,9 @@ public class Biglietto {
     }
 
     /**
-     * Genera titolo ingresso string.
+     * Genera una rappresentazione testuale del titolo di ingresso per la stampa o la visualizzazione.
      *
-     * @return the string
+     * @return una stringa formattata con i dettagli del biglietto.
      */
     public String generaTitoloIngresso() {
         String dettagliPosto = (postoAssegnato != null) ?
@@ -82,86 +85,73 @@ public class Biglietto {
     }
 
     /**
-     * Gets posto assegnato.
-     *
-     * @return the posto assegnato
+     * Restituisce il posto assegnato al biglietto.
+     * @return il {@link Posto} assegnato.
      */
     public Posto getPostoAssegnato() { return postoAssegnato; }
 
     /**
-     * Sets posto assegnato.
-     *
-     * @param postoAssegnato the posto assegnato
+     * Imposta il posto assegnato al biglietto.
+     * @param postoAssegnato il {@link Posto} da assegnare.
      */
     public void setPostoAssegnato(Posto postoAssegnato) { this.postoAssegnato = postoAssegnato; }
 
     /**
-     * Gets proiezione.
-     *
-     * @return the proiezione
+     * Restituisce la proiezione a cui si riferisce il biglietto.
+     * @return l'oggetto {@link Proiezione}.
      */
     public Proiezione getProiezione() { return proiezione; }
 
     /**
-     * Sets proiezione.
-     *
-     * @param proiezione the proiezione
+     * Imposta la proiezione per questo biglietto.
+     * @param proiezione l'oggetto {@link Proiezione} da associare.
      */
     public void setProiezione(Proiezione proiezione) { this.proiezione = proiezione; }
 
     /**
-     * Gets prenotazione.
-     *
-     * @return the prenotazione
+     * Restituisce la prenotazione associata.
+     * @return l'oggetto {@link Prenotazione}.
      */
     public Prenotazione getPrenotazione() { return prenotazione; }
 
     /**
-     * Sets prenotazione.
-     *
-     * @param prenotazione the prenotazione
+     * Imposta la prenotazione per questo biglietto.
+     * @param prenotazione l'oggetto {@link Prenotazione} da associare.
      */
     public void setPrenotazione(Prenotazione prenotazione) { this.prenotazione = prenotazione; }
 
     /**
-     * Is valido boolean.
-     *
-     * @return the boolean
+     * Verifica se il biglietto è stato convalidato.
+     * @return {@code true} se valido, {@code false} altrimenti.
      */
     public boolean isValido() { return valido; }
-
     /**
-     * Sets valido.
-     *
-     * @param valido the valido
+     * Imposta lo stato di validità del biglietto.
+     * @param valido lo stato di validità da impostare.
      */
     public void setValido(boolean valido) { this.valido = valido; }
 
     /**
-     * Gets prezzo finale.
-     *
-     * @return the prezzo finale
+     * Restituisce il prezzo finale del biglietto.
+     * @return il prezzo come valore double.
      */
     public double getPrezzoFinale() { return prezzoFinale; }
 
     /**
-     * Sets prezzo finale.
-     *
-     * @param prezzoFinale the prezzo finale
+     * Imposta il prezzo finale del biglietto.
+     * @param prezzoFinale il nuovo prezzo.
      */
     public void setPrezzoFinale(double prezzoFinale) { this.prezzoFinale = prezzoFinale; }
 
     /**
-     * Gets codice univoco.
-     *
-     * @return the codice univoco
+     * Restituisce il codice univoco del biglietto.
+     * @return il codice come stringa.
      */
     public String getCodiceUnivoco() { return codiceUnivoco; }
 
     /**
-     * Sets codice univoco.
-     *
-     * @param codiceUnivoco the codice univoco
+     * Imposta il codice univoco del biglietto.
+     * @param codiceUnivoco il nuovo codice univoco.
      */
     public void setCodiceUnivoco(String codiceUnivoco) {this.codiceUnivoco = codiceUnivoco;}
 }

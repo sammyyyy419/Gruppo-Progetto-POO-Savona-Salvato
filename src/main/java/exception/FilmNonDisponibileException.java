@@ -1,13 +1,10 @@
 package exception;
 
-/**
- * The type Film non disponibile exception.
- */
 public class FilmNonDisponibileException extends RuntimeException {
     /**
-     * Instantiates a new Film non disponibile exception.
+     * Crea una nuova istanza di {@link FilmNonDisponibileException} con il messaggio di errore specificato.
      *
-     * @param message the message
+     * @param message il messaggio che descrive la causa dell'eccezione.
      */
     public FilmNonDisponibileException(String message) {
         super(message);

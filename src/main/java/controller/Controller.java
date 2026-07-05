@@ -31,9 +31,7 @@ import implementazionePostgresDAO.DipendenteImplementazionePostgresDAO;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-/**
- * The type Controller.
- */
+
 public class Controller {
 
     private ArrayList<Cliente> listaClienti;
@@ -54,9 +52,6 @@ public class Controller {
 
     private ArrayList<Carrello> listaCarrello = new ArrayList<>();
 
-    /**
-     * Instantiates a new Controller.
-     */
     public Controller() {
         this.listaClienti = new ArrayList<>();
         this.listaDipendenti = new ArrayList<>();
@@ -87,19 +82,19 @@ public class Controller {
     }
 
     /**
-     * Imposta utente corrente.
+     * Imposta il cliente specificato come utente correntemente loggato nel sistema.
      *
-     * @param c the c
+     * @param c il {@link Cliente} da impostare come utente corrente.
      */
     public void impostaUtenteCorrente(Cliente c) {
         this.utenteLoggatoTemporaneo = c;
     }
 
     /**
-     * Aggiungi film.
+     * Aggiunge un nuovo film al catalogo, salvandolo nel database e nella lista locale.
      *
-     * @param nuovoFilm the nuovo film
-     * @throws Exception the exception
+     * @param nuovoFilm il {@link Film} da aggiungere (ignorato se null).
+     * @throws Exception in caso di errore durante il salvataggio nel database.
      */
     public void aggiungiFilm(Film nuovoFilm) throws Exception {
         if (nuovoFilm != null) {
@@ -109,10 +104,10 @@ public class Controller {
     }
 
     /**
-     * Elimina film.
+     * Rimuove un film dal catalogo, eliminandolo dal database e dalla lista locale.
      *
-     * @param filmDaEliminare the film da eliminare
-     * @throws Exception the exception
+     * @param filmDaEliminare il {@link Film} da rimuovere (ignorato se null).
+     * @throws Exception in caso di errore durante l'eliminazione dal database.
      */
     public void eliminaFilm(Film filmDaEliminare) throws Exception {
         if (filmDaEliminare != null) {
@@ -122,18 +117,18 @@ public class Controller {
     }
 
     /**
-     * Modifica film.
+     * Aggiorna i dettagli di un film esistente, modificandoli sia nel database che nell'oggetto in memoria.
      *
-     * @param filmAttuale the film attuale
-     * @param nTitolo     the n titolo
-     * @param nDurata     the n durata
-     * @param nGenere     the n genere
-     * @param nClass      the n class
-     * @param nTrama      the n trama
-     * @param nPercorso   the n percorso
-     * @param nDataInizio the n data inizio
-     * @param nSala       the n sala
-     * @throws Exception the exception
+     * @param filmAttuale il {@link Film} da modificare.
+     * @param nTitolo il nuovo titolo del film.
+     * @param nDurata la nuova durata del film.
+     * @param nGenere il nuovo genere del film.
+     * @param nClass la nuova classificazione per età.
+     * @param nTrama la nuova trama.
+     * @param nPercorso il nuovo percorso dell'immagine di copertina.
+     * @param nDataInizio la nuova data di inizio programmazione.
+     * @param nSala la nuova sala assegnata.
+     * @throws Exception in caso di errore durante l'aggiornamento nel database.
      */
     public void modificaFilm(Film filmAttuale, String nTitolo, java.time.LocalTime nDurata, String nGenere, String nClass, String nTrama, String nPercorso, java.time.LocalDate nDataInizio, String nSala) throws Exception {
         String vecchioTitolo = filmAttuale.getTitolo();
@@ -151,21 +146,21 @@ public class Controller {
     }
 
     /**
-     * Gets lista film.
+     * Get lista film.
      *
-     * @return the lista film
+     * @return L'array lista di film
      */
     public ArrayList<Film> getListaFilm() { return listaFilm; }
 
     /**
-     * Aggiungi recensione a film boolean.
+     * Aggiunge una recensione a un film, salvandola nella lista locale e nel database.
      *
-     * @param film     the film
-     * @param cliente  the cliente
-     * @param voto     the voto
-     * @param commento the commento
-     * @return the boolean
-     * @throws RecensioneVuotaException the recensione vuota exception
+     * @param film il {@link Film} da recensire.
+     * @param cliente il {@link Cliente} autore della recensione.
+     * @param voto il voto assegnato al film.
+     * @param commento il testo della recensione.
+     * @return true se la recensione è stata aggiunta con successo.
+     * @throws RecensioneVuotaException se il film, il cliente o il commento sono nulli o vuoti.
      */
     public boolean aggiungiRecensioneAFilm(Film film, Cliente cliente, int voto, String commento) throws RecensioneVuotaException {
         if (film == null || cliente == null) {
@@ -191,10 +186,10 @@ public class Controller {
     }
 
     /**
-     * Aggiungi cliente.
+     * Aggiunge un nuovo cliente al sistema, registrandolo nel database e nella lista locale.
      *
-     * @param nuovoCliente the nuovo cliente
-     * @throws Exception the exception
+     * @param nuovoCliente il {@link Cliente} da aggiungere (ignorato se null).
+     * @throws Exception in caso di errore durante il salvataggio nel database.
      */
     public void aggiungiCliente(Cliente nuovoCliente) throws Exception {
         if (nuovoCliente != null) {
@@ -204,12 +199,12 @@ public class Controller {
     }
 
     /**
-     * Valida login boolean.
+     * Verifica le credenziali di accesso di un utente e, se è un cliente, lo imposta come utente corrente.
      *
-     * @param email    the email
-     * @param password the password
-     * @return the boolean
-     * @throws Exception the exception
+     * @param email l'email dell'utente da validare.
+     * @param password la password dell'utente.
+     * @return true se le credenziali sono corrette e il login ha successo.
+     * @throws Exception se l'email non è registrata o se la password è errata.
      */
     public boolean validaLogin(String email, String password) throws Exception {
         Utente utente = recuperaUtente(email);
@@ -223,11 +218,11 @@ public class Controller {
     }
 
     /**
-     * Recupera utente utente.
+     * Cerca un utente nella lista dei dipendenti in memoria o, se non trovato, nel database dei clienti.
      *
-     * @param email the email
-     * @return the utente
-     * @throws Exception the exception
+     * @param email l'email dell'utente da ricercare.
+     * @return l'oggetto {@link Utente} trovato, oppure null se nessun utente corrisponde all'email.
+     * @throws Exception in caso di errore durante la comunicazione con il database.
      */
     public Utente recuperaUtente(String email) throws Exception {
         for (Dipendente d : listaDipendenti) {
@@ -239,10 +234,10 @@ public class Controller {
     }
 
     /**
-     * Aggiungi segnalazione.
+     * Crea una nuova segnalazione, salvandola nella lista in memoria e nel database.
      *
-     * @param messaggio the messaggio
-     * @param mittente  the mittente
+     * @param messaggio il testo della segnalazione.
+     * @param mittente il {@link Dipendente} che invia la segnalazione.
      */
     public void aggiungiSegnalazione(String messaggio, Dipendente mittente) {
         if (mittente != null && messaggio != null) {
@@ -258,9 +253,9 @@ public class Controller {
     }
 
     /**
-     * Gets segnalazioni.
+     * Recupera l'elenco di tutte le segnalazioni dal database.
      *
-     * @return the segnalazioni
+     * @return un {@link ArrayList} contenente le segnalazioni; in caso di errore, restituisce la lista locale in memoria.
      */
     public ArrayList<String> getSegnalazioni() {
         try {
@@ -272,13 +267,13 @@ public class Controller {
     }
 
     /**
-     * Acquista biglietto biglietto.
+     * Crea e registra un nuovo biglietto nel sistema, salvandolo nel database e nella lista locale.
      *
-     * @param prezzo       the prezzo
-     * @param posto        the posto
-     * @param proiezione   the proiezione
-     * @param prenotazione the prenotazione
-     * @return the biglietto
+     * @param prezzo il costo del biglietto.
+     * @param posto il {@link Posto} associato al biglietto.
+     * @param proiezione la {@link Proiezione} a cui il biglietto si riferisce.
+     * @param prenotazione la {@link Prenotazione} di appartenenza.
+     * @return il {@link Biglietto} appena creato.
      */
     public Biglietto acquistaBiglietto(double prezzo, Posto posto, Proiezione proiezione, Prenotazione prenotazione) {
         Biglietto nuovoBiglietto = new Biglietto(prezzo, posto, proiezione, prenotazione);
@@ -294,11 +289,11 @@ public class Controller {
     }
 
     /**
-     * Convalida biglietto per codice biglietto.
+     * Convalida un biglietto tramite il suo codice univoco, aggiornando lo stato sia in memoria che nel database.
      *
-     * @param codiceUnivoco the codice univoco
-     * @return the biglietto
-     * @throws Exception the exception
+     * @param codiceUnivoco il codice identificativo del biglietto da convalidare.
+     * @return il {@link Biglietto} convalidato.
+     * @throws Exception se il codice è vuoto, inesistente o se il biglietto risulta già convalidato.
      */
     public Biglietto convalidaBigliettoPerCodice(String codiceUnivoco) throws Exception {
         if (codiceUnivoco == null || codiceUnivoco.trim().isEmpty()) {
@@ -327,10 +322,10 @@ public class Controller {
     }
 
     /**
-     * Rimborsa singolo biglietto.
+     * Esegue il rimborso di un singolo biglietto, rimuovendolo dal database e aggiornando lo stato della prenotazione associata.
      *
-     * @param bigliettoDaRimborsare the biglietto da rimborsare
-     * @throws Exception the exception
+     * @param bigliettoDaRimborsare il {@link Biglietto} da rimborsare.
+     * @throws Exception se il biglietto è nullo o se è già stato convalidato (obliterato).
      */
     public void rimborsaSingoloBiglietto(Biglietto bigliettoDaRimborsare) throws Exception {
         if (bigliettoDaRimborsare == null) throw new Exception("Biglietto inesistente.");
@@ -349,10 +344,10 @@ public class Controller {
     }
 
     /**
-     * Gets proiezioni per film.
+     * Recupera l'elenco delle proiezioni pianificate per un determinato film.
      *
-     * @param filmSelezionato the film selezionato
-     * @return the proiezioni per film
+     * @param filmSelezionato il {@link Film} di cui si vogliono recuperare le proiezioni.
+     * @return un {@link ArrayList} contenente le proiezioni associate al film; restituisce una lista vuota in caso di errore o film nullo.
      */
     public ArrayList<Proiezione> getProiezioniPerFilm(Film filmSelezionato) {
         try {
@@ -364,11 +359,11 @@ public class Controller {
     }
 
     /**
-     * Aggiungi al carrello.
+     * Aggiunge una proiezione con la relativa quantità e il prezzo totale al carrello dell'utente.
      *
-     * @param proiezione   the proiezione
-     * @param quantita     the quantita
-     * @param prezzoTotale the prezzo totale
+     * @param proiezione la {@link Proiezione} da aggiungere.
+     * @param quantita la quantità di biglietti selezionati.
+     * @param prezzoTotale il prezzo totale per la proiezione aggiunta.
      */
     public void aggiungiAlCarrello(Proiezione proiezione, int quantita, double prezzoTotale) {
         this.listaCarrello.add(new Carrello(proiezione, quantita, prezzoTotale));
@@ -377,25 +372,25 @@ public class Controller {
     /**
      * Gets carrello.
      *
-     * @return the carrello
+     * @return l'array list carrello
      */
     public ArrayList<Carrello> getCarrello() {
         return listaCarrello;
     }
 
     /**
-     * Rimuovi dal carrello.
+     * Rimuove un elemento specifico dal carrello dell'utente.
      *
-     * @param elemento the elemento
+     * @param elemento il {@link Carrello} da rimuovere (ignorato se null).
      */
     public void rimuoviDalCarrello(Carrello elemento) {
         if (elemento != null) this.listaCarrello.remove(elemento);
     }
 
     /**
-     * Calcola totale carrello double.
+     * Calcola il costo totale di tutti gli elementi presenti nel carrello.
      *
-     * @return the double
+     * @return la somma dei prezzi totali di ogni elemento nel carrello.
      */
     public double calcolaTotaleCarrello() {
         double totale = 0;
@@ -410,13 +405,16 @@ public class Controller {
         this.listaCarrello.clear();
     }
 
-    /**
-     * Gets biglietti acquistati.
-     *
-     * @return the biglietti acquistati
-     */
+
     public ArrayList<Biglietto> getBigliettiAcquistati() { return this.listaBiglietti; }
 
+    /**
+     * Verifica se un determinato posto è già occupato per una specifica proiezione.
+     *
+     * @param proiezione la {@link Proiezione} da controllare.
+     * @param posto il {@link Posto} da verificare.
+     * @return true se il posto risulta occupato, false altrimenti.
+     */
     private boolean isPostoOccupato(Proiezione proiezione, Posto posto) {
         for (Biglietto b : listaBiglietti) {
             if (b.getProiezione() != null &&
@@ -430,7 +428,15 @@ public class Controller {
         }
         return false;
     }
-
+    /**
+     * Tenta di trovare un numero specifico di posti consecutivi nella sala per una determinata proiezione.
+     * Se non trova posti consecutivi, prova a trovare un numero equivalente di posti non consecutivi.
+     *
+     * @param proiezione la {@link Proiezione} per cui ricercare i posti.
+     * @param quantitaRichiesta il numero di posti necessari.
+     * @return un {@link ArrayList} di posti disponibili.
+     * @throws SalaPienaException se non è possibile soddisfare la richiesta, né con posti consecutivi né con posti singoli.
+     */
     private ArrayList<Posto> trovaPostiVicini(Proiezione proiezione, int quantitaRichiesta) throws SalaPienaException {
         ArrayList<Posto> postiScelti = new ArrayList<>();
         char filaAttuale = 'A';
@@ -466,25 +472,24 @@ public class Controller {
     }
 
     /**
-     * Modifica credenziali cliente.
+     * Aggiorna l'email e la password di un cliente, sincronizzando le modifiche sia nel database che nell'oggetto in memoria.
      *
-     * @param cliente       the cliente
-     * @param nuovaEmail    the nuova email
-     * @param nuovaPassword the nuova password
-     * @throws Exception the exception
+     * @param cliente il {@link Cliente} di cui modificare le credenziali.
+     * @param nuovaEmail la nuova email da impostare.
+     * @param nuovaPassword la nuova password da impostare.
+     * @throws Exception in caso di errore durante l'aggiornamento nel database.
      */
     public void modificaCredenzialiCliente(Cliente cliente, String nuovaEmail, String nuovaPassword) throws Exception {
         clienteDAO.aggiornaCredenzialiClienteDB(cliente.getEmail(), nuovaEmail, nuovaPassword);
         cliente.setEmail(nuovaEmail);
         cliente.setPassword(nuovaPassword);
     }
-
     /**
-     * Modifica password dipendente.
+     * Aggiorna la password di un dipendente, sincronizzando la modifica nel database e nell'oggetto in memoria.
      *
-     * @param dipendente    the dipendente
-     * @param nuovaPassword the nuova password
-     * @throws Exception the exception
+     * @param dipendente il {@link Dipendente} di cui modificare la password.
+     * @param nuovaPassword la nuova password da impostare.
+     * @throws Exception in caso di errore durante l'aggiornamento nel database.
      */
     public void modificaPasswordDipendente(Dipendente dipendente, String nuovaPassword) throws Exception {
         dipendenteDAO.aggiornaPasswordDipendenteDB(dipendente.getEmail(), nuovaPassword);
@@ -492,11 +497,12 @@ public class Controller {
     }
 
     /**
-     * Conferma acquisto carrello.
+     * Finalizza l'acquisto degli elementi presenti nel carrello, calcolando i prezzi in base al tipo di sala
+     * e all'eventuale sconto, assegnando i posti disponibili e registrando le prenotazioni e i biglietti.
      *
-     * @param metodoPagamento   the metodo pagamento
-     * @param percentualeSconto the percentuale sconto
-     * @throws SalaPienaException the sala piena exception
+     * @param metodoPagamento il metodo di pagamento utilizzato per la transazione.
+     * @param percentualeSconto la percentuale di sconto da applicare al prezzo base.
+     * @throws SalaPienaException se non è possibile assegnare i posti necessari per una delle proiezioni nel carrello.
      */
     public void confermaAcquistoCarrello(String metodoPagamento, double percentualeSconto) throws SalaPienaException {
         for (Carrello elem : listaCarrello) {
@@ -523,10 +529,10 @@ public class Controller {
     }
 
     /**
-     * Valuta codice sconto double.
+     * Verifica la validità di un codice sconto e restituisce la percentuale associata.
      *
-     * @param codice the codice
-     * @return the double
+     * @param codice il codice sconto fornito dall'utente.
+     * @return la percentuale di sconto corrispondente (es. 10.0 per 10%), oppure 0.0 se il codice non è valido.
      */
     public double valutaCodiceSconto(String codice) {
         if (codice == null) return 0.0;
@@ -538,10 +544,10 @@ public class Controller {
     }
 
     /**
-     * Ottieni recensioni dal db array list.
+     * Recupera l'elenco delle recensioni associate a un determinato film dal database.
      *
-     * @param titoloFilm the titolo film
-     * @return the array list
+     * @param titoloFilm il titolo del film di cui si desiderano recuperare le recensioni.
+     * @return un {@link ArrayList} di stringhe contenente le recensioni; restituisce una lista vuota in caso di errore.
      */
     public ArrayList<String> ottieniRecensioniDalDB(String titoloFilm) {
         try {
@@ -553,10 +559,10 @@ public class Controller {
     }
 
     /**
-     * Verifica stato sala string.
+     * Recupera lo stato attuale di una sala, verificando se vi siano segnalazioni di guasti o problemi tecnici.
      *
-     * @param nomeSala the nome sala
-     * @return the string
+     * @param nomeSala il nome identificativo della sala.
+     * @return una stringa descrittiva del problema se presente, null altrimenti o in caso di errore.
      */
     public String verificaStatoSala(String nomeSala) {
         try {
@@ -567,11 +573,11 @@ public class Controller {
     }
 
     /**
-     * Segnala sala guasta.
+     * Invia una segnalazione di guasto per una specifica sala, registrandola nel database.
      *
-     * @param mittente  the mittente
-     * @param nomeSala  the nome sala
-     * @param messaggio the messaggio
+     * @param mittente il {@link Dipendente} che effettua la segnalazione.
+     * @param nomeSala il nome identificativo della sala soggetta a guasto.
+     * @param messaggio la descrizione dettagliata del problema riscontrato.
      */
     public void segnalaSalaGuasta(Dipendente mittente, String nomeSala, String messaggio) {
         try {
@@ -582,9 +588,9 @@ public class Controller {
     }
 
     /**
-     * Ripara sala.
+     * Segnala la risoluzione di un guasto per una specifica sala, aggiornando il suo stato nel database.
      *
-     * @param nomeSala the nome sala
+     * @param nomeSala il nome identificativo della sala che è stata riparata.
      */
     public void riparaSala(String nomeSala) {
         try {

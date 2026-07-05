@@ -12,57 +12,45 @@ public class Pagamento {
     private String metodoPagamento;
 
     /**
-     * Instantiates a new Pagamento.
+     * Crea una nuova istanza di Pagamento.
      *
-     * @param importo         the importo
-     * @param dataPagamento   the data pagamento
-     * @param metodoPagamento the metodo pagamento
+     * @param importo         il valore monetario della transazione.
+     * @param dataPagamento   la data e l'ora esatta in cui è avvenuto il pagamento.
+     * @param metodoPagamento il metodo utilizzato per saldare la transazione.
      */
-    public Pagamento (double importo, LocalDateTime dataPagamento, String metodoPagamento) {
+    public Pagamento(double importo, LocalDateTime dataPagamento, String metodoPagamento) {
         this.importo = importo;
         this.dataPagamento = dataPagamento;
         this.metodoPagamento = metodoPagamento;
     }
 
-    /**
-     * Gets importo.
-     *
-     * @return the importo
+    /** * Restituisce l'importo del pagamento.
+     * @return il valore della transazione.
      */
     public double getImporto() { return importo; }
 
-    /**
-     * Sets importo.
-     *
-     * @param importo the importo
+    /** * Imposta l'importo del pagamento.
+     * @param importo il valore della transazione da impostare.
      */
     public void setImporto(double importo) { this.importo = importo; }
 
-    /**
-     * Gets data pagamento.
-     *
-     * @return the data pagamento
+    /** * Restituisce la data e l'ora del pagamento.
+     * @return un oggetto {@link LocalDateTime} rappresentante il momento del pagamento.
      */
     public LocalDateTime getDataPagamento() { return dataPagamento; }
 
-    /**
-     * Sets data pagamento.
-     *
-     * @param dataPagamento the data pagamento
+    /** * Imposta la data e l'ora del pagamento.
+     * @param dataPagamento il {@link LocalDateTime} da assegnare.
      */
     public void setDataPagamento(LocalDateTime dataPagamento) { this.dataPagamento = dataPagamento; }
 
-    /**
-     * Gets metodo pagamento.
-     *
-     * @return the metodo pagamento
+    /** * Restituisce il metodo di pagamento utilizzato.
+     * @return una stringa che identifica il metodo di pagamento.
      */
     public String getMetodoPagamento() { return metodoPagamento; }
 
-    /**
-     * Sets metodo pagamento.
-     *
-     * @param metodoPagamento the metodo pagamento
+    /** * Imposta il metodo di pagamento utilizzato.
+     * @param metodoPagamento il metodo di pagamento da assegnare.
      */
     public void setMetodoPagamento(String metodoPagamento) { this.metodoPagamento = metodoPagamento; }
 }

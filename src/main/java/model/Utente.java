@@ -4,30 +4,22 @@ package model;
  * The type Utente.
  */
 public abstract class Utente {
-    /**
-     * The Nome.
-     */
+    /** Il nome dell'utente. */
     protected String Nome;
-    /**
-     * The Cognome.
-     */
+    /** Il cognome dell'utente. */
     protected String Cognome;
-    /**
-     * The Email.
-     */
+    /** L'indirizzo email utilizzato per l'identificazione. */
     protected String email;
-    /**
-     * The Password.
-     */
+    /** La password di accesso associata all'account. */
     protected String password;
 
     /**
-     * Instantiates a new Utente.
+     * Costruttore protetto per le classi derivate.
      *
-     * @param nome     the nome
-     * @param cognome  the cognome
-     * @param email    the email
-     * @param password the password
+     * @param nome     il nome dell'utente.
+     * @param cognome  il cognome dell'utente.
+     * @param email    l'indirizzo email univoco.
+     * @param password la password di sistema.
      */
     public Utente(String nome, String cognome, String email, String password) {
         this.Nome = nome;
@@ -37,22 +29,22 @@ public abstract class Utente {
     }
 
     /**
-     * Fare l autenticazione boolean.
+     * Verifica se le credenziali fornite corrispondono a quelle dell'utente.
      *
-     * @param emailInserita    the email inserita
-     * @param passwordInserita the password inserita
-     * @return the boolean
+     * @param emailInserita    l'email inserita per l'accesso.
+     * @param passwordInserita la password inserita per l'accesso.
+     * @return {@code true} se le credenziali coincidono, {@code false} altrimenti.
      */
     public boolean fareLAutenticazione(String emailInserita, String passwordInserita) {
         return this.email.equals(emailInserita) && this.password.equals(passwordInserita);
     }
 
     /**
-     * Aggiornare dati personali.
+     * Aggiorna le informazioni personali dell'utente.
      *
-     * @param nuovoNome     the nuovo nome
-     * @param nuovoCognome  the nuovo cognome
-     * @param nuovaPassword the nuova password
+     * @param nuovoNome     il nuovo nome da impostare.
+     * @param nuovoCognome  il nuovo cognome da impostare.
+     * @param nuovaPassword la nuova password da impostare.
      */
     public void aggiornareDatiPersonali(String nuovoNome, String nuovoCognome, String nuovaPassword) {
         this.Nome = nuovoNome;
@@ -60,59 +52,25 @@ public abstract class Utente {
         this.password = nuovaPassword;
     }
 
-    /**
-     * Gets nome.
-     *
-     * @return the nome
-     */
-    public String getNome() { return Nome; }
+    // --- Getter e Setter ---
 
-    /**
-     * Sets nome.
-     *
-     * @param nome the nome
-     */
+    /** @return il nome dell'utente. */
+    public String getNome() { return Nome; }
+    /** @param nome il nome da impostare. */
     public void setNome(String nome) { Nome = nome; }
 
-    /**
-     * Gets cognome.
-     *
-     * @return the cognome
-     */
+    /** @return il cognome dell'utente. */
     public String getCognome() { return Cognome; }
-
-    /**
-     * Sets cognome.
-     *
-     * @param cognome the cognome
-     */
+    /** @param cognome il cognome da impostare. */
     public void setCognome(String cognome) { Cognome = cognome; }
 
-    /**
-     * Gets email.
-     *
-     * @return the email
-     */
+    /** @return l'email dell'utente. */
     public String getEmail() { return email; }
-
-    /**
-     * Sets email.
-     *
-     * @param email the email
-     */
+    /** @param email l'email da impostare. */
     public void setEmail(String email) { this.email = email; }
 
-    /**
-     * Gets password.
-     *
-     * @return the password
-     */
+    /** @return la password dell'utente. */
     public String getPassword() { return password; }
-
-    /**
-     * Sets password.
-     *
-     * @param password the password
-     */
+    /** @param password la password da impostare. */
     public void setPassword(String password) { this.password = password; }
 }

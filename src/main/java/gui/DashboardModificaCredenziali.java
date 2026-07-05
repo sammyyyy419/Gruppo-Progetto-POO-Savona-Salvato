@@ -11,9 +11,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 
-/**
- * The type Dashboard modifica credenziali.
- */
+
 public class DashboardModificaCredenziali extends JFrame {
     private JPanel mainPanel;
     private JLabel labelTitolo;
@@ -28,10 +26,11 @@ public class DashboardModificaCredenziali extends JFrame {
     private Utente utenteLoggato;
 
     /**
-     * Instantiates a new Dashboard modifica credenziali.
+     * Crea una nuova istanza della dashboard di modifica credenziali, inizializzando i campi
+     * con i dati correnti dell'utente e impostando i listener per la validazione dinamica degli input.
      *
-     * @param controller the controller
-     * @param utente     the utente
+     * @param controller il controller di sistema per gestire la persistenza dei dati.
+     * @param utente l'oggetto {@link Utente} (istanza di {@link Cliente} o {@link Dipendente}) che richiede la modifica.
      */
     public DashboardModificaCredenziali(Controller controller, Utente utente) {
         this.controller = controller;

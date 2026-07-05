@@ -9,11 +9,11 @@ public class Carrello {
     private double prezzoTotale;
 
     /**
-     * Instantiates a new Carrello.
+     * Crea una nuova istanza di un elemento Carrello.
      *
-     * @param proiezione   the proiezione
-     * @param quantita     the quantita
-     * @param prezzoTotale the prezzo totale
+     * @param proiezione   l'oggetto {@link Proiezione} relativo ai biglietti selezionati.
+     * @param quantita     il numero di biglietti desiderati.
+     * @param prezzoTotale il costo complessivo calcolato per questa selezione.
      */
     public Carrello(Proiezione proiezione, int quantita, double prezzoTotale) {
         this.proiezione = proiezione;
@@ -22,23 +22,20 @@ public class Carrello {
     }
 
     /**
-     * Gets proiezione.
-     *
-     * @return the proiezione
+     * Restituisce la proiezione associata a questo elemento del carrello.
+     * * @return l'oggetto {@link Proiezione} selezionato.
      */
     public Proiezione getProiezione() { return proiezione; }
 
     /**
-     * Gets quantita.
-     *
-     * @return the quantita
+     * Restituisce la quantità di biglietti selezionati per questa proiezione.
+     * * @return il numero di biglietti.
      */
     public int getQuantita() { return quantita; }
 
     /**
-     * Gets prezzo totale.
-     *
-     * @return the prezzo totale
+     * Restituisce il prezzo totale calcolato per questa voce del carrello.
+     * * @return il prezzo totale come valore double.
      */
     public double getPrezzoTotale() { return prezzoTotale; }
 }

@@ -6,9 +6,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-/**
- * The type Dashboard bar.
- */
 public class DashboardBar extends JFrame {
     private JPanel panelBar;
     private JLabel labelBar;
@@ -26,10 +23,10 @@ public class DashboardBar extends JFrame {
     private Cliente clienteLoggato;
 
     /**
-     * Instantiates a new Dashboard bar.
+     * Crea una nuova istanza della dashboard del bar.
      *
-     * @param controller the controller
-     * @param cliente    the cliente
+     * @param controller il controller principale che gestisce la logica applicativa.
+     * @param cliente il {@link Cliente} attualmente autenticato nel sistema.
      */
     public DashboardBar(Controller controller, Cliente cliente) {
         this.controller = controller;

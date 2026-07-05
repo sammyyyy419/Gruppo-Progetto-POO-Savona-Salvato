@@ -5,9 +5,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-/**
- * The type Dashboard gestione sale.
- */
+
 public class DashboardGestioneSale extends JFrame {
 
     private Controller controller;
@@ -18,9 +16,9 @@ public class DashboardGestioneSale extends JFrame {
     private JPanel panelSale;
 
     /**
-     * Instantiates a new Dashboard gestione sale.
+     * Crea una nuova istanza della dashboard di gestione sale.
      *
-     * @param controller the controller
+     * @param controller il controller principale che gestisce la logica di sistema e l'interazione con il database.
      */
     public DashboardGestioneSale(Controller controller) {
         this.controller = controller;

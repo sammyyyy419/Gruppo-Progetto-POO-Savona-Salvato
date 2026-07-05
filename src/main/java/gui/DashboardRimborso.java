@@ -10,9 +10,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 
-/**
- * The type Dashboard rimborso.
- */
 public class DashboardRimborso extends JFrame {
 
     private JPanel panelRimborso;
@@ -32,12 +29,14 @@ public class DashboardRimborso extends JFrame {
     private DashboardBigliettiAcquistati finestraPadre;
 
     /**
-     * Instantiates a new Dashboard rimborso.
+     * Crea una nuova istanza della dashboard rimborso.
+     * Inizializza l'interfaccia, imposta i listener per la validazione dell'IBAN e prepara
+     * l'interazione con il controller per lo storno effettivo del pagamento.
      *
-     * @param controller    the controller
-     * @param cliente       the cliente
-     * @param biglietto     the biglietto
-     * @param finestraPadre the finestra padre
+     * @param controller    il controller principale del sistema.
+     * @param cliente       l'oggetto {@link Cliente} che effettua la richiesta.
+     * @param biglietto     l'oggetto {@link Biglietto} da rimborsare.
+     * @param finestraPadre il riferimento alla dashboard chiamante per aggiornare l'interfaccia dopo l'operazione.
      */
     public DashboardRimborso(Controller controller, Cliente cliente, Biglietto biglietto, DashboardBigliettiAcquistati finestraPadre) {
         this.controller = controller;

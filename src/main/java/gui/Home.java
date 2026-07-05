@@ -10,9 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-/**
- * The type Home.
- */
+
 public class Home extends JFrame {
     private JPanel mainPanel;
     private JLabel labelTitolo;
@@ -25,9 +23,11 @@ public class Home extends JFrame {
     private Controller controller;
 
     /**
-     * Instantiates a new Home.
+     * Crea una nuova istanza della finestra Home.
+     * Inizializza l'interfaccia, configura i componenti grafici e associa i listener
+     * necessari per gestire le azioni di accesso e di reindirizzamento alla registrazione.
      *
-     * @param controller the controller
+     * @param controller il controller principale che gestisce la logica di autenticazione e di sistema.
      */
     public Home(Controller controller) {
         this.controller = controller;

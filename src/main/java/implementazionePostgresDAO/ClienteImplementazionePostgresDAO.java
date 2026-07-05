@@ -6,9 +6,7 @@ import model.Cliente;
 
 import java.sql.*;
 
-/**
- * The type Cliente implementazione postgres dao.
- */
+
 public class ClienteImplementazionePostgresDAO implements ClienteDAO {
 
     @Override

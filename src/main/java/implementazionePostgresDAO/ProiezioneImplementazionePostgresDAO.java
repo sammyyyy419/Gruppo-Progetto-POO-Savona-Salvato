@@ -10,9 +10,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
-/**
- * The type Proiezione implementazione postgres dao.
- */
 public class ProiezioneImplementazionePostgresDAO implements ProiezioneDAO {
 
     @Override

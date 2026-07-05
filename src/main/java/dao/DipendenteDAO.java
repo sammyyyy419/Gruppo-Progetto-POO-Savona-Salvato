@@ -4,25 +4,23 @@ import model.Dipendente;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-/**
- * The interface Dipendente dao.
- */
+
 public interface DipendenteDAO {
 
 	/**
-	 * Recupera tutti dipendenti array list.
+	 * Recupera l'elenco completo di tutti i dipendenti registrati nel database.
 	 *
-	 * @return the array list
-	 * @throws SQLException the sql exception
+	 * @return un {@link ArrayList} contenente tutti i dipendenti.
+	 * @throws SQLException se si verifica un errore durante l'interazione con il database.
 	 */
 	ArrayList<Dipendente> recuperaTuttiDipendenti() throws SQLException;
 
 	/**
-	 * Aggiorna password dipendente db.
+	 * Aggiorna la password di un dipendente nel database identificandolo tramite la sua email.
 	 *
-	 * @param email         the email
-	 * @param nuovaPassword the nuova password
-	 * @throws SQLException the sql exception
+	 * @param email l'indirizzo email del dipendente.
+	 * @param nuovaPassword la nuova password da impostare.
+	 * @throws SQLException se si verifica un errore durante l'interazione con il database.
 	 */
 	void aggiornaPasswordDipendenteDB(String email, String nuovaPassword) throws SQLException;
 }

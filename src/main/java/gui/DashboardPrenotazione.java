@@ -14,9 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
-/**
- * The type Dashboard prenotazione.
- */
+
 public class DashboardPrenotazione extends JFrame {
 
     private JPanel mainPanel;
@@ -45,11 +43,13 @@ public class DashboardPrenotazione extends JFrame {
     private ArrayList<Proiezione> proiezioniDelFilm;
 
     /**
-     * Instantiates a new Dashboard prenotazione.
+     * Inizializza la dashboard di prenotazione caricando le informazioni del film selezionato.
+     * Configura la logica di controllo delle date (validità della programmazione), popola i
+     * componenti di selezione e gestisce gli eventi per il calcolo del prezzo in base al tipo di sala.
      *
-     * @param controller the controller
-     * @param cliente    the cliente
-     * @param film       the film
+     * @param controller il controller principale del sistema.
+     * @param cliente    l'istanza di {@link Cliente} che effettua la prenotazione.
+     * @param film       l'oggetto {@link Film} per cui si desidera prenotare.
      */
     public DashboardPrenotazione(Controller controller, Cliente cliente, Film film) {
         this.controller = controller;

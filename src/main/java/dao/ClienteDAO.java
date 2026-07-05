@@ -3,35 +3,33 @@ package dao;
 import model.Cliente;
 import java.sql.SQLException;
 
-/**
- * The interface Cliente dao.
- */
+
 public interface ClienteDAO {
 
     /**
-     * Inserisci cliente db.
+     * Inserisce un nuovo cliente nel database.
      *
-     * @param cliente the cliente
-     * @throws SQLException the sql exception
+     * @param cliente l'oggetto {@link Cliente} da registrare.
+     * @throws SQLException se si verifica un errore durante l'interazione con il database.
      */
     void inserisciClienteDB(Cliente cliente) throws SQLException;
 
     /**
-     * Recupera cliente da db cliente.
+     * Recupera le informazioni di un cliente dal database utilizzando l'email come identificativo.
      *
-     * @param email the email
-     * @return the cliente
-     * @throws SQLException the sql exception
+     * @param email l'indirizzo email del cliente da ricercare.
+     * @return l'oggetto {@link Cliente} corrispondente, oppure null se non trovato.
+     * @throws SQLException se si verifica un errore durante l'interazione con il database.
      */
     Cliente recuperaClienteDaDB(String email) throws SQLException;
 
     /**
-     * Aggiorna credenziali cliente db.
+     * Aggiorna le credenziali di accesso (email e password) di un cliente nel database.
      *
-     * @param vecchiaEmail  the vecchia email
-     * @param nuovaEmail    the nuova email
-     * @param nuovaPassword the nuova password
-     * @throws SQLException the sql exception
+     * @param vecchiaEmail l'indirizzo email attuale del cliente.
+     * @param nuovaEmail il nuovo indirizzo email da impostare.
+     * @param nuovaPassword la nuova password da impostare.
+     * @throws SQLException se si verifica un errore durante l'interazione con il database.
      */
     void aggiornaCredenzialiClienteDB(String vecchiaEmail, String nuovaEmail, String nuovaPassword) throws SQLException;
 }

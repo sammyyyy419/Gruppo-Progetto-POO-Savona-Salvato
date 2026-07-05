@@ -4,41 +4,38 @@ import model.Biglietto;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-/**
- * The interface Biglietto dao.
- */
 public interface BigliettoDAO {
 
     /**
-     * Inserisci biglietto db.
+     * Inserisce un nuovo biglietto nel database.
      *
-     * @param biglietto the biglietto
-     * @throws SQLException the sql exception
+     * @param biglietto il {@link Biglietto} da inserire.
+     * @throws SQLException se si verifica un errore durante l'interazione con il database.
      */
     void inserisciBigliettoDB(Biglietto biglietto) throws SQLException;
 
     /**
-     * Aggiorna stato biglietto db.
+     * Aggiorna lo stato di un biglietto nel database identificandolo tramite il codice univoco.
      *
-     * @param codiceUnivoco the codice univoco
-     * @param nuovoStato    the nuovo stato
-     * @throws SQLException the sql exception
+     * @param codiceUnivoco il codice identificativo del biglietto.
+     * @param nuovoStato la stringa rappresentante il nuovo stato da assegnare.
+     * @throws SQLException se si verifica un errore durante l'interazione con il database.
      */
     void aggiornaStatoBigliettoDB(String codiceUnivoco, String nuovoStato) throws SQLException;
 
     /**
-     * Elimina biglietto db.
+     * Elimina un biglietto dal database identificandolo tramite il codice univoco.
      *
-     * @param codiceUnivoco the codice univoco
-     * @throws SQLException the sql exception
+     * @param codiceUnivoco il codice identificativo del biglietto da eliminare.
+     * @throws SQLException se si verifica un errore durante l'interazione con il database.
      */
     void eliminaBigliettoDB(String codiceUnivoco) throws SQLException;
 
     /**
-     * Recupera tutti biglietti array list.
+     * Recupera l'elenco completo di tutti i biglietti presenti nel database.
      *
-     * @return the array list
-     * @throws SQLException the sql exception
+     * @return un {@link ArrayList} contenente tutti i biglietti registrati.
+     * @throws SQLException se si verifica un errore durante l'interazione con il database.
      */
     ArrayList<Biglietto> recuperaTuttiBiglietti() throws SQLException;
 }

@@ -12,19 +12,18 @@ public class Prenotazione {
     private StatoPrenotazione stato;
     private Proiezione proiezione;
     private ArrayList<Biglietto> biglietti;
-
     private Cliente cliente;
     private Pagamento pagamento;
 
     /**
-     * Instantiates a new Prenotazione.
+     * Crea una nuova istanza di Prenotazione.
      *
-     * @param dataPrenotazione the data prenotazione
-     * @param stato            the stato
-     * @param proiezione       the proiezione
-     * @param biglietti        the biglietti
-     * @param cliente          the cliente
-     * @param pagamento        the pagamento
+     * @param dataPrenotazione la data e l'ora in cui viene effettuata la prenotazione.
+     * @param stato            lo stato iniziale della prenotazione (es. PENDENTE, CONFERMATO).
+     * @param proiezione       la {@link Proiezione} a cui la prenotazione si riferisce.
+     * @param biglietti        la lista di oggetti {@link Biglietto} associati.
+     * @param cliente          il {@link Cliente} che effettua la prenotazione.
+     * @param pagamento        l'oggetto {@link Pagamento} relativo alla transazione.
      */
     public Prenotazione(LocalDateTime dataPrenotazione, StatoPrenotazione stato, Proiezione proiezione, ArrayList<Biglietto> biglietti, Cliente cliente, Pagamento pagamento) {
         this.dataPrenotazione = dataPrenotazione;
@@ -36,18 +35,20 @@ public class Prenotazione {
     }
 
     /**
-     * Gets numero biglietti.
+     * Restituisce il numero totale di biglietti contenuti nella prenotazione.
      *
-     * @return the numero biglietti
+     * @return il conteggio dei biglietti.
      */
     public int getNumeroBiglietti() {
         return this.biglietti.size();
     }
 
     /**
-     * Verifica disponibilita posti in sala boolean.
+     * Verifica se la sala associata alla proiezione ha ancora disponibilità di posti
+     * sufficienti per soddisfare la quantità di biglietti richiesti.
+     * In caso di indisponibilità, lo stato della prenotazione viene impostato ad ANNULLATO.
      *
-     * @return the boolean
+     * @return {@code true} se i posti sono disponibili, {@code false} altrimenti.
      */
     public boolean verificaDisponibilitaPostiInSala() {
         if (this.proiezione == null) {
@@ -66,9 +67,9 @@ public class Prenotazione {
     }
 
     /**
-     * Inserisci biglietti.
+     * Aggiunge un biglietto alla lista dei biglietti della prenotazione.
      *
-     * @param biglietto the biglietto
+     * @param biglietto l'oggetto {@link Biglietto} da inserire.
      */
     public void inserisciBiglietti(Biglietto biglietto) {
         if (biglietto != null) {
@@ -77,7 +78,7 @@ public class Prenotazione {
     }
 
     /**
-     * Conferma prenotazione.
+     * Conferma la prenotazione, aggiornando il suo stato e registrandola presso la proiezione.
      */
     public void confermaPrenotazione() {
         this.stato = StatoPrenotazione.CONFERMATO;
@@ -87,7 +88,7 @@ public class Prenotazione {
     }
 
     /**
-     * Aggiungi posto.
+     * Crea un nuovo biglietto basato sul prezzo base della proiezione e lo aggiunge alla prenotazione.
      */
     public void aggiungiPosto() {
         if (this.proiezione != null) {
@@ -98,9 +99,9 @@ public class Prenotazione {
     }
 
     /**
-     * Calcolo prezzo totale double.
+     * Calcola il prezzo totale della prenotazione sommando il prezzo finale di tutti i biglietti inclusi.
      *
-     * @return the double
+     * @return il costo totale della prenotazione.
      */
     public double calcoloPrezzoTotale() {
         double totale = 0.0;
@@ -112,87 +113,34 @@ public class Prenotazione {
         return totale;
     }
 
-    /**
-     * Gets data prenotazione.
-     *
-     * @return the data prenotazione
-     */
+    // Metodi Getter e Setter
+    /** @return la data della prenotazione. */
     public LocalDateTime getDataPrenotazione() { return dataPrenotazione; }
-
-    /**
-     * Sets data prenotazione.
-     *
-     * @param dataPrenotazione the data prenotazione
-     */
+    /** @param dataPrenotazione la data da impostare. */
     public void setDataPrenotazione(LocalDateTime dataPrenotazione) { this.dataPrenotazione = dataPrenotazione; }
 
-    /**
-     * Gets stato.
-     *
-     * @return the stato
-     */
+    /** @return lo stato attuale della prenotazione. */
     public StatoPrenotazione getStato() { return stato; }
-
-    /**
-     * Sets stato.
-     *
-     * @param stato the stato
-     */
+    /** @param stato lo stato da impostare. */
     public void setStato(StatoPrenotazione stato) { this.stato = stato; }
 
-    /**
-     * Gets proiezione.
-     *
-     * @return the proiezione
-     */
+    /** @return la proiezione associata. */
     public Proiezione getProiezione() { return proiezione; }
-
-    /**
-     * Sets proiezione.
-     *
-     * @param proiezione the proiezione
-     */
+    /** @param proiezione la proiezione da associare. */
     public void setProiezione(Proiezione proiezione) { this.proiezione = proiezione; }
 
-    /**
-     * Gets biglietti.
-     *
-     * @return the biglietti
-     */
+    /** @return la lista dei biglietti. */
     public ArrayList<Biglietto> getBiglietti() { return biglietti; }
-
-    /**
-     * Sets biglietti.
-     *
-     * @param biglietti the biglietti
-     */
+    /** @param biglietti la lista di biglietti da impostare. */
     public void setBiglietti(ArrayList<Biglietto> biglietti) { this.biglietti = biglietti; }
 
-    /**
-     * Gets cliente.
-     *
-     * @return the cliente
-     */
+    /** @return il cliente che ha prenotato. */
     public Cliente getCliente() { return cliente; }
-
-    /**
-     * Sets cliente.
-     *
-     * @param cliente the cliente
-     */
+    /** @param cliente il cliente da associare. */
     public void setCliente(Cliente cliente) { this.cliente = cliente; }
 
-    /**
-     * Gets pagamento.
-     *
-     * @return the pagamento
-     */
+    /** @return l'oggetto pagamento. */
     public Pagamento getPagamento() { return pagamento; }
-
-    /**
-     * Sets pagamento.
-     *
-     * @param pagamento the pagamento
-     */
+    /** @param pagamento l'oggetto pagamento da associare. */
     public void setPagamento(Pagamento pagamento) { this.pagamento = pagamento; }
 }

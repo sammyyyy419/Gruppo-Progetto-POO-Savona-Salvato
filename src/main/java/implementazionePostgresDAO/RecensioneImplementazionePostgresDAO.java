@@ -5,9 +5,7 @@ import database.ConnessioneDatabase;
 import java.sql.*;
 import java.util.ArrayList;
 
-/**
- * The type Recensione implementazione postgres dao.
- */
+
 public class RecensioneImplementazionePostgresDAO implements RecensioneDAO {
 
     @Override

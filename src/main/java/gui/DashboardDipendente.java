@@ -9,9 +9,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
 
-/**
- * The type Dashboard dipendente.
- */
+
 public class DashboardDipendente extends JFrame {
     private JPanel mainPanel;
     private JLabel labelBenvenuto;
@@ -29,10 +27,11 @@ public class DashboardDipendente extends JFrame {
     private Dipendente dipendenteLoggato;
 
     /**
-     * Instantiates a new Dashboard dipendente.
+     * Crea e inizializza la dashboard del dipendente. Configura i permessi in base al ruolo
+     * e associa le azioni necessarie a ciascun pulsante.
      *
-     * @param controller the controller
-     * @param dipendente the dipendente
+     * @param controller il controller di sistema per gestire la logica di business.
+     * @param dipendente l'oggetto {@link Dipendente} che ha effettuato l'accesso.
      */
     public DashboardDipendente(Controller controller, Dipendente dipendente) {
         this.controller = controller;

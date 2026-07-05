@@ -6,9 +6,6 @@ import model.Film;
 import java.sql.*;
 import java.util.ArrayList;
 
-/**
- * The type Film implementazione postgres dao.
- */
 public class FilmImplementazionePostgresDAO implements FilmDAO {
 
     @Override

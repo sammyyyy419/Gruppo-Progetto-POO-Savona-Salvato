@@ -3,9 +3,6 @@ package model;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-/**
- * The type Sala.
- */
 public class Sala {
     private String numeroSala;
     private int capienza;
@@ -14,11 +11,12 @@ public class Sala {
     private ArrayList<Proiezione> proiezioni;
 
     /**
-     * Instantiates a new Sala.
+     * Crea una nuova istanza di Sala, inizializzando automaticamente la disposizione dei posti
+     * in base alla tipologia specificata (IMAX o Standard).
      *
-     * @param numeroSala       the numero sala
-     * @param capienzaGenerica the capienza generica
-     * @param tipoSala         the tipo sala
+     * @param numeroSala       l'identificativo della sala.
+     * @param capienzaGenerica parametro di supporto per la creazione.
+     * @param tipoSala         il tipo di tecnologia/configurazione (es. "IMAX").
      */
     public Sala(String numeroSala, int capienzaGenerica, String tipoSala) {
         this.numeroSala = numeroSala;
@@ -46,10 +44,11 @@ public class Sala {
     }
 
     /**
-     * Controllare capienza posti residua int.
+     * Calcola il numero di posti ancora disponibili per una specifica proiezione,
+     * sottraendo alla capienza totale i posti già riservati tramite prenotazioni confermate o pendenti.
      *
-     * @param proiezioneCorrente the proiezione corrente
-     * @return the int
+     * @param proiezioneCorrente la {@link Proiezione} di riferimento.
+     * @return il numero di posti liberi residui.
      */
     public int controllareCapienzaPostiResidua(Proiezione proiezioneCorrente) {
         if (proiezioneCorrente == null) return this.capienza;
@@ -63,11 +62,11 @@ public class Sala {
     }
 
     /**
-     * Is libera boolean.
+     * Verifica se la sala è libera da impegni in un determinato intervallo temporale.
      *
-     * @param inizio the inizio
-     * @param fine   the fine
-     * @return the boolean
+     * @param inizio l'orario di inizio desiderato.
+     * @param fine   l'orario di fine desiderato.
+     * @return {@code true} se la sala è libera, {@code false} se risulta occupata da un'altra proiezione.
      */
     public boolean isLibera(LocalDateTime inizio, LocalDateTime fine) {
         for (Proiezione p : proiezioni) {
@@ -78,73 +77,30 @@ public class Sala {
         return true;
     }
 
-    /**
-     * Gets numero sala.
-     *
-     * @return the numero sala
-     */
-    public String getNumeroSala() { return numeroSala; }
+    // --- Getter e Setter ---
 
-    /**
-     * Sets numero sala.
-     *
-     * @param numeroSala the numero sala
-     */
+    /** @return il numero della sala. */
+    public String getNumeroSala() { return numeroSala; }
+    /** @param numeroSala il numero della sala da impostare. */
     public void setNumeroSala(String numeroSala) { this.numeroSala = numeroSala; }
 
-    /**
-     * Gets capienza.
-     *
-     * @return the capienza
-     */
+    /** @return la capienza totale della sala. */
     public int getCapienza() { return capienza; }
-
-    /**
-     * Sets capienza.
-     *
-     * @param capienza the capienza
-     */
+    /** @param capienza la capienza da impostare. */
     public void setCapienza(int capienza) { this.capienza = capienza; }
 
-    /**
-     * Gets tipo sala.
-     *
-     * @return the tipo sala
-     */
+    /** @return il tipo di sala (es. IMAX). */
     public String getTipoSala() { return tipoSala; }
-
-    /**
-     * Sets tipo sala.
-     *
-     * @param tipoSala the tipo sala
-     */
+    /** @param tipoSala il tipo di sala da impostare. */
     public void setTipoSala(String tipoSala) { this.tipoSala = tipoSala; }
 
-    /**
-     * Gets posti.
-     *
-     * @return the posti
-     */
+    /** @return la lista dei posti presenti nella sala. */
     public ArrayList<Posto> getPosti() { return posti; }
-
-    /**
-     * Sets posti.
-     *
-     * @param posti the posti
-     */
+    /** @param posti la lista dei posti da assegnare. */
     public void setPosti(ArrayList<Posto> posti) { this.posti = posti; }
 
-    /**
-     * Gets proiezioni.
-     *
-     * @return the proiezioni
-     */
+    /** @return la lista delle proiezioni programmate in questa sala. */
     public ArrayList<Proiezione> getProiezioni() { return proiezioni; }
-
-    /**
-     * Sets proiezioni.
-     *
-     * @param proiezioni the proiezioni
-     */
+    /** @param proiezioni la lista di proiezioni da assegnare. */
     public void setProiezioni(ArrayList<Proiezione> proiezioni) { this.proiezioni = proiezioni; }
 }

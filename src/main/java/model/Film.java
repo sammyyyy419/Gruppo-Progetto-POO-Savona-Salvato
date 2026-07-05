@@ -4,9 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
-/**
- * The type Film.
- */
+
 public class Film {
     private String titolo;
     private LocalTime durata;
@@ -20,17 +18,17 @@ public class Film {
     private String salaAssegnata;
 
     /**
-     * Instantiates a new Film.
+     * Crea una nuova istanza di Film con tutti i dettagli necessari.
      *
-     * @param titolo                   the titolo
-     * @param durata                   the durata
-     * @param genere                   the genere
-     * @param classificazioneEta       the classificazione eta
-     * @param trama                    the trama
-     * @param recensioni               the recensioni
-     * @param percorsoCopertina        the percorso copertina
-     * @param dataInizioProgrammazione the data inizio programmazione
-     * @param salaAssegnata            the sala assegnata
+     * @param titolo                   il titolo del film.
+     * @param durata                   la durata espressa come {@link LocalTime}.
+     * @param genere                   il genere cinematografico.
+     * @param classificazioneEta       l'età minima consigliata.
+     * @param trama                    la sinossi del film.
+     * @param recensioni               una lista di feedback esistenti.
+     * @param percorsoCopertina        il path al file dell'immagine di copertina.
+     * @param dataInizioProgrammazione la data di inizio programmazione.
+     * @param salaAssegnata            l'identificativo della sala in cui è proiettato.
      */
     public Film(String titolo, LocalTime durata, String genere, String classificazioneEta, String trama, ArrayList<String> recensioni, String percorsoCopertina, LocalDate dataInizioProgrammazione, String salaAssegnata) {
         this.titolo = titolo;
@@ -46,9 +44,9 @@ public class Film {
     }
 
     /**
-     * Get durata minuti int.
+     * Calcola e restituisce la durata del film convertita in minuti totali.
      *
-     * @return the int
+     * @return la durata totale in minuti, o 0 se la durata non è definita.
      */
     public int getDurataMinuti(){
         if(this.durata == null){
@@ -58,11 +56,12 @@ public class Film {
     }
 
     /**
-     * Aggiungi feedback.
+     * Aggiunge un feedback al film se il voto è compreso tra 1 e 5 e il commento è valido.
+     * Il formato salvato sarà: "Autore||Voto||Commento".
      *
-     * @param autore   the autore
-     * @param voto     the voto
-     * @param commento the commento
+     * @param autore   l'autore della recensione.
+     * @param voto     il voto dato al film (1-5).
+     * @param commento il testo del feedback.
      */
     public void aggiungiFeedback(String autore, int voto, String commento) {
         if (commento != null && voto >= 1 && voto <= 5) {
@@ -72,18 +71,18 @@ public class Film {
     }
 
     /**
-     * Gets recensioni clienti.
+     * Restituisce la lista completa delle recensioni ricevute.
      *
-     * @return the recensioni clienti
+     * @return un {@link ArrayList} di stringhe contenenti i feedback.
      */
     public ArrayList<String> getRecensioniClienti() {
         return this.recensioni;
     }
 
     /**
-     * Gets dettagli.
+     * Genera una stringa formattata con tutti i dettagli principali del film.
      *
-     * @return the dettagli
+     * @return una stringa contenente titolo, genere, durata, sala e trama.
      */
     public String getDettagli() {
         return "  " + this.titolo + "  \n" +
@@ -96,129 +95,48 @@ public class Film {
                 "--------------------------------------------------";
     }
 
-    /**
-     * Gets titolo.
-     *
-     * @return the titolo
-     */
+    /** @return il titolo del film. */
     public String getTitolo() { return titolo; }
-
-    /**
-     * Sets titolo.
-     *
-     * @param titolo the titolo
-     */
+    /** @param titolo il nuovo titolo da assegnare. */
     public void setTitolo(String titolo) { this.titolo = titolo; }
 
-    /**
-     * Gets durata.
-     *
-     * @return the durata
-     */
+    /** @return la durata del film. */
     public LocalTime getDurata() { return durata; }
-
-    /**
-     * Sets durata.
-     *
-     * @param durata the durata
-     */
+    /** @param durata la nuova durata da assegnare. */
     public void setDurata(LocalTime durata) { this.durata = durata; }
 
-    /**
-     * Gets genere.
-     *
-     * @return the genere
-     */
+    /** @return il genere del film. */
     public String getGenere() { return genere; }
-
-    /**
-     * Sets genere.
-     *
-     * @param genere the genere
-     */
+    /** @param genere il nuovo genere da assegnare. */
     public void setGenere(String genere) { this.genere = genere; }
 
-    /**
-     * Gets classificazione eta.
-     *
-     * @return the classificazione eta
-     */
+    /** @return la classificazione di età. */
     public String getClassificazioneEta() { return classificazioneEta; }
-
-    /**
-     * Sets classificazione eta.
-     *
-     * @param classificazioneEta the classificazione eta
-     */
+    /** @param classificazioneEta la nuova classificazione da assegnare. */
     public void setClassificazioneEta(String classificazioneEta) { this.classificazioneEta = classificazioneEta; }
 
-    /**
-     * Gets trama.
-     *
-     * @return the trama
-     */
+    /** @return la trama del film. */
     public String getTrama() { return trama; }
-
-    /**
-     * Sets trama.
-     *
-     * @param trama the trama
-     */
+    /** @param trama la nuova trama da assegnare. */
     public void setTrama(String trama) { this.trama = trama; }
 
-    /**
-     * Gets recensioni.
-     *
-     * @return the recensioni
-     */
+    /** @return la lista dei feedback. */
     public ArrayList<String> getRecensioni() { return recensioni; }
-
-    /**
-     * Sets recensioni.
-     *
-     * @param recensioni the recensioni
-     */
+    /** @param recensioni la nuova lista di feedback. */
     public void setRecensioni(ArrayList<String> recensioni) { this.recensioni = recensioni; }
 
-    /**
-     * Gets percorso copertina.
-     *
-     * @return the percorso copertina
-     */
+    /** @return il percorso del file copertina. */
     public String getPercorsoCopertina() { return percorsoCopertina; }
-
-    /**
-     * Sets percorso copertina.
-     *
-     * @param percorsoCopertina the percorso copertina
-     */
+    /** @param percorsoCopertina il nuovo path della copertina. */
     public void setPercorsoCopertina(String percorsoCopertina) { this.percorsoCopertina = percorsoCopertina; }
 
-    /**
-     * Gets data inizio programmazione.
-     *
-     * @return the data inizio programmazione
-     */
+    /** @return la data di inizio programmazione. */
     public LocalDate getDataInizioProgrammazione() { return dataInizioProgrammazione; }
-
-    /**
-     * Sets data inizio programmazione.
-     *
-     * @param dataInizioProgrammazione the data inizio programmazione
-     */
+    /** @param dataInizioProgrammazione la nuova data di inizio programmazione. */
     public void setDataInizioProgrammazione(LocalDate dataInizioProgrammazione) { this.dataInizioProgrammazione = dataInizioProgrammazione; }
 
-    /**
-     * Gets sala assegnata.
-     *
-     * @return the sala assegnata
-     */
+    /** @return la sala assegnata. */
     public String getSalaAssegnata() { return salaAssegnata; }
-
-    /**
-     * Sets sala assegnata.
-     *
-     * @param salaAssegnata the sala assegnata
-     */
+    /** @param salaAssegnata la nuova sala da assegnare. */
     public void setSalaAssegnata(String salaAssegnata) { this.salaAssegnata = salaAssegnata; }
 }
