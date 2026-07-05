@@ -10,6 +10,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+/**
+ * The type Dipendente implementazione postgres dao.
+ */
 public class DipendenteImplementazionePostgresDAO implements DipendenteDAO {
 
 	@Override

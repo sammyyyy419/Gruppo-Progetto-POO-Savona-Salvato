@@ -6,6 +6,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * The type Dashboard bar.
+ */
 public class DashboardBar extends JFrame {
     private JPanel panelBar;
     private JLabel labelBar;
@@ -22,6 +25,12 @@ public class DashboardBar extends JFrame {
     private Controller controller;
     private Cliente clienteLoggato;
 
+    /**
+     * Instantiates a new Dashboard bar.
+     *
+     * @param controller the controller
+     * @param cliente    the cliente
+     */
     public DashboardBar(Controller controller, Cliente cliente) {
         this.controller = controller;
         this.clienteLoggato = cliente;

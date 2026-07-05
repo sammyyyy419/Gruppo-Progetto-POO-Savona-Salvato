@@ -9,6 +9,9 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * The type Dashboard dipendente.
+ */
 public class DashboardDipendente extends JFrame {
     private JPanel mainPanel;
     private JLabel labelBenvenuto;
@@ -25,6 +28,12 @@ public class DashboardDipendente extends JFrame {
     private Controller controller;
     private Dipendente dipendenteLoggato;
 
+    /**
+     * Instantiates a new Dashboard dipendente.
+     *
+     * @param controller the controller
+     * @param dipendente the dipendente
+     */
     public DashboardDipendente(Controller controller, Dipendente dipendente) {
         this.controller = controller;
         this.dipendenteLoggato = dipendente;

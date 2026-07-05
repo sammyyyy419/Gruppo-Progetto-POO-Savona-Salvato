@@ -10,6 +10,9 @@ import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+/**
+ * The type Dashboard biglietti acquistati.
+ */
 public class DashboardBigliettiAcquistati extends JFrame {
 
     private JPanel mainPanel;
@@ -21,6 +24,12 @@ public class DashboardBigliettiAcquistati extends JFrame {
     private Controller controller;
     private Cliente clienteLoggato;
 
+    /**
+     * Instantiates a new Dashboard biglietti acquistati.
+     *
+     * @param controller the controller
+     * @param cliente    the cliente
+     */
     public DashboardBigliettiAcquistati(Controller controller, Cliente cliente) {
         this.controller = controller;
         this.clienteLoggato = cliente;
@@ -44,6 +53,9 @@ public class DashboardBigliettiAcquistati extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Aggiorna interfaccia.
+     */
     public void aggiornaInterfaccia() {
         caricaBiglietti();
     }

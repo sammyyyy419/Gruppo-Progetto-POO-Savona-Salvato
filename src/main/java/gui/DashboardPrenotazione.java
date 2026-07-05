@@ -14,6 +14,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
+/**
+ * The type Dashboard prenotazione.
+ */
 public class DashboardPrenotazione extends JFrame {
 
     private JPanel mainPanel;
@@ -41,6 +44,13 @@ public class DashboardPrenotazione extends JFrame {
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private ArrayList<Proiezione> proiezioniDelFilm;
 
+    /**
+     * Instantiates a new Dashboard prenotazione.
+     *
+     * @param controller the controller
+     * @param cliente    the cliente
+     * @param film       the film
+     */
     public DashboardPrenotazione(Controller controller, Cliente cliente, Film film) {
         this.controller = controller;
         this.clienteLoggato = cliente;

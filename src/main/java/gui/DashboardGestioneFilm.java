@@ -17,6 +17,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
 
+/**
+ * The type Dashboard gestione film.
+ */
 public class DashboardGestioneFilm extends JFrame {
     private Controller controller;
 
@@ -43,6 +46,11 @@ public class DashboardGestioneFilm extends JFrame {
 
     private String percorsoImmagineSelezionata = null;
 
+    /**
+     * Instantiates a new Dashboard gestione film.
+     *
+     * @param controller the controller
+     */
     public DashboardGestioneFilm(Controller controller) {
         this.controller = controller;
 

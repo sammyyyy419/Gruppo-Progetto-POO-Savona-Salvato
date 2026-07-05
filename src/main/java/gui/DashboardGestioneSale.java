@@ -5,6 +5,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * The type Dashboard gestione sale.
+ */
 public class DashboardGestioneSale extends JFrame {
 
     private Controller controller;
@@ -14,6 +17,11 @@ public class DashboardGestioneSale extends JFrame {
     private JButton indietroButton;
     private JPanel panelSale;
 
+    /**
+     * Instantiates a new Dashboard gestione sale.
+     *
+     * @param controller the controller
+     */
     public DashboardGestioneSale(Controller controller) {
         this.controller = controller;
 

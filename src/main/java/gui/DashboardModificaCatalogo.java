@@ -16,6 +16,9 @@ import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
+/**
+ * The type Dashboard modifica catalogo.
+ */
 public class DashboardModificaCatalogo extends JFrame {
 
     private JPanel mainPanel;
@@ -28,6 +31,11 @@ public class DashboardModificaCatalogo extends JFrame {
 
     private Controller controller;
 
+    /**
+     * Instantiates a new Dashboard modifica catalogo.
+     *
+     * @param controller the controller
+     */
     public DashboardModificaCatalogo(Controller controller) {
         this.controller = controller;
 

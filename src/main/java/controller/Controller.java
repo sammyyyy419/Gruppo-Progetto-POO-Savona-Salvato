@@ -31,6 +31,9 @@ import implementazionePostgresDAO.DipendenteImplementazionePostgresDAO;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+/**
+ * The type Controller.
+ */
 public class Controller {
 
     private ArrayList<Cliente> listaClienti;
@@ -51,6 +54,9 @@ public class Controller {
 
     private ArrayList<Carrello> listaCarrello = new ArrayList<>();
 
+    /**
+     * Instantiates a new Controller.
+     */
     public Controller() {
         this.listaClienti = new ArrayList<>();
         this.listaDipendenti = new ArrayList<>();
@@ -80,10 +86,21 @@ public class Controller {
         }
     }
 
+    /**
+     * Imposta utente corrente.
+     *
+     * @param c the c
+     */
     public void impostaUtenteCorrente(Cliente c) {
         this.utenteLoggatoTemporaneo = c;
     }
 
+    /**
+     * Aggiungi film.
+     *
+     * @param nuovoFilm the nuovo film
+     * @throws Exception the exception
+     */
     public void aggiungiFilm(Film nuovoFilm) throws Exception {
         if (nuovoFilm != null) {
             filmDAO.inserisciFilmDB(nuovoFilm);
@@ -91,6 +108,12 @@ public class Controller {
         }
     }
 
+    /**
+     * Elimina film.
+     *
+     * @param filmDaEliminare the film da eliminare
+     * @throws Exception the exception
+     */
     public void eliminaFilm(Film filmDaEliminare) throws Exception {
         if (filmDaEliminare != null) {
             filmDAO.eliminaFilmDB(filmDaEliminare);
@@ -98,6 +121,20 @@ public class Controller {
         }
     }
 
+    /**
+     * Modifica film.
+     *
+     * @param filmAttuale the film attuale
+     * @param nTitolo     the n titolo
+     * @param nDurata     the n durata
+     * @param nGenere     the n genere
+     * @param nClass      the n class
+     * @param nTrama      the n trama
+     * @param nPercorso   the n percorso
+     * @param nDataInizio the n data inizio
+     * @param nSala       the n sala
+     * @throws Exception the exception
+     */
     public void modificaFilm(Film filmAttuale, String nTitolo, java.time.LocalTime nDurata, String nGenere, String nClass, String nTrama, String nPercorso, java.time.LocalDate nDataInizio, String nSala) throws Exception {
         String vecchioTitolo = filmAttuale.getTitolo();
         Film filmAggiornato = new Film(nTitolo, nDurata, nGenere, nClass, nTrama, filmAttuale.getRecensioniClienti(), nPercorso, nDataInizio, nSala);
@@ -113,8 +150,23 @@ public class Controller {
         filmAttuale.setSalaAssegnata(nSala);
     }
 
+    /**
+     * Gets lista film.
+     *
+     * @return the lista film
+     */
     public ArrayList<Film> getListaFilm() { return listaFilm; }
 
+    /**
+     * Aggiungi recensione a film boolean.
+     *
+     * @param film     the film
+     * @param cliente  the cliente
+     * @param voto     the voto
+     * @param commento the commento
+     * @return the boolean
+     * @throws RecensioneVuotaException the recensione vuota exception
+     */
     public boolean aggiungiRecensioneAFilm(Film film, Cliente cliente, int voto, String commento) throws RecensioneVuotaException {
         if (film == null || cliente == null) {
             throw new RecensioneVuotaException("Errore: Impossibile aggiungere la recensione.");
@@ -138,6 +190,12 @@ public class Controller {
         return true;
     }
 
+    /**
+     * Aggiungi cliente.
+     *
+     * @param nuovoCliente the nuovo cliente
+     * @throws Exception the exception
+     */
     public void aggiungiCliente(Cliente nuovoCliente) throws Exception {
         if (nuovoCliente != null) {
             clienteDAO.inserisciClienteDB(nuovoCliente);
@@ -145,6 +203,14 @@ public class Controller {
         }
     }
 
+    /**
+     * Valida login boolean.
+     *
+     * @param email    the email
+     * @param password the password
+     * @return the boolean
+     * @throws Exception the exception
+     */
     public boolean validaLogin(String email, String password) throws Exception {
         Utente utente = recuperaUtente(email);
         if (utente == null) throw new Exception("Utente non trovato con questa email.");
@@ -156,6 +222,13 @@ public class Controller {
         return true;
     }
 
+    /**
+     * Recupera utente utente.
+     *
+     * @param email the email
+     * @return the utente
+     * @throws Exception the exception
+     */
     public Utente recuperaUtente(String email) throws Exception {
         for (Dipendente d : listaDipendenti) {
             if (d.getEmail().equalsIgnoreCase(email)) return d;
@@ -165,6 +238,12 @@ public class Controller {
         return null;
     }
 
+    /**
+     * Aggiungi segnalazione.
+     *
+     * @param messaggio the messaggio
+     * @param mittente  the mittente
+     */
     public void aggiungiSegnalazione(String messaggio, Dipendente mittente) {
         if (mittente != null && messaggio != null) {
             String segnalazioneCompleta = mittente.getNome() + " " + mittente.getCognome() + " (" + mittente.getRuolo() + ") - " + messaggio;
@@ -178,6 +257,11 @@ public class Controller {
         }
     }
 
+    /**
+     * Gets segnalazioni.
+     *
+     * @return the segnalazioni
+     */
     public ArrayList<String> getSegnalazioni() {
         try {
             return segnalazioneDAO.recuperaTutteSegnalazioni();
@@ -187,6 +271,15 @@ public class Controller {
         }
     }
 
+    /**
+     * Acquista biglietto biglietto.
+     *
+     * @param prezzo       the prezzo
+     * @param posto        the posto
+     * @param proiezione   the proiezione
+     * @param prenotazione the prenotazione
+     * @return the biglietto
+     */
     public Biglietto acquistaBiglietto(double prezzo, Posto posto, Proiezione proiezione, Prenotazione prenotazione) {
         Biglietto nuovoBiglietto = new Biglietto(prezzo, posto, proiezione, prenotazione);
         listaBiglietti.add(nuovoBiglietto);
@@ -200,6 +293,13 @@ public class Controller {
         return nuovoBiglietto;
     }
 
+    /**
+     * Convalida biglietto per codice biglietto.
+     *
+     * @param codiceUnivoco the codice univoco
+     * @return the biglietto
+     * @throws Exception the exception
+     */
     public Biglietto convalidaBigliettoPerCodice(String codiceUnivoco) throws Exception {
         if (codiceUnivoco == null || codiceUnivoco.trim().isEmpty()) {
             throw new Exception("Inserire un codice valido.");
@@ -226,6 +326,12 @@ public class Controller {
         throw new Exception("Codice inesistente. Nessun biglietto valido trovato per: " + codiceUnivoco);
     }
 
+    /**
+     * Rimborsa singolo biglietto.
+     *
+     * @param bigliettoDaRimborsare the biglietto da rimborsare
+     * @throws Exception the exception
+     */
     public void rimborsaSingoloBiglietto(Biglietto bigliettoDaRimborsare) throws Exception {
         if (bigliettoDaRimborsare == null) throw new Exception("Biglietto inesistente.");
         if (bigliettoDaRimborsare.isValido()) throw new Exception("Impossibile rimborsare un biglietto già obliterato.");
@@ -242,6 +348,12 @@ public class Controller {
         }
     }
 
+    /**
+     * Gets proiezioni per film.
+     *
+     * @param filmSelezionato the film selezionato
+     * @return the proiezioni per film
+     */
     public ArrayList<Proiezione> getProiezioniPerFilm(Film filmSelezionato) {
         try {
             if (filmSelezionato != null) return proiezioneDAO.recuperaProiezioniDiUnFilm(filmSelezionato);
@@ -251,28 +363,58 @@ public class Controller {
         return new ArrayList<>();
     }
 
+    /**
+     * Aggiungi al carrello.
+     *
+     * @param proiezione   the proiezione
+     * @param quantita     the quantita
+     * @param prezzoTotale the prezzo totale
+     */
     public void aggiungiAlCarrello(Proiezione proiezione, int quantita, double prezzoTotale) {
         this.listaCarrello.add(new Carrello(proiezione, quantita, prezzoTotale));
     }
 
+    /**
+     * Gets carrello.
+     *
+     * @return the carrello
+     */
     public ArrayList<Carrello> getCarrello() {
         return listaCarrello;
     }
 
+    /**
+     * Rimuovi dal carrello.
+     *
+     * @param elemento the elemento
+     */
     public void rimuoviDalCarrello(Carrello elemento) {
         if (elemento != null) this.listaCarrello.remove(elemento);
     }
 
+    /**
+     * Calcola totale carrello double.
+     *
+     * @return the double
+     */
     public double calcolaTotaleCarrello() {
         double totale = 0;
         for (Carrello elem : listaCarrello) totale += elem.getPrezzoTotale();
         return totale;
     }
 
+    /**
+     * Svuota carrello.
+     */
     public void svuotaCarrello() {
         this.listaCarrello.clear();
     }
 
+    /**
+     * Gets biglietti acquistati.
+     *
+     * @return the biglietti acquistati
+     */
     public ArrayList<Biglietto> getBigliettiAcquistati() { return this.listaBiglietti; }
 
     private boolean isPostoOccupato(Proiezione proiezione, Posto posto) {
@@ -323,17 +465,39 @@ public class Controller {
                 " biglietti. Posti rimanenti in questa sala: " + postiScelti.size());
     }
 
+    /**
+     * Modifica credenziali cliente.
+     *
+     * @param cliente       the cliente
+     * @param nuovaEmail    the nuova email
+     * @param nuovaPassword the nuova password
+     * @throws Exception the exception
+     */
     public void modificaCredenzialiCliente(Cliente cliente, String nuovaEmail, String nuovaPassword) throws Exception {
         clienteDAO.aggiornaCredenzialiClienteDB(cliente.getEmail(), nuovaEmail, nuovaPassword);
         cliente.setEmail(nuovaEmail);
         cliente.setPassword(nuovaPassword);
     }
 
+    /**
+     * Modifica password dipendente.
+     *
+     * @param dipendente    the dipendente
+     * @param nuovaPassword the nuova password
+     * @throws Exception the exception
+     */
     public void modificaPasswordDipendente(Dipendente dipendente, String nuovaPassword) throws Exception {
         dipendenteDAO.aggiornaPasswordDipendenteDB(dipendente.getEmail(), nuovaPassword);
         dipendente.setPassword(nuovaPassword);
     }
 
+    /**
+     * Conferma acquisto carrello.
+     *
+     * @param metodoPagamento   the metodo pagamento
+     * @param percentualeSconto the percentuale sconto
+     * @throws SalaPienaException the sala piena exception
+     */
     public void confermaAcquistoCarrello(String metodoPagamento, double percentualeSconto) throws SalaPienaException {
         for (Carrello elem : listaCarrello) {
             int quantita = elem.getQuantita();
@@ -358,6 +522,12 @@ public class Controller {
         svuotaCarrello();
     }
 
+    /**
+     * Valuta codice sconto double.
+     *
+     * @param codice the codice
+     * @return the double
+     */
     public double valutaCodiceSconto(String codice) {
         if (codice == null) return 0.0;
         String cod = codice.toUpperCase().trim();
@@ -367,6 +537,12 @@ public class Controller {
         return 0.0;
     }
 
+    /**
+     * Ottieni recensioni dal db array list.
+     *
+     * @param titoloFilm the titolo film
+     * @return the array list
+     */
     public ArrayList<String> ottieniRecensioniDalDB(String titoloFilm) {
         try {
             return recensioneDAO.recuperaRecensioniPerFilm(titoloFilm);
@@ -376,6 +552,12 @@ public class Controller {
         }
     }
 
+    /**
+     * Verifica stato sala string.
+     *
+     * @param nomeSala the nome sala
+     * @return the string
+     */
     public String verificaStatoSala(String nomeSala) {
         try {
             return segnalazioneDAO.ottieniProblemaSala(nomeSala);
@@ -384,6 +566,13 @@ public class Controller {
         }
     }
 
+    /**
+     * Segnala sala guasta.
+     *
+     * @param mittente  the mittente
+     * @param nomeSala  the nome sala
+     * @param messaggio the messaggio
+     */
     public void segnalaSalaGuasta(Dipendente mittente, String nomeSala, String messaggio) {
         try {
             segnalazioneDAO.inserisciSegnalazioneSalaDB(mittente.getEmail(), messaggio, nomeSala);
@@ -392,6 +581,11 @@ public class Controller {
         }
     }
 
+    /**
+     * Ripara sala.
+     *
+     * @param nomeSala the nome sala
+     */
     public void riparaSala(String nomeSala) {
         try {
             segnalazioneDAO.risolviSegnalazioneSalaDB(nomeSala);

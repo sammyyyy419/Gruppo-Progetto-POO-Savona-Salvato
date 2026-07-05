@@ -4,8 +4,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * The type Connessione database.
+ */
 public class ConnessioneDatabase {
 	private static ConnessioneDatabase instance;
+	/**
+	 * The Connection.
+	 */
 	public Connection connection = null;
 
 	private String nome = "postgres";
@@ -25,6 +31,12 @@ public class ConnessioneDatabase {
 		}
 	}
 
+	/**
+	 * Gets instance.
+	 *
+	 * @return the instance
+	 * @throws SQLException the sql exception
+	 */
 	public static ConnessioneDatabase getInstance() throws SQLException {
 		if (instance == null) {
 			instance = new ConnessioneDatabase();
@@ -34,10 +46,21 @@ public class ConnessioneDatabase {
 		return instance;
 	}
 
+	/**
+	 * Gets connection.
+	 *
+	 * @return the connection
+	 */
 	public Connection getConnection() {
 		return connection;
 	}
 
+	/**
+	 * Gets connessione.
+	 *
+	 * @return the connessione
+	 * @throws SQLException the sql exception
+	 */
 	public static Connection getConnessione() throws SQLException {
 		return getInstance().getConnection();
 	}

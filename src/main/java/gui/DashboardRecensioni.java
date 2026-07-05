@@ -9,6 +9,9 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * The type Dashboard recensioni.
+ */
 public class DashboardRecensioni extends JFrame {
     private JPanel mainPanel;
     private JPanel panelAlto;
@@ -22,6 +25,13 @@ public class DashboardRecensioni extends JFrame {
     private Cliente clienteLoggato;
     private Film filmSelezionato;
 
+    /**
+     * Instantiates a new Dashboard recensioni.
+     *
+     * @param controller the controller
+     * @param cliente    the cliente
+     * @param film       the film
+     */
     public DashboardRecensioni(Controller controller, Cliente cliente, Film film) {
         this.controller = controller;
         this.clienteLoggato = cliente;

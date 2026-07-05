@@ -10,6 +10,9 @@ import java.awt.event.WindowEvent;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+/**
+ * The type Dashboard carrello.
+ */
 public class DashboardCarrello extends JFrame {
 
     private JPanel panelCarrello;
@@ -27,6 +30,12 @@ public class DashboardCarrello extends JFrame {
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
+    /**
+     * Instantiates a new Dashboard carrello.
+     *
+     * @param controller the controller
+     * @param cliente    the cliente
+     */
     public DashboardCarrello(Controller controller, Cliente cliente) {
         this.controller = controller;
         this.clienteLoggato = cliente;
@@ -70,7 +79,6 @@ public class DashboardCarrello extends JFrame {
         Color bluAcceso = new Color(54, 112, 233);
         Color grigioScuro = new Color(50, 58, 89);
 
-        panelCarrello.removeAll();
         panelCarrello.setLayout(new BorderLayout());
         panelCarrello.setBackground(sfondoScuro);
 
