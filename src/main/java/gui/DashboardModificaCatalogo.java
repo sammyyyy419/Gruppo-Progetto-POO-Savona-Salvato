@@ -17,15 +17,24 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 public class DashboardModificaCatalogo extends JFrame {
+
     private JPanel mainPanel;
-    private JButton btnTorna;
-    private JScrollPane scrollPanelFilm;
+    private JLabel labelGestioneCatalogo;
+    private JPanel panelScroll;
+    private JScrollPane scrollCatalogo;
+    private JButton indietroButton;
+
     private JPanel panelListaFilm;
 
     private Controller controller;
 
     public DashboardModificaCatalogo(Controller controller) {
         this.controller = controller;
+
+        panelListaFilm = new JPanel();
+        panelListaFilm.setLayout(new BoxLayout(panelListaFilm, BoxLayout.Y_AXIS));
+        scrollCatalogo.setViewportView(panelListaFilm);
+        scrollCatalogo.getVerticalScrollBar().setUnitIncrement(16);
 
         sistemaGrafica();
 
@@ -36,51 +45,41 @@ public class DashboardModificaCatalogo extends JFrame {
         setMinimumSize(new Dimension(820, 560));
         setLocationRelativeTo(null);
 
-        panelListaFilm.setLayout(new BoxLayout(panelListaFilm, BoxLayout.Y_AXIS));
         aggiornaListaFilm();
 
-        btnTorna.addActionListener(e -> this.dispose());
+        indietroButton.addActionListener(e -> this.dispose());
 
         setVisible(true);
     }
 
     private void sistemaGrafica() {
+
         Color sfondoScuro = new Color(18, 22, 40);
         Color sfondoPannello = new Color(28, 34, 58);
         Color testoChiaro = Color.WHITE;
         Color grigioScuro = new Color(50, 58, 89);
 
-        mainPanel.removeAll();
-        mainPanel.setLayout(new BorderLayout());
+
         mainPanel.setBackground(sfondoScuro);
 
-        JPanel panelTop = new JPanel(new BorderLayout(15, 0));
-        panelTop.setBackground(sfondoScuro);
-        panelTop.setBorder(new EmptyBorder(15, 20, 15, 20));
+        labelGestioneCatalogo.setForeground(testoChiaro);
+        labelGestioneCatalogo.setFont(new Font("SansSerif", Font.BOLD, 22));
 
-        JLabel labelTitoloSchermata = new JLabel("Gestione Catalogo Film");
-        labelTitoloSchermata.setForeground(testoChiaro);
-        labelTitoloSchermata.setFont(new Font("SansSerif", Font.BOLD, 18));
+        panelScroll.setBackground(sfondoScuro);
+        panelScroll.setBorder(new EmptyBorder(10, 20, 10, 20));
 
-        btnTorna.setText("Indietro");
-        btnTorna.setBackground(grigioScuro);
-        btnTorna.setForeground(testoChiaro);
-        btnTorna.setFocusPainted(false);
-        btnTorna.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnTorna.setPreferredSize(new Dimension(100, 32));
-
-        panelTop.add(labelTitoloSchermata, BorderLayout.WEST);
-        panelTop.add(btnTorna, BorderLayout.EAST);
-
-        scrollPanelFilm.setBorder(BorderFactory.createEmptyBorder());
-        scrollPanelFilm.setBackground(sfondoPannello);
-        scrollPanelFilm.getViewport().setBackground(sfondoPannello);
+        scrollCatalogo.setBorder(BorderFactory.createEmptyBorder());
+        scrollCatalogo.setBackground(sfondoPannello);
+        scrollCatalogo.getViewport().setBackground(sfondoPannello);
 
         panelListaFilm.setBackground(sfondoPannello);
         panelListaFilm.setBorder(new EmptyBorder(15, 20, 15, 20));
 
-        mainPanel.add(panelTop, BorderLayout.NORTH);
-        mainPanel.add(scrollPanelFilm, BorderLayout.CENTER);
+        indietroButton.setBackground(grigioScuro);
+        indietroButton.setForeground(testoChiaro);
+        indietroButton.setFocusPainted(false);
+        indietroButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        indietroButton.setFont(new Font("SansSerif", Font.BOLD, 14));
     }
 
     private void aggiornaListaFilm() {
