@@ -10,6 +10,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 
+/**
+ * The type Dashboard rimborso.
+ */
 public class DashboardRimborso extends JFrame {
 
     private JPanel panelRimborso;
@@ -28,6 +31,14 @@ public class DashboardRimborso extends JFrame {
     private Biglietto bigliettoDaRimborsare;
     private DashboardBigliettiAcquistati finestraPadre;
 
+    /**
+     * Instantiates a new Dashboard rimborso.
+     *
+     * @param controller    the controller
+     * @param cliente       the cliente
+     * @param biglietto     the biglietto
+     * @param finestraPadre the finestra padre
+     */
     public DashboardRimborso(Controller controller, Cliente cliente, Biglietto biglietto, DashboardBigliettiAcquistati finestraPadre) {
         this.controller = controller;
         this.clienteLoggato = cliente;

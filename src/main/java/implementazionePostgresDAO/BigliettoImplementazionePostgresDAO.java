@@ -12,6 +12,9 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+/**
+ * The type Biglietto implementazione postgres dao.
+ */
 public class BigliettoImplementazionePostgresDAO implements BigliettoDAO {
 
     @Override

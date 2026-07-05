@@ -5,15 +5,27 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * The type Dashboard gestione sale.
+ */
 public class DashboardGestioneSale extends JFrame {
 
     private Controller controller;
-    private JPanel mainPanel;
-    private JPanel panelGrigliaSale;
-    private JButton indietroButton;
 
+    private JPanel mainPanel;
+    private JLabel labelSale;
+    private JButton indietroButton;
+    private JPanel panelSale;
+
+    /**
+     * Instantiates a new Dashboard gestione sale.
+     *
+     * @param controller the controller
+     */
     public DashboardGestioneSale(Controller controller) {
         this.controller = controller;
+
+        panelSale.setLayout(new GridLayout(3, 4, 15, 15));
 
         sistemaGrafica();
 
@@ -24,6 +36,8 @@ public class DashboardGestioneSale extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        disegnaMappa();
+
         indietroButton.addActionListener(e -> this.dispose());
 
         setVisible(true);
@@ -33,41 +47,28 @@ public class DashboardGestioneSale extends JFrame {
         Color sfondoScuro = new Color(18, 22, 40);
         Color sfondoPannello = new Color(28, 34, 58);
         Color grigioScuro = new Color(50, 58, 89);
+        Color testoChiaro = Color.WHITE;
 
-        mainPanel.removeAll();
-        mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(sfondoScuro);
 
-        JPanel panelTop = new JPanel(new BorderLayout(15, 0));
-        panelTop.setBackground(sfondoScuro);
-        panelTop.setBorder(new EmptyBorder(15, 20, 10, 20));
+        mainPanel.setBorder(new EmptyBorder(15, 20, 15, 20));
 
-        JLabel lblTitolo = new JLabel("Piantina Sale Cinematografiche", SwingConstants.CENTER);
-        lblTitolo.setForeground(Color.WHITE);
-        lblTitolo.setFont(new Font("SansSerif", Font.BOLD, 18));
+        labelSale.setForeground(testoChiaro);
+        labelSale.setFont(new Font("SansSerif", Font.BOLD, 18));
 
-        indietroButton = new JButton("Indietro");
         indietroButton.setBackground(grigioScuro);
-        indietroButton.setForeground(Color.WHITE);
+        indietroButton.setForeground(testoChiaro);
         indietroButton.setFocusPainted(false);
         indietroButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         indietroButton.setPreferredSize(new Dimension(100, 32));
 
-        panelTop.add(lblTitolo, BorderLayout.WEST);
-        panelTop.add(indietroButton, BorderLayout.EAST);
-        mainPanel.add(panelTop, BorderLayout.NORTH);
-
-        panelGrigliaSale = new JPanel(new GridLayout(3, 4, 15, 15));
-        panelGrigliaSale.setBackground(sfondoPannello);
-        panelGrigliaSale.setBorder(new EmptyBorder(20, 20, 20, 20));
-
-        disegnaMappa();
-
-        mainPanel.add(panelGrigliaSale, BorderLayout.CENTER);
+        panelSale.setBackground(sfondoPannello);
+        panelSale.setBorder(new EmptyBorder(20, 20, 20, 20));
     }
 
     private void disegnaMappa() {
-        panelGrigliaSale.removeAll();
+
+        panelSale.removeAll();
 
         Color verdeSuccesso = new Color(46, 204, 113);
         Color rossoErrore = new Color(176, 58, 75);
@@ -94,11 +95,11 @@ public class DashboardGestioneSale extends JFrame {
                 btnSala.addActionListener(e -> JOptionPane.showMessageDialog(this, "La " + nomeSala + " è pienamente operativa.", "Tutto OK", JOptionPane.INFORMATION_MESSAGE));
             }
 
-            panelGrigliaSale.add(btnSala);
+            panelSale.add(btnSala);
         }
 
-        panelGrigliaSale.revalidate();
-        panelGrigliaSale.repaint();
+        panelSale.revalidate();
+        panelSale.repaint();
     }
 
     private void apriPannelloRisoluzione(String nomeSala, String problema) {

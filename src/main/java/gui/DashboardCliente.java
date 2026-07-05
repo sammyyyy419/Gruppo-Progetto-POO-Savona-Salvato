@@ -8,6 +8,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * The type Dashboard cliente.
+ */
 public class DashboardCliente extends JFrame {
     private JPanel mainPanel;
     private JButton buttonCatalogoFilm;
@@ -21,6 +24,12 @@ public class DashboardCliente extends JFrame {
     private Controller controller;
     private Cliente clienteLoggato;
 
+    /**
+     * Instantiates a new Dashboard cliente.
+     *
+     * @param controller the controller
+     * @param cliente    the cliente
+     */
     public DashboardCliente(Controller controller, Cliente cliente) {
         this.controller = controller;
         this.clienteLoggato = cliente;

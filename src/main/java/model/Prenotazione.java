@@ -3,6 +3,9 @@ package model;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+/**
+ * The type Prenotazione.
+ */
 public class Prenotazione {
 
     private LocalDateTime dataPrenotazione;
@@ -13,6 +16,16 @@ public class Prenotazione {
     private Cliente cliente;
     private Pagamento pagamento;
 
+    /**
+     * Instantiates a new Prenotazione.
+     *
+     * @param dataPrenotazione the data prenotazione
+     * @param stato            the stato
+     * @param proiezione       the proiezione
+     * @param biglietti        the biglietti
+     * @param cliente          the cliente
+     * @param pagamento        the pagamento
+     */
     public Prenotazione(LocalDateTime dataPrenotazione, StatoPrenotazione stato, Proiezione proiezione, ArrayList<Biglietto> biglietti, Cliente cliente, Pagamento pagamento) {
         this.dataPrenotazione = dataPrenotazione;
         this.stato = stato;
@@ -22,10 +35,20 @@ public class Prenotazione {
         this.pagamento = pagamento;
     }
 
+    /**
+     * Gets numero biglietti.
+     *
+     * @return the numero biglietti
+     */
     public int getNumeroBiglietti() {
         return this.biglietti.size();
     }
 
+    /**
+     * Verifica disponibilita posti in sala boolean.
+     *
+     * @return the boolean
+     */
     public boolean verificaDisponibilitaPostiInSala() {
         if (this.proiezione == null) {
             return false;
@@ -42,12 +65,20 @@ public class Prenotazione {
         }
     }
 
+    /**
+     * Inserisci biglietti.
+     *
+     * @param biglietto the biglietto
+     */
     public void inserisciBiglietti(Biglietto biglietto) {
         if (biglietto != null) {
             this.biglietti.add(biglietto);
         }
     }
 
+    /**
+     * Conferma prenotazione.
+     */
     public void confermaPrenotazione() {
         this.stato = StatoPrenotazione.CONFERMATO;
         if (this.proiezione != null) {
@@ -55,6 +86,9 @@ public class Prenotazione {
         }
     }
 
+    /**
+     * Aggiungi posto.
+     */
     public void aggiungiPosto() {
         if (this.proiezione != null) {
             double prezzo = this.proiezione.getPrezzoBase();
@@ -63,6 +97,11 @@ public class Prenotazione {
         }
     }
 
+    /**
+     * Calcolo prezzo totale double.
+     *
+     * @return the double
+     */
     public double calcoloPrezzoTotale() {
         double totale = 0.0;
         if (this.biglietti != null) {
@@ -73,16 +112,87 @@ public class Prenotazione {
         return totale;
     }
 
+    /**
+     * Gets data prenotazione.
+     *
+     * @return the data prenotazione
+     */
     public LocalDateTime getDataPrenotazione() { return dataPrenotazione; }
+
+    /**
+     * Sets data prenotazione.
+     *
+     * @param dataPrenotazione the data prenotazione
+     */
     public void setDataPrenotazione(LocalDateTime dataPrenotazione) { this.dataPrenotazione = dataPrenotazione; }
+
+    /**
+     * Gets stato.
+     *
+     * @return the stato
+     */
     public StatoPrenotazione getStato() { return stato; }
+
+    /**
+     * Sets stato.
+     *
+     * @param stato the stato
+     */
     public void setStato(StatoPrenotazione stato) { this.stato = stato; }
+
+    /**
+     * Gets proiezione.
+     *
+     * @return the proiezione
+     */
     public Proiezione getProiezione() { return proiezione; }
+
+    /**
+     * Sets proiezione.
+     *
+     * @param proiezione the proiezione
+     */
     public void setProiezione(Proiezione proiezione) { this.proiezione = proiezione; }
+
+    /**
+     * Gets biglietti.
+     *
+     * @return the biglietti
+     */
     public ArrayList<Biglietto> getBiglietti() { return biglietti; }
+
+    /**
+     * Sets biglietti.
+     *
+     * @param biglietti the biglietti
+     */
     public void setBiglietti(ArrayList<Biglietto> biglietti) { this.biglietti = biglietti; }
+
+    /**
+     * Gets cliente.
+     *
+     * @return the cliente
+     */
     public Cliente getCliente() { return cliente; }
+
+    /**
+     * Sets cliente.
+     *
+     * @param cliente the cliente
+     */
     public void setCliente(Cliente cliente) { this.cliente = cliente; }
+
+    /**
+     * Gets pagamento.
+     *
+     * @return the pagamento
+     */
     public Pagamento getPagamento() { return pagamento; }
+
+    /**
+     * Sets pagamento.
+     *
+     * @param pagamento the pagamento
+     */
     public void setPagamento(Pagamento pagamento) { this.pagamento = pagamento; }
 }

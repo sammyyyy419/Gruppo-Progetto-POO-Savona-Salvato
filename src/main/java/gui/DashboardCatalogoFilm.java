@@ -9,6 +9,9 @@ import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 
+/**
+ * The type Dashboard catalogo film.
+ */
 public class DashboardCatalogoFilm extends JFrame {
     private JPanel panelCatalogo;
     private JButton tornaAlMenuButton;
@@ -17,6 +20,12 @@ public class DashboardCatalogoFilm extends JFrame {
     private Controller controller;
     private Cliente clienteLoggato;
 
+    /**
+     * Instantiates a new Dashboard catalogo film.
+     *
+     * @param controller the controller
+     * @param cliente    the cliente
+     */
     public DashboardCatalogoFilm(Controller controller, Cliente cliente) {
         this.controller = controller;
         this.clienteLoggato = cliente;

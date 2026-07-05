@@ -5,6 +5,7 @@ import model.Cliente;
 import model.Film;
 import model.Proiezione;
 import model.Sala;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -13,44 +14,62 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
+/**
+ * The type Dashboard prenotazione.
+ */
 public class DashboardPrenotazione extends JFrame {
-    private JPanel panelPrenotazione;
-    private JLabel labelTitoloFilm;
-    private JLabel labelDettagliFilm;
-    private JButton btnScegliData;
-    private JComboBox<Proiezione> comboOrari;
-    private JComboBox<Integer> comboQuantita;
-    private JLabel labelTotPagamento;
-    private JButton pulsanteAggiungiCarrello;
-    private JButton pulsanteTorna;
+
+    private JPanel mainPanel;
+    private JPanel topPanel;
+    private JButton tornaAlCatalogoButton;
+    private JLabel labelTitolo;
+    private JLabel labelInfo;
+
+    private JPanel midPanel;
+    private JLabel labelData;
+    private JLabel labelOrari;
+    private JLabel labelQuantita;
+    private JButton calendarioButton;
+    private JComboBox<Proiezione> comboBox1;
+    private JComboBox<Integer> comboBox2;
+
+    private JPanel bottomPanel;
+    private JLabel labelTotale;
+    private JButton aggiungiAlCarrelloButton;
 
     private Controller controller;
     private Cliente clienteLoggato;
     private Film filmSelezionato;
     private double prezzoSingoloBiglietto = 8.00;
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
     private ArrayList<Proiezione> proiezioniDelFilm;
 
+    /**
+     * Instantiates a new Dashboard prenotazione.
+     *
+     * @param controller the controller
+     * @param cliente    the cliente
+     * @param film       the film
+     */
     public DashboardPrenotazione(Controller controller, Cliente cliente, Film film) {
         this.controller = controller;
         this.clienteLoggato = cliente;
         this.filmSelezionato = film;
 
-        inizializzaInterfaccia();
+        sistemaGrafica();
 
-        setContentPane(panelPrenotazione);
+        setContentPane(mainPanel);
         setTitle("Prenotazione Biglietti - Enterprise Cinema");
         setSize(660, 520);
         setMinimumSize(new Dimension(600, 460));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        labelTitoloFilm.setText(filmSelezionato.getTitolo().toUpperCase());
-        labelDettagliFilm.setText("Genere: " + filmSelezionato.getGenere() + " | Durata: " + filmSelezionato.getDurataMinuti() + " min | Ubicazione: " + filmSelezionato.getSalaAssegnata());
+        labelTitolo.setText(filmSelezionato.getTitolo().toUpperCase());
+        labelInfo.setText("Genere: " + filmSelezionato.getGenere() + " | Durata: " + filmSelezionato.getDurataMinuti() + " min | Ubicazione: " + filmSelezionato.getSalaAssegnata());
 
         for (int i = 1; i <= 10; i++) {
-            comboQuantita.addItem(i);
+            comboBox2.addItem(i);
         }
 
         LocalDate oggi = LocalDate.now();
@@ -71,25 +90,23 @@ public class DashboardPrenotazione extends JFrame {
 
                 if ((dataProiezione.isEqual(oggi) || dataProiezione.isAfter(oggi)) &&
                         (dataProiezione.isEqual(fineProgrammazione) || dataProiezione.isBefore(fineProgrammazione))) {
-
                     giorniValidi.add(dataProiezione.format(dateFormatter));
                 }
             }
         }
 
-        pulsanteTorna.addActionListener(e -> {
+        tornaAlCatalogoButton.addActionListener(e -> {
             this.dispose();
         });
 
-        btnScegliData.addActionListener(e -> apriMiniCalendario(giorniValidi));
+        calendarioButton.addActionListener(e -> apriMiniCalendario(giorniValidi));
 
-        comboOrari.addActionListener(e -> {
-            if (comboOrari.getItemCount() == 0) return;
-            Proiezione proiezioneSelezionata = (Proiezione) comboOrari.getSelectedItem();
+        comboBox1.addActionListener(e -> {
+            if (comboBox1.getItemCount() == 0) return;
+            Proiezione proiezioneSelezionata = (Proiezione) comboBox1.getSelectedItem();
 
             if (proiezioneSelezionata != null) {
 
-                // CORREZIONE: Aggiorna dinamicamente il prezzo in base al tipo di sala dello spettacolo scelto
                 if ("IMAX".equalsIgnoreCase(proiezioneSelezionata.getSala().getTipoSala())) {
                     prezzoSingoloBiglietto = 12.00;
                 } else {
@@ -101,27 +118,28 @@ public class DashboardPrenotazione extends JFrame {
 
                 if (postiLiberi < 1) {
                     JOptionPane.showMessageDialog(this, "Siamo spiacenti! Non ci sono più biglietti disponibili per la data/ora scelti", "Posti Esauriti", JOptionPane.WARNING_MESSAGE);
-                    pulsanteAggiungiCarrello.setEnabled(false);
+                    aggiungiAlCarrelloButton.setEnabled(false);
                     return;
                 }
-                Integer quantita = (Integer) comboQuantita.getSelectedItem();
+
+                Integer quantita = (Integer) comboBox2.getSelectedItem();
                 if (quantita != null && quantita > postiLiberi) {
-                    comboQuantita.setSelectedItem(postiLiberi);
+                    comboBox2.setSelectedItem(postiLiberi);
                     quantita = postiLiberi;
                 }
 
                 double totale = quantita * prezzoSingoloBiglietto;
-                labelTotPagamento.setText("Tot. : " + String.format("%.2f", totale) + " €");
-                pulsanteAggiungiCarrello.setEnabled(true);
+                labelTotale.setText("Tot. : " + String.format("%.2f", totale) + " €");
+                aggiungiAlCarrelloButton.setEnabled(true);
             } else {
-                pulsanteAggiungiCarrello.setEnabled(false);
+                aggiungiAlCarrelloButton.setEnabled(false);
             }
         });
 
-        comboQuantita.addActionListener(e -> {
-            if (comboOrari.getItemCount() == 0) return;
-            Proiezione proiezioneSelezionata = (Proiezione) comboOrari.getSelectedItem();
-            Integer quantita = (Integer) comboQuantita.getSelectedItem();
+        comboBox2.addActionListener(e -> {
+            if (comboBox1.getItemCount() == 0) return;
+            Proiezione proiezioneSelezionata = (Proiezione) comboBox1.getSelectedItem();
+            Integer quantita = (Integer) comboBox2.getSelectedItem();
 
             if (proiezioneSelezionata != null && quantita != null) {
                 Sala sala = proiezioneSelezionata.getSala();
@@ -129,18 +147,18 @@ public class DashboardPrenotazione extends JFrame {
 
                 if (quantita > postiLiberi) {
                     JOptionPane.showMessageDialog(this, "Attenzione! Per questa proiezione sono disponibili solo " + postiLiberi + " biglietti.", "Disponibilità Superata", JOptionPane.WARNING_MESSAGE);
-                    comboQuantita.setSelectedItem(postiLiberi);
+                    comboBox2.setSelectedItem(postiLiberi);
                     return;
                 }
                 double totale = quantita * prezzoSingoloBiglietto;
-                labelTotPagamento.setText("Tot. : " + String.format("%.2f", totale) + " €");
-                pulsanteAggiungiCarrello.setEnabled(true);
+                labelTotale.setText("Tot. : " + String.format("%.2f", totale) + " €");
+                aggiungiAlCarrelloButton.setEnabled(true);
             }
         });
 
-        pulsanteAggiungiCarrello.addActionListener(e -> {
-            Proiezione proiezioneSelezionata = (Proiezione) comboOrari.getSelectedItem();
-            Integer quantita = (Integer) comboQuantita.getSelectedItem();
+        aggiungiAlCarrelloButton.addActionListener(e -> {
+            Proiezione proiezioneSelezionata = (Proiezione) comboBox1.getSelectedItem();
+            Integer quantita = (Integer) comboBox2.getSelectedItem();
 
             if (proiezioneSelezionata != null && quantita != null) {
                 double totale = quantita * prezzoSingoloBiglietto;
@@ -151,6 +169,76 @@ public class DashboardPrenotazione extends JFrame {
         });
 
         setVisible(true);
+    }
+
+    private void sistemaGrafica() {
+
+        Color sfondoScuro = new Color(18, 22, 40);
+        Color sfondoPannello = new Color(28, 34, 58);
+        Color sfondoCard = new Color(38, 46, 78);
+        Color testoChiaro = Color.WHITE;
+        Color bluAcceso = new Color(54, 112, 233);
+        Color grigioScuro = new Color(50, 58, 89);
+
+        mainPanel.setBackground(sfondoScuro);
+
+        topPanel.setBackground(sfondoScuro);
+        topPanel.setBorder(new EmptyBorder(15, 20, 10, 20));
+
+        tornaAlCatalogoButton.setBackground(grigioScuro);
+        tornaAlCatalogoButton.setForeground(testoChiaro);
+        tornaAlCatalogoButton.setFocusable(false);
+        tornaAlCatalogoButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        tornaAlCatalogoButton.setPreferredSize(new Dimension(160, 32));
+
+        labelTitolo.setFont(new Font("SansSerif", Font.BOLD, 20));
+        labelTitolo.setForeground(testoChiaro);
+        labelTitolo.setHorizontalAlignment(SwingConstants.CENTER);
+
+        labelInfo.setFont(new Font("SansSerif", Font.ITALIC, 13));
+        labelInfo.setForeground(new Color(200, 210, 230));
+        labelInfo.setHorizontalAlignment(SwingConstants.CENTER);
+
+        midPanel.setBackground(sfondoPannello);
+        midPanel.setBorder(new EmptyBorder(30, 40, 30, 40));
+
+        calendarioButton.setBackground(sfondoCard);
+        calendarioButton.setForeground(testoChiaro);
+        calendarioButton.setFocusPainted(false);
+        calendarioButton.setFont(new Font("SansSerif", Font.BOLD, 13));
+        calendarioButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        comboBox1.setBackground(sfondoCard);
+        comboBox1.setForeground(testoChiaro);
+        comboBox1.setFont(new Font("SansSerif", Font.PLAIN, 13));
+
+        comboBox2.setBackground(sfondoCard);
+        comboBox2.setForeground(testoChiaro);
+        comboBox2.setFont(new Font("SansSerif", Font.PLAIN, 13));
+
+        labelData.setForeground(testoChiaro);
+        labelData.setFont(new Font("SansSerif", Font.PLAIN, 13));
+
+        labelOrari.setForeground(testoChiaro);
+        labelOrari.setFont(new Font("SansSerif", Font.PLAIN, 13));
+
+        labelQuantita.setForeground(testoChiaro);
+        labelQuantita.setFont(new Font("SansSerif", Font.PLAIN, 13));
+
+        bottomPanel.setBackground(sfondoScuro);
+        bottomPanel.setBorder(new EmptyBorder(12, 20, 15, 20));
+
+        labelTotale.setFont(new Font("SansSerif", Font.BOLD, 16));
+        labelTotale.setForeground(testoChiaro);
+        labelTotale.setText("Tot. : 0,00 €"); // Valore di default
+
+        aggiungiAlCarrelloButton.setBackground(bluAcceso);
+        aggiungiAlCarrelloButton.setForeground(testoChiaro);
+        aggiungiAlCarrelloButton.setFont(new Font("SansSerif", Font.BOLD, 13));
+        aggiungiAlCarrelloButton.setFocusPainted(false);
+        aggiungiAlCarrelloButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        aggiungiAlCarrelloButton.setPreferredSize(new Dimension(190, 40));
+        aggiungiAlCarrelloButton.setEnabled(false); // Disabilitato all'inizio
     }
 
     private void apriMiniCalendario(LinkedHashSet<String> giorniValidi) {
@@ -174,15 +262,16 @@ public class DashboardPrenotazione extends JFrame {
             btnGiorno.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
             btnGiorno.addActionListener(ev -> {
-                btnScegliData.setText(giorno);
-                btnScegliData.setBackground(new Color(46, 204, 113));
-                btnScegliData.setForeground(Color.WHITE);
+                calendarioButton.setText(giorno);
+                calendarioButton.setBackground(new Color(46, 204, 113));
+                calendarioButton.setForeground(Color.WHITE);
 
-                comboOrari.removeAllItems();
-                pulsanteAggiungiCarrello.setEnabled(false);
+                comboBox1.removeAllItems();
+                aggiungiAlCarrelloButton.setEnabled(false);
+
                 for (Proiezione p : proiezioniDelFilm) {
                     if (p.getDataOraInizio() != null && p.getDataOraInizio().toLocalDate().format(dateFormatter).equals(giorno)) {
-                        comboOrari.addItem(p);
+                        comboBox1.addItem(p);
                     }
                 }
                 dialogCalendario.dispose();
@@ -190,114 +279,5 @@ public class DashboardPrenotazione extends JFrame {
             dialogCalendario.add(btnGiorno);
         }
         dialogCalendario.setVisible(true);
-    }
-
-    private void inizializzaInterfaccia() {
-        Color sfondoScuro = new Color(18, 22, 40);
-        Color sfondoPannello = new Color(28, 34, 58);
-        Color sfondoCard = new Color(38, 46, 78);
-        Color testoChiaro = Color.WHITE;
-        Color bluAcceso = new Color(54, 112, 233);
-        Color grigioScuro = new Color(50, 58, 89);
-
-        panelPrenotazione = new JPanel(new BorderLayout());
-        panelPrenotazione.setBackground(sfondoScuro);
-
-        JPanel topPanel = new JPanel(new BorderLayout(15, 5));
-        topPanel.setBackground(sfondoScuro);
-        topPanel.setBorder(new EmptyBorder(15, 20, 10, 20));
-
-        pulsanteTorna = new JButton("← Torna al Catalogo");
-        pulsanteTorna.setBackground(grigioScuro);
-        pulsanteTorna.setForeground(testoChiaro);
-        pulsanteTorna.setFocusable(false);
-        pulsanteTorna.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        pulsanteTorna.setPreferredSize(new Dimension(160, 32));
-
-        JPanel wrapperBottone = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
-        wrapperBottone.setOpaque(false);
-        wrapperBottone.add(pulsanteTorna);
-
-        JPanel infoFilmPanel = new JPanel(new GridLayout(2, 1, 5, 2));
-        infoFilmPanel.setOpaque(false);
-
-        labelTitoloFilm = new JLabel("", SwingConstants.CENTER);
-        labelTitoloFilm.setFont(new Font("SansSerif", Font.BOLD, 20));
-        labelTitoloFilm.setForeground(testoChiaro);
-
-        labelDettagliFilm = new JLabel("", SwingConstants.CENTER);
-        labelDettagliFilm.setFont(new Font("SansSerif", Font.ITALIC, 13));
-        labelDettagliFilm.setForeground(new Color(200, 210, 230));
-
-        infoFilmPanel.add(labelTitoloFilm);
-        infoFilmPanel.add(labelDettagliFilm);
-
-        JLabel spacerDestro = new JLabel("");
-        spacerDestro.setPreferredSize(new Dimension(160, 10));
-
-        topPanel.add(wrapperBottone, BorderLayout.WEST);
-        topPanel.add(infoFilmPanel, BorderLayout.CENTER);
-        topPanel.add(spacerDestro, BorderLayout.EAST);
-        panelPrenotazione.add(topPanel, BorderLayout.NORTH);
-
-        JPanel centerPanel = new JPanel(new GridLayout(3, 2, 15, 25));
-        centerPanel.setBackground(sfondoPannello);
-        centerPanel.setBorder(new EmptyBorder(30, 40, 30, 40));
-
-        btnScegliData = new JButton("Scegli Data dal Calendario 📅");
-        btnScegliData.setBackground(sfondoCard);
-        btnScegliData.setForeground(testoChiaro);
-        btnScegliData.setFocusPainted(false);
-        btnScegliData.setFont(new Font("SansSerif", Font.BOLD, 13));
-        btnScegliData.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        comboOrari = new JComboBox<>();
-        comboOrari.setBackground(sfondoCard);
-        comboOrari.setForeground(testoChiaro);
-        comboOrari.setFont(new Font("SansSerif", Font.PLAIN, 13));
-
-        comboQuantita = new JComboBox<>();
-        comboQuantita.setBackground(sfondoCard);
-        comboQuantita.setForeground(testoChiaro);
-        comboQuantita.setFont(new Font("SansSerif", Font.PLAIN, 13));
-
-        JLabel lblData = new JLabel("Data Spettacolo:", SwingConstants.RIGHT);
-        JLabel lblOrario = new JLabel("Seleziona Orario:", SwingConstants.RIGHT);
-        JLabel lblQuant = new JLabel("Quantità Biglietti:", SwingConstants.RIGHT);
-
-        JLabel[] centerLabels = {lblData, lblOrario, lblQuant};
-        for (JLabel l : centerLabels) {
-            l.setForeground(testoChiaro);
-            l.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        }
-
-        centerPanel.add(lblData);
-        centerPanel.add(btnScegliData);
-        centerPanel.add(lblOrario);
-        centerPanel.add(comboOrari);
-        centerPanel.add(lblQuant);
-        centerPanel.add(comboQuantita);
-        panelPrenotazione.add(centerPanel, BorderLayout.CENTER);
-
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-        bottomPanel.setBackground(sfondoScuro);
-        bottomPanel.setBorder(new EmptyBorder(12, 20, 15, 20));
-
-        labelTotPagamento = new JLabel("Tot. : 0,00 €");
-        labelTotPagamento.setFont(new Font("SansSerif", Font.BOLD, 16));
-        labelTotPagamento.setForeground(testoChiaro);
-
-        pulsanteAggiungiCarrello = new JButton("Aggiungi al Carrello 🛒");
-        pulsanteAggiungiCarrello.setBackground(bluAcceso);
-        pulsanteAggiungiCarrello.setForeground(testoChiaro);
-        pulsanteAggiungiCarrello.setFont(new Font("SansSerif", Font.BOLD, 13));
-        pulsanteAggiungiCarrello.setFocusPainted(false);
-        pulsanteAggiungiCarrello.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        pulsanteAggiungiCarrello.setPreferredSize(new Dimension(190, 40));
-        pulsanteAggiungiCarrello.setEnabled(false);
-
-        bottomPanel.add(labelTotPagamento, BorderLayout.WEST);
-        bottomPanel.add(pulsanteAggiungiCarrello, BorderLayout.EAST);
-        panelPrenotazione.add(bottomPanel, BorderLayout.SOUTH);
     }
 }

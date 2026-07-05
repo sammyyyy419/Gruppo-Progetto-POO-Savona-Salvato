@@ -10,6 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+/**
+ * The type Home.
+ */
 public class Home extends JFrame {
     private JPanel mainPanel;
     private JLabel labelTitolo;
@@ -21,6 +24,11 @@ public class Home extends JFrame {
     private JButton buttonAccedi;
     private Controller controller;
 
+    /**
+     * Instantiates a new Home.
+     *
+     * @param controller the controller
+     */
     public Home(Controller controller) {
         this.controller = controller;
 
@@ -59,7 +67,6 @@ public class Home extends JFrame {
         Color blu = new Color(70, 120, 255);
         Color viola = new Color(126, 87, 194);
 
-        mainPanel.removeAll();
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(pannello);
 
