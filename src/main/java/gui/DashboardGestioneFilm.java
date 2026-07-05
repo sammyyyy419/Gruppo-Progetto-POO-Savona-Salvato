@@ -39,7 +39,7 @@ public class DashboardGestioneFilm extends JFrame {
     private JTextField textTitolo;
     private JTextField textGenere;
     private JTextField textDurata;
-    private JTextArea textTrama;   // <-- Aggiornato a JTextArea
+    private JTextArea textTrama;
 
     private String percorsoImmagineSelezionata = null;
 
