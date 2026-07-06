@@ -406,7 +406,10 @@ public class Controller {
         this.listaCarrello.clear();
     }
 
-
+    /**
+     *
+     * @return la lista biglietti
+     */
     public ArrayList<Biglietto> getBigliettiAcquistati() { return this.listaBiglietti; }
 
     /**

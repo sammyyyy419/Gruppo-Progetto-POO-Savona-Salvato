@@ -106,31 +106,18 @@ public class DashboardPrenotazione extends JFrame {
             Proiezione proiezioneSelezionata = (Proiezione) comboBox1.getSelectedItem();
 
             if (proiezioneSelezionata != null) {
-
                 if ("IMAX".equalsIgnoreCase(proiezioneSelezionata.getSala().getTipoSala())) {
                     prezzoSingoloBiglietto = 12.00;
                 } else {
                     prezzoSingoloBiglietto = 8.00;
                 }
 
-                Sala sala = proiezioneSelezionata.getSala();
-                int postiLiberi = sala.controllareCapienzaPostiResidua(proiezioneSelezionata);
-
-                if (postiLiberi < 1) {
-                    JOptionPane.showMessageDialog(this, "Siamo spiacenti! Non ci sono più biglietti disponibili per la data/ora scelti", "Posti Esauriti", JOptionPane.WARNING_MESSAGE);
-                    aggiungiAlCarrelloButton.setEnabled(false);
-                    return;
-                }
-
                 Integer quantita = (Integer) comboBox2.getSelectedItem();
-                if (quantita != null && quantita > postiLiberi) {
-                    comboBox2.setSelectedItem(postiLiberi);
-                    quantita = postiLiberi;
+                if (quantita != null) {
+                    double totale = quantita * prezzoSingoloBiglietto;
+                    labelTotale.setText("Tot. : " + String.format("%.2f", totale) + " €");
+                    aggiungiAlCarrelloButton.setEnabled(true);
                 }
-
-                double totale = quantita * prezzoSingoloBiglietto;
-                labelTotale.setText("Tot. : " + String.format("%.2f", totale) + " €");
-                aggiungiAlCarrelloButton.setEnabled(true);
             } else {
                 aggiungiAlCarrelloButton.setEnabled(false);
             }
@@ -142,14 +129,6 @@ public class DashboardPrenotazione extends JFrame {
             Integer quantita = (Integer) comboBox2.getSelectedItem();
 
             if (proiezioneSelezionata != null && quantita != null) {
-                Sala sala = proiezioneSelezionata.getSala();
-                int postiLiberi = sala.controllareCapienzaPostiResidua(proiezioneSelezionata);
-
-                if (quantita > postiLiberi) {
-                    JOptionPane.showMessageDialog(this, "Attenzione! Per questa proiezione sono disponibili solo " + postiLiberi + " biglietti.", "Disponibilità Superata", JOptionPane.WARNING_MESSAGE);
-                    comboBox2.setSelectedItem(postiLiberi);
-                    return;
-                }
                 double totale = quantita * prezzoSingoloBiglietto;
                 labelTotale.setText("Tot. : " + String.format("%.2f", totale) + " €");
                 aggiungiAlCarrelloButton.setEnabled(true);
