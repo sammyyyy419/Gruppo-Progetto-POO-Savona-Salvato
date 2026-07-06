@@ -2,6 +2,8 @@ package gui;
 
 import controller.Controller;
 import model.Utente;
+import exception.UtenteNonTrovatoException;
+import exception.PasswordErrataException;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -180,6 +182,20 @@ public class Home extends JFrame {
                 this.dispose();
             }
 
+        } catch (UtenteNonTrovatoException e) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Utente Non Trovato",
+                    JOptionPane.WARNING_MESSAGE
+            );
+        } catch (PasswordErrataException e) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage(),
+                    "Password Errata",
+                    JOptionPane.ERROR_MESSAGE
+            );
         } catch (Exception e) {
             JOptionPane.showMessageDialog(
                     this,

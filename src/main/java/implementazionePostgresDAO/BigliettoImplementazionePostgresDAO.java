@@ -82,7 +82,7 @@ public class BigliettoImplementazionePostgresDAO implements BigliettoDAO {
                 double prezzo = rs.getDouble("prezzo_pagato");
 
                 Biglietto b = new Biglietto(prezzo, fintoPosto, fintaProiezione, null);
-                b.setCodiceUnivoco(rs.getString("codice_univoco")); // Imposta il VERO codice salvato!
+                b.setCodiceUnivoco(rs.getString("codice_univoco"));
                 b.setValido(rs.getString("stato").equals("CONVALIDATO"));
 
                 lista.add(b);

@@ -2,6 +2,8 @@ package controller;
 
 import exception.RecensioneVuotaException;
 import exception.SalaPienaException;
+import exception.PasswordErrataException;
+import exception.UtenteNonTrovatoException;
 import model.Cliente;
 import model.Dipendente;
 import model.Utente;
@@ -209,8 +211,8 @@ public class Controller {
      */
     public boolean validaLogin(String email, String password) throws Exception {
         Utente utente = recuperaUtente(email);
-        if (utente == null) throw new Exception("Utente non trovato con questa email.");
-        if (!utente.getPassword().equals(password)) throw new Exception("Password errata.");
+        if (utente == null) throw new UtenteNonTrovatoException("Utente non trovato con questa email.");
+        if (!utente.getPassword().equals(password)) throw new PasswordErrataException("Password errata.");
 
         if (utente instanceof Cliente) {
             impostaUtenteCorrente((Cliente) utente);
