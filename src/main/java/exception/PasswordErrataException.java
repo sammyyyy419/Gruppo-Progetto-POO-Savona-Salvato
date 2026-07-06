@@ -1,7 +1,7 @@
 package exception;
 
 
-public class PasswordErrataException extends RuntimeException {
+public class PasswordErrataException extends Exception {
 
     /**
      * Crea una nuova istanza di {@link PasswordErrataException} con il messaggio di errore specificato.

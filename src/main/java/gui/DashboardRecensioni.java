@@ -269,14 +269,18 @@ public class DashboardRecensioni extends JFrame {
             int votoScelto = (Integer) comboVoto.getSelectedItem();
             String testoScritto = txtNuovoCommento.getText().trim();
 
-            boolean successo = controller.aggiungiRecensioneAFilm(filmSelezionato, clienteLoggato, votoScelto, testoScritto);
+            try {
+                boolean successo = controller.aggiungiRecensioneAFilm(filmSelezionato, clienteLoggato, votoScelto, testoScritto);
 
-            if (successo) {
-                JOptionPane.showMessageDialog(dialog, "Recensione aggiunta con successo!");
-                dialog.dispose();
-                aggiornaListaRecensioni();
-            } else {
-                JOptionPane.showMessageDialog(dialog, "Assicurati di aver scritto un commento valido.", "Errore", JOptionPane.ERROR_MESSAGE);
+                if (successo) {
+                    JOptionPane.showMessageDialog(dialog, "Recensione aggiunta con successo!");
+                    dialog.dispose();
+                    aggiornaListaRecensioni();
+                } else {
+                    JOptionPane.showMessageDialog(dialog, "Assicurati di aver scritto un commento valido.", "Errore", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (exception.RecensioneVuotaException ex) {
+                JOptionPane.showMessageDialog(dialog, ex.getMessage(), "Errore - Recensione Vuota", JOptionPane.ERROR_MESSAGE);
             }
         });
 

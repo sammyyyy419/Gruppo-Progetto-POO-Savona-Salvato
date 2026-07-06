@@ -1,6 +1,6 @@
 package exception;
 
-public class FilmNonDisponibileException extends RuntimeException {
+public class FilmNonDisponibileException extends Exception {
     /**
      * Crea una nuova istanza di {@link FilmNonDisponibileException} con il messaggio di errore specificato.
      *

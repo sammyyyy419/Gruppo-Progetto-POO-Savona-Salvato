@@ -1,7 +1,7 @@
 package exception;
 
 
-public class SalaPienaException extends RuntimeException {
+public class SalaPienaException extends Exception {
     /**
      * Crea una nuova istanza di {@link SalaPienaException} con il messaggio di errore specificato.
      *
