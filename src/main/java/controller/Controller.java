@@ -38,25 +38,26 @@ public class Controller {
     private ArrayList<Dipendente> listaDipendenti;
     private ArrayList<String> listaSegnalazioni;
     private ArrayList<Biglietto> listaBiglietti;
-    private ProiezioneDAO proiezioneDAO;
     private ArrayList<Film> listaFilm;
+    private ArrayList<Carrello> listaCarrello;
 
     private Cliente utenteLoggatoTemporaneo;
     private DipendenteDAO dipendenteDAO;
 
+    private ProiezioneDAO proiezioneDAO;
     private FilmDAO filmDAO;
     private ClienteDAO clienteDAO;
     private BigliettoDAO bigliettoDAO;
     private RecensioneDAO recensioneDAO;
     private SegnalazioneDAO segnalazioneDAO;
 
-    private ArrayList<Carrello> listaCarrello = new ArrayList<>();
 
     public Controller() {
         this.listaClienti = new ArrayList<>();
         this.listaDipendenti = new ArrayList<>();
         this.listaSegnalazioni = new ArrayList<>();
         this.listaBiglietti = new ArrayList<>();
+        this.listaCarrello = new ArrayList<>();
 
         this.filmDAO = new FilmImplementazionePostgresDAO();
         this.clienteDAO = new ClienteImplementazionePostgresDAO();
